@@ -1,5 +1,5 @@
-import { ExceptionModule } from './exception/exception.module';
-import { LoggingModule } from './logging/logging.module';
+import { ExceptionModule } from './common/exceptions/exception.module';
+import { LoggingModule } from './common/logging/logging.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
