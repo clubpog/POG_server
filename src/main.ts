@@ -5,9 +5,35 @@ import {
   WinstonModule,
 } from 'nest-winston';
 import { AppModule } from './app.module';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { Logger } from '@nestjs/common';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+class Application {
+  private logger = new Logger(Application.name);
+  private PORT: string;
+  private DEV_MODE: boolean;
+
+  constructor(private server: NestExpressApplication) {
+    this.server = server;
+    this.PORT = process.env.PORT;
+    this.DEV_MODE = process.env.NODE_ENV === 'production' ? false : true;
+  }
+
+  async bootstrap() {
+    await this.server.listen(this.PORT);
+  }
+
+  startLog() {
+    if (this.DEV_MODE) {
+      this.logger.log(`✅ Server on http://localhost:${this.PORT}`);
+    } else {
+      this.logger.log(`✅ Server on port ${this.PORT}...`);
+    }
+  }
+}
+
+async function bootstrap(): Promise<void> {
+  const server = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: WinstonModule.createLogger({
       transports: [
         new winston.transports.Console({
@@ -22,6 +48,12 @@ async function bootstrap() {
       ],
     }),
   });
-  await app.listen(3000);
+
+  const app = new Application(server);
+  await app.bootstrap();
+  app.startLog();
 }
-bootstrap();
+
+bootstrap().catch((error) => {
+  new Logger('init').error(error);
+});
