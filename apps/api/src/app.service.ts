@@ -11,7 +11,7 @@ export class AppService {
   ) {}
 
   getHello(): string {
-    // return this.dbConfig.dbName;
+    // return this.dbConfig.dbName
     return 'Hello World';
   }
 }
