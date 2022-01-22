@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import * as winston from 'winston';
 import {
   utilities as nestWinstonModuleUtilities,
@@ -6,7 +6,7 @@ import {
 } from 'nest-winston';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { Logger } from '@nestjs/common';
+import { ClassSerializerInterceptor, Logger } from '@nestjs/common';
 
 class Application {
   private logger = new Logger(Application.name);
@@ -19,7 +19,14 @@ class Application {
     this.DEV_MODE = process.env.NODE_ENV === 'production' ? false : true;
   }
 
+  private async setUpGlobalMiddleware() {
+    this.server.useGlobalInterceptors(
+      new ClassSerializerInterceptor(this.server.get(Reflector)),
+    );
+  }
+
   async bootstrap() {
+    await this.setUpGlobalMiddleware();
     await this.server.listen(this.PORT);
   }
 
