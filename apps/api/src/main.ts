@@ -7,6 +7,7 @@ import {
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
+import { setNestApp } from 'libs/common-config/src/setNextWebApp';
 
 class Application {
   private logger = new Logger(Application.name);
@@ -20,6 +21,7 @@ class Application {
   }
 
   async bootstrap() {
+    setNestApp(this.server);
     await this.server.listen(this.PORT);
   }
 
@@ -54,6 +56,6 @@ async function bootstrap(): Promise<void> {
   app.startLog();
 }
 
-bootstrap().catch((error) => {
+bootstrap().catch(error => {
   new Logger('init').error(error);
 });
