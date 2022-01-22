@@ -1,7 +1,6 @@
 import { Exclude, Expose } from 'class-transformer';
 
 export class UserShowDto {
-  // (1)
   @Exclude() private readonly _id: number;
   @Exclude() private readonly _firstName: string;
   @Exclude() private readonly _lastName: string;
@@ -12,7 +11,7 @@ export class UserShowDto {
     this._lastName = user.lastName;
   }
 
-  @Expose() // (3)
+  @Expose()
   get id(): number {
     return this._id;
   }
