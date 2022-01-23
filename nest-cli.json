@@ -1,14 +1,6 @@
 {
   "collection": "@nestjs/schematics",
   "sourceRoot": "apps/api/src",
-  "compilerOptions": {
-    "assets": [
-      {
-        "include": "./config/env/*.env",
-        "outDir": "./dist/apps/api/src"
-      }
-    ]
-  },
   "projects": {
     "entity": {
       "type": "library",
