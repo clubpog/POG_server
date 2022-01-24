@@ -1,19 +1,23 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+
+import { LoggingModule } from '@app/common-config/logging/logging.module';
+import { ExceptionModule } from '@app/common-config/exceptions/exception.module';
+
+import {
+  AuthConfig,
+  DatabaseConfig,
+  ValidationSchema,
+} from '@app/common-config/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { LoggingModule } from '../../../libs/common-config/src/logging/logging.module';
-import { ExceptionModule } from '../../../libs/common-config/src/exceptions/exception.module';
-import { ConfigModule } from '@nestjs/config';
-import { validationSchema } from '../../../libs/common-config/src/config/validationSchema';
-import authConfig from '../../../libs/common-config/src/config/authConfig';
-import databaseConfig from '../../../libs/common-config/src/config/databaseConfig';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [databaseConfig, authConfig],
+      load: [DatabaseConfig, AuthConfig],
       isGlobal: true,
-      validationSchema,
+      validationSchema: ValidationSchema,
     }),
     LoggingModule,
     ExceptionModule,

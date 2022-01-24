@@ -1,9 +1,9 @@
-import { CommonResponseFormInterceptor } from '../../../libs/common-config/src/interceptors/common.response.form.interceptor';
 import { Controller, Get, UseInterceptors } from '@nestjs/common';
+import { CommonResponseFormInterceptor } from '@app/common-config/interceptors';
+import { RoleEntity, UserEntity } from '@app/entity/domain/user';
+
 import { AppService } from './app.service';
 import { UserShowDto } from './dto/userShow.dto';
-import { UserEntity } from '../../../libs/entity/src/domain/user/user.entity';
-import { RoleEntity } from '../../../libs/entity/src/domain/user/role.entity';
 
 @UseInterceptors(CommonResponseFormInterceptor)
 @Controller()

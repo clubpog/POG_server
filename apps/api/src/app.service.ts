@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
-import DatabaseConfig from '../../../libs/common-config/src/config/databaseConfig';
-import AuthConfig from '../../../libs/common-config/src/config/authConfig';
+import { DatabaseConfig, AuthConfig } from '@app/common-config/config';
 
 @Injectable()
 export class AppService {

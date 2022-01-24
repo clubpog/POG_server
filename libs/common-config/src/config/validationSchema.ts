@@ -1,6 +1,6 @@
 import * as Joi from 'joi';
 
-export const validationSchema = Joi.object({
+export const ValidationSchema = Joi.object({
   PORT: Joi.string().required(),
   DB_HOST: Joi.string().required(),
   DB_PORT: Joi.string().required(),
