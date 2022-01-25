@@ -13,4 +13,9 @@ export class AppService {
     // return this.dbConfig.dbName
     return 'Hello World';
   }
+
+  signup(signupUser): string {
+    // console.log(signupUser);
+    return 'ok';
+  }
 }
