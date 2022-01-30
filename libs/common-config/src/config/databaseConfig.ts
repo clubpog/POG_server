@@ -1,9 +1,9 @@
 import { registerAs } from '@nestjs/config';
 
 export const DatabaseConfig = registerAs('database', () => ({
-  dbHost: process.env.DB_HOST,
-  dbPort: process.env.DB_PORT,
-  dbName: process.env.DB_NAME,
-  dbUserName: process.env.DB_USERNAME,
-  dbPassword: process.env.DB_PASSWORD,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  database: process.env.DB_NAME,
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
 }));
