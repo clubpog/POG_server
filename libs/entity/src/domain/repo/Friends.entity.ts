@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { BaseTimeEntity } from './BaseEntity';
+import { BaseTimeEntity } from './BaseTimeEntity';
 import { StringValueTransformer } from './transformer/StringValueTransformer';
 import { Users } from './Users.entity';
 
@@ -17,7 +17,7 @@ export class Friends extends BaseTimeEntity {
   //     createForeignKeyConstraints: false,
   //   })
   //   @JoinColumn({ name: 'users_id', referencedColumnName: 'id' })
-  user_id: Users[];
+  userId: Users[];
 
   @Column({
     type: 'varchar',
@@ -43,7 +43,7 @@ export class Friends extends BaseTimeEntity {
     type: 'varchar',
     transformer: new StringValueTransformer(),
   })
-  profile_icon_id: string;
+  profileIconId: string;
 
   @Column({
     type: 'varchar',
@@ -53,12 +53,12 @@ export class Friends extends BaseTimeEntity {
   @Column({
     type: 'varchar',
   })
-  lol_id: string;
+  lolId: string;
 
   @Column({
     type: 'int',
   })
-  league_point: number;
+  leaguePoint: number;
 
   @Column({
     type: 'varchar',

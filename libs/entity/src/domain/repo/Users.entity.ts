@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { BaseTimeEntity } from './BaseEntity';
+import { BaseTimeEntity } from './BaseTimeEntity';
 
 @Entity()
 export class Users extends BaseTimeEntity {
@@ -11,15 +11,15 @@ export class Users extends BaseTimeEntity {
     length: 50,
     nullable: false,
   })
-  device_id: string;
+  deviceId: string;
 
   @Column({ default: true })
-  is_push: boolean;
+  isPush: boolean;
 
   @Column({
     type: 'varchar',
     // length: 50,
     nullable: false,
   })
-  firebase_token: string;
+  firebaseToken: string;
 }
