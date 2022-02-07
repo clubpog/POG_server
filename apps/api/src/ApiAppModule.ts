@@ -1,19 +1,15 @@
+import { LoggingModule } from '@app/common-config/logging/logging.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-
-import { LoggingModule } from '@app/common-config/logging/logging.module';
-import { ExceptionModule } from '@app/common-config/exceptions/exception.module';
 
 import {
   AuthConfig,
   DatabaseConfig,
   ValidationSchema,
 } from '@app/common-config/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { getRealTypeOrmModule } from '../../../libs/entity/getTypeOrmModule';
-import { AuthModule } from './auth/AuthApiModule';
-import { UserModule } from './user/UserApiModule';
+import { AuthApiModule } from './auth/AuthApiModule';
+import { UserApiModule } from './user/UserApiModule';
 
 @Module({
   imports: [
@@ -22,13 +18,10 @@ import { UserModule } from './user/UserApiModule';
       isGlobal: true,
       validationSchema: ValidationSchema,
     }),
-    LoggingModule,
-    ExceptionModule,
     getRealTypeOrmModule(),
-    AuthModule,
-    UserModule,
+    LoggingModule,
+    AuthApiModule,
+    UserApiModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
