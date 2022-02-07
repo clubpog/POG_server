@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
 import { StringValueTransformer } from '../../transformer/StringValueTransformer';
-import { User } from '../user/User.entity';
+import { User } from '../user/user.entity';
 
 @Entity()
 // @Index('user_id', ['user_id'])
