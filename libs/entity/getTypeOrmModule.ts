@@ -4,7 +4,8 @@ import * as path from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 export const getRealTypeOrmModule = () => {
-  const entityPath = path.join(__dirname, 'entity/src/domain/repo/*.entity.js');
+  const entityPath = path.join(__dirname, 'entity/src/domain/**/*.entity.js');
+
   return TypeOrmModule.forRootAsync({
     imports: [ConfigModule],
     useFactory: (configService: ConfigService): TypeOrmModuleOptions =>
@@ -12,8 +13,9 @@ export const getRealTypeOrmModule = () => {
         type: 'postgres',
         entities: [entityPath],
         autoLoadEntities: true,
-        synchronize: true,
-        logging: true,
+        synchronize:
+          configService.get('NODE_ENV') === 'development' ? true : false,
+        logging: configService.get('NODE_ENV') === 'development' ? true : false,
         namingStrategy: new SnakeNamingStrategy(),
       }),
 
