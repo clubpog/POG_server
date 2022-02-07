@@ -1,11 +1,11 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { BaseTimeEntity } from './BaseTimeEntity';
-import { StringValueTransformer } from './transformer/StringValueTransformer';
-import { Users } from './Users.entity';
+import { BaseTimeEntity } from '../BaseTimeEntity';
+import { StringValueTransformer } from '../../transformer/StringValueTransformer';
+import { User } from '../user/User.entity';
 
 @Entity()
 // @Index('user_id', ['user_id'])
-export class Friends extends BaseTimeEntity {
+export class Friend extends BaseTimeEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -17,7 +17,7 @@ export class Friends extends BaseTimeEntity {
   //     createForeignKeyConstraints: false,
   //   })
   //   @JoinColumn({ name: 'users_id', referencedColumnName: 'id' })
-  userId: Users[];
+  userId: User[];
 
   @Column({
     type: 'varchar',

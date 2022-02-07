@@ -1,23 +1,37 @@
-import { Exclude, Expose, Transform } from 'class-transformer';
-import { RoleEntity } from './role.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseTimeEntity } from '../BaseTimeEntity';
 
-export class UserEntity {
+@Entity()
+export class User extends BaseTimeEntity {
+  @PrimaryGeneratedColumn()
   id: number;
-  firstName: string;
-  lastName: string;
 
-  @Exclude()
+  @Column({
+    unique: true,
+  })
+  userId: string;
+
+  @Column()
   password: string;
 
-  @Expose()
-  get fullName(): string {
-    return `${this.firstName} ${this.lastName}`;
-  }
+  @Column()
+  ip: string;
 
-  @Transform(({ value }) => value.name)
-  role: RoleEntity;
+  @Column({
+    type: 'varchar',
+    length: 50,
+    nullable: false,
+    unique: true,
+  })
+  deviceId: string;
 
-  constructor(partial: Partial<UserEntity>) {
-    Object.assign(this, partial);
-  }
+  @Column({ default: true })
+  isPush: boolean;
+
+  @Column({
+    type: 'varchar',
+    // length: 50,
+    nullable: false,
+  })
+  firebaseToken: string;
 }

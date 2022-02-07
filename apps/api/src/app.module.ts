@@ -11,7 +11,9 @@ import {
 } from '@app/common-config/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { getRealTypeOrmModule } from '../../../libs/getTypeOrmModule';
+import { getRealTypeOrmModule } from '../../../libs/entity/getTypeOrmModule';
+import { AuthModule } from './auth/AuthApiModule';
+import { UserModule } from './user/UserApiModule';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { getRealTypeOrmModule } from '../../../libs/getTypeOrmModule';
     LoggingModule,
     ExceptionModule,
     getRealTypeOrmModule(),
+    AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
