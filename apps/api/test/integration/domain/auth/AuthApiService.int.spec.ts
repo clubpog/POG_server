@@ -27,13 +27,14 @@ describe('AuthApiService', () => {
 
   it('signup', async () => {
     //given
-    const userId = 'test';
-    const password = 'test';
+    // const userId = 'test';
+    // const password = 'test';
     const deviceId = 'test';
     const firebaseToken = 'test';
+    const isPush = true;
 
     await authApiService.signup(
-      await User.signup(userId, password, deviceId, firebaseToken),
+      await User.signup(deviceId, firebaseToken, isPush),
     );
 
     const user = await userRepository.findOne();

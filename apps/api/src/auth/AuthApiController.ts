@@ -23,9 +23,8 @@ export class AuthApiController {
   @ApiOperation({
     summary: '회원 가입',
     description: `
-    회원 가입할 때 아이디, 비밀번호, deviceId, firebaseToken을 입력받습니다. \n
-    회원 가입할 때 입력값을 누락하거나 하나 이상의 소문자, 대문자, 숫자 및 특수 문자를 포함하는 8~20자 비밀번호를 입력하지 않은 경우 에러를 출력합니다. \n
-    회원 가입할 때 이미 가입된 아이디를 입력받으면 회원 가입이 실패했다는 응답을 출력합니다.
+    회원 가입할 때 deviceId, firebaseToken, isPush을 입력받습니다. \n
+    회원 가입할 때 입력값을 누락한 경우 에러를 출력합니다. \n
     `,
   })
   @ApiCreatedResponse({
@@ -33,8 +32,7 @@ export class AuthApiController {
     type: ResponseEntity,
   })
   @ApiBadRequestResponse({
-    description:
-      '입력값을 누락하거나 하나 이상의 소문자, 대문자, 숫자 및 특수 문자를 포함하는 8~20자 비밀번호를 입력하지 않은 경우입니다.',
+    description: '입력값을 누락한 경우 입니다.',
     type: BadRequestError,
   })
   @ApiInternalServerErrorResponse({
