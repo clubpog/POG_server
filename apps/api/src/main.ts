@@ -8,20 +8,60 @@ import { ApiAppModule } from './ApiAppModule';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
 import { SetNestApp } from '@app/common-config/setNextWebApp';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as expressBasicAuth from 'express-basic-auth';
 
 class Application {
   private logger = new Logger(Application.name);
   private PORT: string;
   private DEV_MODE: boolean;
+  private ADMIN_USER: string;
+  private ADMIN_PASSWORD: string;
 
   constructor(private server: NestExpressApplication) {
     this.server = server;
     this.PORT = process.env.PORT;
     this.DEV_MODE = process.env.NODE_ENV === 'production' ? false : true;
+    this.ADMIN_USER = process.env.ADMIN_USER;
+    this.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+  }
+
+  private async swagger() {
+    this.setUpBasicAuth();
+    this.setUpOpenAPIMiddleware();
+  }
+
+  private setUpBasicAuth() {
+    this.server.use(
+      ['/docs', '/docs-json'],
+      expressBasicAuth({
+        challenge: true,
+        users: {
+          [this.ADMIN_USER]: this.ADMIN_PASSWORD,
+        },
+      }),
+    );
+  }
+
+  private setUpOpenAPIMiddleware() {
+    this.server.enableCors();
+    SwaggerModule.setup(
+      'docs',
+      this.server,
+      SwaggerModule.createDocument(
+        this.server,
+        new DocumentBuilder()
+          .setTitle('POG - API')
+          .setDescription('POG API 목록')
+          .setVersion('0.0.1')
+          .build(),
+      ),
+    );
   }
 
   async bootstrap() {
     SetNestApp(this.server);
+    await this.swagger();
     await this.server.listen(this.PORT);
   }
 

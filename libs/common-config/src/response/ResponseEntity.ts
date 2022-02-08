@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { ResponseStatus } from '@app/common-config/response/ResponseStatus';
 import { Exclude, Expose } from 'class-transformer';
 
@@ -47,16 +48,28 @@ export class ResponseEntity<T> {
     return new ResponseEntity<T>(code, message, data);
   }
 
+  @ApiProperty({
+    title: '응답 코드',
+    example: 'OK | CREATED | SERVER_ERROR',
+  })
   @Expose()
   get statusCode(): string {
     return this._statusCode;
   }
 
+  @ApiProperty({
+    title: '응답 메시지',
+    example: `'' | 서버 에러가 발생했습니다. | 입력 값`,
+  })
   @Expose()
   get message(): string {
     return this._message;
   }
 
+  @ApiProperty({
+    title: '응답 데이터',
+    example: `'' | {}`,
+  })
   @Expose()
   get data(): T {
     return this._data;
