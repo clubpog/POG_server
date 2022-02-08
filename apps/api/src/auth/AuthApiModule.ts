@@ -1,7 +1,19 @@
+import { UserModule } from './../../../../libs/entity/src/domain/user/UserModule';
 import { Module } from '@nestjs/common';
-import { AuthService } from './AuthApiService';
+import { AuthApiService } from './AuthApiService';
+import { AuthApiController } from './AuthApiController';
+import { UserApiModule } from '../user/UserApiModule';
+import { WinstonModule } from 'nest-winston';
+import { getWinstonLogger } from '@app/common-config/getWinstonLogger';
 
 @Module({
-  providers: [AuthService],
+  imports: [
+    UserModule,
+    UserApiModule,
+    WinstonModule.forRoot(getWinstonLogger(process.env.NODE_ENV, 'api')),
+  ],
+  controllers: [AuthApiController],
+  providers: [AuthApiService],
+  exports: [AuthApiService],
 })
-export class AuthModule {}
+export class AuthApiModule {}
