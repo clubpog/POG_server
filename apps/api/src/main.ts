@@ -4,7 +4,7 @@ import {
   utilities as nestWinstonModuleUtilities,
   WinstonModule,
 } from 'nest-winston';
-import { AppModule } from './app.module';
+import { ApiAppModule } from './ApiAppModule';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
 import { SetNestApp } from '@app/common-config/setNextWebApp';
@@ -35,21 +35,24 @@ class Application {
 }
 
 async function bootstrap(): Promise<void> {
-  const server = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: WinstonModule.createLogger({
-      transports: [
-        new winston.transports.Console({
-          level: process.env.NODE_ENV === 'production' ? 'info' : 'silly',
-          format: winston.format.combine(
-            winston.format.timestamp(),
-            nestWinstonModuleUtilities.format.nestLike('MyApp', {
-              prettyPrint: true,
-            }),
-          ),
-        }),
-      ],
-    }),
-  });
+  const server = await NestFactory.create<NestExpressApplication>(
+    ApiAppModule,
+    {
+      logger: WinstonModule.createLogger({
+        transports: [
+          new winston.transports.Console({
+            level: process.env.NODE_ENV === 'production' ? 'info' : 'silly',
+            format: winston.format.combine(
+              winston.format.timestamp(),
+              nestWinstonModuleUtilities.format.nestLike('MyApp', {
+                prettyPrint: true,
+              }),
+            ),
+          }),
+        ],
+      }),
+    },
+  );
 
   const app = new Application(server);
   await app.bootstrap();

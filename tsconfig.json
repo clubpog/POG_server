@@ -24,6 +24,12 @@
       "@app/entity/*": [
         "libs/entity/src/*"
       ],
+      "@app/entity/test": [
+        "libs/entity/test"
+      ],
+      "@app/entity/test/*": [
+        "libs/entity/test/*"
+      ],
       "@app/utils": [
         "libs/utils/src"
       ],
@@ -35,7 +41,7 @@
       ],
       "@app/common-config/*": [
         "libs/common-config/src/*"
-      ]
+      ],
     }
   }
 }

@@ -1,3 +1,5 @@
+import { getRealTypeOrmModule } from '../../../libs/entity/getTypeOrmModule';
+// import { getPgTestTypeOrmModule } from '../../../libs/entity/test/getPgTestTypeOrmModule';
 import { LoggingModule } from '@app/common-config/logging/logging.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -7,7 +9,6 @@ import {
   DatabaseConfig,
   ValidationSchema,
 } from '@app/common-config/config';
-import { getRealTypeOrmModule } from '../../../libs/entity/getTypeOrmModule';
 import { AuthApiModule } from './auth/AuthApiModule';
 import { UserApiModule } from './user/UserApiModule';
 
@@ -19,9 +20,10 @@ import { UserApiModule } from './user/UserApiModule';
       validationSchema: ValidationSchema,
     }),
     getRealTypeOrmModule(),
+    // getPgTestTypeOrmModule(),
     LoggingModule,
     AuthApiModule,
     UserApiModule,
   ],
 })
-export class AppModule {}
+export class ApiAppModule {}
