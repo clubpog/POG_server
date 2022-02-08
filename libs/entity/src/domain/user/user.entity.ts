@@ -10,10 +10,13 @@ export class User extends BaseTimeEntity {
 
   @Column({
     unique: true,
+    nullable: true,
   })
   userId: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   password: string;
 
   @Column({
@@ -24,7 +27,10 @@ export class User extends BaseTimeEntity {
   })
   deviceId: string;
 
-  @Column({ default: true })
+  @Column({
+    default: true,
+    nullable: false,
+  })
   isPush: boolean;
 
   @Column({
@@ -40,19 +46,20 @@ export class User extends BaseTimeEntity {
   currentHashedRefreshToken?: string;
 
   static async signup(
-    userId: string,
-    password: string,
+    // userId: string,
+    // password: string,
     deviceId: string,
     firebaseToken: string,
+    isPush: boolean,
   ): Promise<User> {
-    const salt = await genSalt();
+    // const salt = await genSalt();
 
     const user = new User();
-    user.userId = userId;
-    user.password = await hash(password, salt);
+    // user.userId = userId;
+    // user.password = await hash(password, salt);
     user.deviceId = deviceId;
     user.firebaseToken = firebaseToken;
-    user.isPush = true;
+    user.isPush = isPush;
     return user;
   }
 }

@@ -35,73 +35,77 @@ describe('AuthApiController (e2e)', () => {
   // });
 
   it('/signup (POST)', async () => {
-    const userId = 'test';
-    const password = 'Test123!';
+    // const userId = 'test';
+    // const password = 'Test123!';
     const deviceId = 'test';
     const firebaseToken = 'test';
+    const isPush = true;
 
     const res = await request(app.getHttpServer()).post('/auth/signup').send({
-      userId,
-      password,
+      // userId,
+      // password,
       deviceId,
       firebaseToken,
+      isPush,
     });
-
     expect(res.status).toBe(HttpStatus.CREATED);
 
     const body: ResponseEntity<string> = res.body;
     expect(body.statusCode).toBe(ResponseEntity.CREATED().statusCode);
 
     const user = await userRepository.findOne();
-    expect(user.userId).toBe(userId);
-    expect(
-      password !== (await hash(user.password, await genSalt())),
-    ).toBeTruthy();
+    // expect(user.userId).toBe(userId);
+    // expect(
+    //   password !== (await hash(user.password, await genSalt())),
+    // ).toBeTruthy();
     expect(user.deviceId).toBe(deviceId);
     expect(user.firebaseToken).toBe(firebaseToken);
+    expect(user.isPush).toBe(isPush);
   });
 
-  it('/signup 시 이미 가입되어 있는 아이디를 입력하면 에러가 발생한다.', async () => {
-    const userId = 'test';
-    const password = 'Test123!';
-    const deviceId = 'test';
+  // it('/signup 시 이미 가입되어 있는 아이디를 입력하면 에러가 발생한다.', async () => {
+  //   const userId = 'test';
+  //   const password = 'Test123!';
+  //   const deviceId = 'test';
+  //   const firebaseToken = 'test';
+
+  //   const res = await request(app.getHttpServer()).post('/auth/signup').send({
+  //     userId,
+  //     password,
+  //     deviceId,
+  //     firebaseToken,
+  //   });
+
+  //   expect(res.status).toBe(HttpStatus.CREATED);
+
+  //   const body: ResponseEntity<string> = res.body;
+  //   const testBody: ResponseEntity<string> =
+  //     ResponseEntity.ERROR_WITH('회원 가입에 실패했습니다.');
+  //   expect(body.statusCode).toBe(testBody.statusCode);
+  //   expect(body.message).toBe(testBody.message);
+  //   expect(body.data).toBe(testBody.data);
+  // });
+
+  it('/signup 시 deviceId가 없으면 벨리데이션 에러가 발생한다', async () => {
+    // const password = 'test';
+    // const deviceId = 'test';
     const firebaseToken = 'test';
+    const isPush = true;
 
     const res = await request(app.getHttpServer()).post('/auth/signup').send({
-      userId,
-      password,
-      deviceId,
+      // password,
+      // deviceId,
       firebaseToken,
-    });
-
-    expect(res.status).toBe(HttpStatus.CREATED);
-
-    const body: ResponseEntity<string> = res.body;
-    const testBody: ResponseEntity<string> =
-      ResponseEntity.ERROR_WITH('회원 가입에 실패했습니다.');
-    expect(body.statusCode).toBe(testBody.statusCode);
-    expect(body.message).toBe(testBody.message);
-    expect(body.data).toBe(testBody.data);
-  });
-
-  it('/signup 시 userId가 없으면 벨리데이션 에러가 발생한다', async () => {
-    const password = 'test';
-    const deviceId = 'test';
-    const firebaseToken = 'test';
-
-    const res = await request(app.getHttpServer()).post('/auth/signup').send({
-      password,
-      deviceId,
-      firebaseToken,
+      isPush,
     });
 
     expect(res.status).toBe(HttpStatus.BAD_REQUEST);
     const body: ResponseEntity<string> = res.body;
     expect(body.data[0]['constraints'][0]['message']).toBe(
-      'userId must be a string',
+      'deviceId must be a string',
     );
     expect(body.data[0]['constraints'][1]['message']).toBe(
-      'userId should not be empty',
+      'deviceId should not be empty',
     );
   });
 });
