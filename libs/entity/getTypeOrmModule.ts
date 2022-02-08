@@ -4,7 +4,7 @@ import * as path from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 export const getRealTypeOrmModule = () => {
-  const entityPath = path.join(__dirname, 'src/domain/**/*.entity.js');
+  const entityPath = path.join(__dirname, 'src/domain/**/*.entity.{js, ts}');
   return TypeOrmModule.forRootAsync({
     imports: [ConfigModule],
     useFactory: (configService: ConfigService): TypeOrmModuleOptions =>
