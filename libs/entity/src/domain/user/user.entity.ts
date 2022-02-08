@@ -1,5 +1,7 @@
+import { Exclude } from 'class-transformer';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
+import { genSalt, hash } from 'bcrypt';
 
 @Entity()
 export class User extends BaseTimeEntity {
@@ -14,9 +16,6 @@ export class User extends BaseTimeEntity {
   @Column()
   password: string;
 
-  @Column()
-  ip: string;
-
   @Column({
     type: 'varchar',
     length: 50,
@@ -30,8 +29,30 @@ export class User extends BaseTimeEntity {
 
   @Column({
     type: 'varchar',
-    // length: 50,
     nullable: false,
   })
   firebaseToken: string;
+
+  @Column({
+    nullable: true,
+  })
+  @Exclude()
+  currentHashedRefreshToken?: string;
+
+  static async signup(
+    userId: string,
+    password: string,
+    deviceId: string,
+    firebaseToken: string,
+  ): Promise<User> {
+    const salt = await genSalt();
+
+    const user = new User();
+    user.userId = userId;
+    user.password = await hash(password, salt);
+    user.deviceId = deviceId;
+    user.firebaseToken = firebaseToken;
+    user.isPush = true;
+    return user;
+  }
 }
