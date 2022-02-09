@@ -3,13 +3,27 @@ import { User } from '@app/entity/domain/user/User.entity';
 import { getConnection, Repository } from 'typeorm';
 import { UserModule } from '@app/entity/domain/user/UserModule';
 import { getPgTestTypeOrmModule } from '../../../getPgTestTypeOrmModule';
+import { ConfigModule } from '@nestjs/config';
+import {
+  AuthConfig,
+  TestDatabaseConfig,
+  ValidationSchema,
+} from '@app/common-config/config';
 
 describe('UserRepository', () => {
   let userRepository: Repository<User>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [UserModule, getPgTestTypeOrmModule()],
+      imports: [
+        UserModule,
+        ConfigModule.forRoot({
+          load: [TestDatabaseConfig, AuthConfig],
+          isGlobal: true,
+          validationSchema: ValidationSchema,
+        }),
+        getPgTestTypeOrmModule(),
+      ],
     }).compile();
 
     userRepository = module.get('UserRepository');

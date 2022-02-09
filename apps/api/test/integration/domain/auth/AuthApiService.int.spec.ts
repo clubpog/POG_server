@@ -6,6 +6,12 @@ import { UserModule } from '@app/entity/domain/user/UserModule';
 
 import { User } from '@app/entity/domain/user/User.entity';
 import { getPgTestTypeOrmModule } from '../../../../../../libs/entity/test/getPgTestTypeOrmModule';
+import { ConfigModule } from '@nestjs/config';
+import {
+  AuthConfig,
+  TestDatabaseConfig,
+  ValidationSchema,
+} from '@app/common-config/config';
 
 describe('AuthApiService', () => {
   let userRepository: Repository<User>;
@@ -13,7 +19,15 @@ describe('AuthApiService', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [UserModule, getPgTestTypeOrmModule()],
+      imports: [
+        UserModule,
+        ConfigModule.forRoot({
+          load: [TestDatabaseConfig, AuthConfig],
+          isGlobal: true,
+          validationSchema: ValidationSchema,
+        }),
+        getPgTestTypeOrmModule(),
+      ],
       providers: [AuthApiService, UserApiService],
     }).compile();
 

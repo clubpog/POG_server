@@ -1,20 +1,25 @@
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import * as path from 'path';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 export const getPgTestTypeOrmModule = () => {
-  const logging = process.env.LOGGING;
+  const entityPath = path.join(__dirname, '../src/domain/**/*.entity.{js, ts}');
+  const logging = process.env.DEV_LOGGING;
+  const synchronize = process.env.DEV_SYNCHRONIZE;
 
-  return TypeOrmModule.forRoot({
-    type: 'postgres',
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT),
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DEV_NAME,
-    entities: [path.join(__dirname, '../src/domain/**/*.entity.{ts,js}')],
-    synchronize: true,
-    logging: logging === undefined ? true : Boolean(logging),
-    namingStrategy: new SnakeNamingStrategy(),
+  return TypeOrmModule.forRootAsync({
+    imports: [ConfigModule],
+    useFactory: (configService: ConfigService): TypeOrmModuleOptions =>
+      Object.assign(configService.get<TypeOrmModuleOptions>('testDatabase'), {
+        type: 'postgres',
+        entities: [entityPath],
+        autoLoadEntities: true,
+        synchronize: synchronize === 'false' ? false : Boolean(synchronize),
+        logging: logging === 'false' ? false : Boolean(logging),
+        namingStrategy: new SnakeNamingStrategy(),
+      }),
+
+    inject: [ConfigService],
   });
 };
