@@ -25,6 +25,10 @@ export class ResponseEntity<T> {
     return new ResponseEntity<string>(ResponseStatus.CREATED, '', '');
   }
 
+  static CREATED_WITH<T>(data: T): ResponseEntity<T> {
+    return new ResponseEntity<T>(ResponseStatus.OK, '', data);
+  }
+
   static ERROR(): ResponseEntity<string> {
     return new ResponseEntity<string>(
       ResponseStatus.SERVER_ERROR,
