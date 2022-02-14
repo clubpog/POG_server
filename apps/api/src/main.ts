@@ -7,7 +7,7 @@ import {
 import { ApiAppModule } from './ApiAppModule';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
-import { SetNestApp } from '@app/common-config/setNextWebApp';
+import { SetNestApp } from '@app/common-config/setNestApp';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as expressBasicAuth from 'express-basic-auth';
 
