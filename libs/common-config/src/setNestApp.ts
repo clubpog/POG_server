@@ -23,6 +23,7 @@ export function SetNestApp<T extends INestApplication>(app: T): void {
           validationErrors.map(e => new CustomValidationError(e)),
         );
       },
+      validateCustomDecorators: true,
     }),
   );
   app.useGlobalFilters(new BadParameterFilter(), new ForbiddenFilter());
