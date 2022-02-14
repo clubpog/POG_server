@@ -3,12 +3,12 @@ import { ResponseStatus } from '@app/common-config/response/ResponseStatus';
 import { Exclude, Expose } from 'class-transformer';
 
 export class ResponseEntity<T> {
-  @Exclude() private readonly _statusCode: string;
+  @Exclude() private readonly _statusCode: ResponseStatus;
   @Exclude() private readonly _message: string;
   @Exclude() private readonly _data: T;
 
   private constructor(status: ResponseStatus, message: string, data: T) {
-    this._statusCode = ResponseStatus[status];
+    this._statusCode = status;
     this._message = message;
     this._data = data;
   }
@@ -54,10 +54,10 @@ export class ResponseEntity<T> {
 
   @ApiProperty({
     title: '응답 코드',
-    example: 'OK | CREATED | SERVER_ERROR',
+    example: '200 | 201 | 500',
   })
   @Expose()
-  get statusCode(): string {
+  get statusCode(): ResponseStatus {
     return this._statusCode;
   }
 

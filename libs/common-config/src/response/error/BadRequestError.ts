@@ -6,7 +6,7 @@ export class BadRequestError {
   @ApiProperty({
     type: 'number',
     description: 'HTTP Error Code입니다.',
-    example: 'BAD_PARAMETER',
+    example: 400,
   })
   statusCode: number;
 
