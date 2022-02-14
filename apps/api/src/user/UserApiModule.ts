@@ -7,6 +7,5 @@ import { UserModule } from '@app/entity/domain/user/UserModule';
   imports: [UserModule],
   controllers: [UserApiController],
   providers: [UserApiService],
-  exports: [UserApiService],
 })
 export class UserApiModule {}
