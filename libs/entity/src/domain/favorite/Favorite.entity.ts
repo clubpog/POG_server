@@ -1,23 +1,19 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
 import { StringValueTransformer } from '../../transformer/StringValueTransformer';
-import { User } from '../user/user.entity';
+import { User } from '../user/User.entity';
 
 @Entity()
 // @Index('user_id', ['user_id'])
-export class Friend extends BaseTimeEntity {
+export class Favorite extends BaseTimeEntity {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({
-    type: 'int',
-    array: true,
-  })
-  //   @ManyToOne(() => Users, {
-  //     createForeignKeyConstraints: false,
-  //   })
-  //   @JoinColumn({ name: 'users_id', referencedColumnName: 'id' })
-  userId: User[];
 
   @Column({
     type: 'varchar',
@@ -64,4 +60,11 @@ export class Friend extends BaseTimeEntity {
     type: 'varchar',
   })
   rank: string;
+
+  @ManyToOne(() => User, (user: User) => user.Favorite, {
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+  User: User[];
 }
