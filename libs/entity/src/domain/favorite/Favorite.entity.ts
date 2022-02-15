@@ -65,6 +65,6 @@ export class Favorite extends BaseTimeEntity {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   User: User[];
 }
