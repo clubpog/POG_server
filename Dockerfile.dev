@@ -1,26 +1,27 @@
-FROM node:14-alpine AS development
+FROM node:14-alpine AS build
 
 # Create app directory
 WORKDIR /app/pog_server
 
-## 프로젝트의 모든 파일을 WORKDIR(/app)로 복사한다
+COPY package*.json /app/pog_server/
+RUN npm ci
 COPY . /app/pog_server/
-
-
-# Docker 추가적인 공부 필요.
+RUN npm run build
 
 # Copy important files - Add ormconfig.ts here if using Typeorm
 # COPY .eslintrc.js nest-cli.json tsconfig.json tsconfig.build.json ./
 
-# Copy env
-# COPY .env /app/pog_server/.env
+FROM node:14-alpine
 
-RUN npm ci
+ENV NODE_ENV=development
+WORKDIR /app/pog_server
 
+COPY --from=build /app/pog_server/dist /app/pog_server/dist
+COPY --from=build /app/pog_server/node_modules /app/pog_server/node_modules
+COPY --from=build /app/pog_server/package.json /app/pog_server/package.json
 # Add storage folder to the container (If you want to add other folder contents to the container)
 # ADD storage /var/www/backend/storage
 
 EXPOSE 3000
-# Entrypoint command - Replace `"yarn"` with `"npm", "run"` if you are using NPM as your package manager.
-# You can update this to run other NodeJS apps
-CMD [ "npm", "run", "start"]
+ENTRYPOINT [ "node" ]
+CMD [ "dist/apps/api/src/main.js" ]
