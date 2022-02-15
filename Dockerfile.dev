@@ -8,8 +8,7 @@ RUN npm ci
 COPY . /app/pog_server/
 RUN npm run build
 
-# Copy important files - Add ormconfig.ts here if using Typeorm
-# COPY .eslintrc.js nest-cli.json tsconfig.json tsconfig.build.json ./
+
 
 FROM node:14-alpine
 

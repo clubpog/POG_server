@@ -28,5 +28,3 @@ services:
       - pog_redis
     depends_on:
       - pog_redis
-    volumes:
-      - ./:/app/pog_server
