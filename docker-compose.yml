@@ -4,6 +4,7 @@ services:
   pog_redis:
     image: redis:latest
     restart: unless-stopped
+    user: root
     labels:
       - pog_redis
     ports:
