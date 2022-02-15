@@ -1,3 +1,5 @@
+import { Favorite } from '@app/entity/domain/favorite/Favorite.entity';
+import { FavoriteModule } from '@app/entity/domain/favorite/FavoriteModule';
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '@app/entity/domain/user/User.entity';
 import { getConnection, Repository } from 'typeorm';
@@ -12,11 +14,13 @@ import {
 
 describe('UserRepository', () => {
   let userRepository: Repository<User>;
+  let favoriteRepository: Repository<Favorite>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         UserModule,
+        FavoriteModule,
         ConfigModule.forRoot({
           load: [TestDatabaseConfig, AuthConfig],
           isGlobal: true,
@@ -27,11 +31,15 @@ describe('UserRepository', () => {
     }).compile();
 
     userRepository = module.get('UserRepository');
-    await userRepository.clear();
+    favoriteRepository = module.get('FavoriteRepository');
+
+    await userRepository.delete({});
+    await favoriteRepository.delete({});
   });
 
   afterEach(async () => {
-    await userRepository.clear();
+    await userRepository.delete({});
+    await favoriteRepository.delete({});
   });
 
   afterAll(async () => {

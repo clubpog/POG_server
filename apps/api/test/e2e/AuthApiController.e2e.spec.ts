@@ -1,3 +1,5 @@
+import { FavoriteModule } from '@app/entity/domain/favorite/FavoriteModule';
+import { Favorite } from '@app/entity/domain/favorite/Favorite.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
@@ -5,6 +7,7 @@ import { ApiAppModule } from '../../src/ApiAppModule';
 import { getConnection, Repository } from 'typeorm';
 import { SetNestApp } from '@app/common-config/setNestApp';
 import { User } from '@app/entity/domain/user/User.entity';
+
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
 import { genSalt, hash } from 'bcrypt';
@@ -12,32 +15,36 @@ import { genSalt, hash } from 'bcrypt';
 describe('AuthApiController (e2e)', () => {
   let app: INestApplication;
   let userRepository: Repository<User>;
+  let favoriteRepository: Repository<Favorite>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ApiAppModule],
+      imports: [FavoriteModule, ApiAppModule],
     }).compile();
 
     app = module.createNestApplication();
     userRepository = module.get(getRepositoryToken(User));
+    favoriteRepository = module.get(getRepositoryToken(Favorite));
 
     SetNestApp(app); // ClassSerializerInterceptor 적용
     await app.init();
+    await userRepository.delete({});
+    await favoriteRepository.delete({});
   });
 
   afterAll(async () => {
-    await userRepository.clear();
     await getConnection().close();
   });
 
-  // afterEach(async () => {
-  //   await userRepository.clear();
-  // });
+  afterEach(async () => {
+    await userRepository.delete({});
+    await favoriteRepository.delete({});
+  });
 
   it('/signup (POST)', async () => {
     // const userId = 'test';
     // const password = 'Test123!';
-    const deviceId = 'test';
+    const deviceId = 'testtest';
     const firebaseToken = 'test';
     const isPush = true;
 

@@ -1,3 +1,4 @@
+import { FavoriteModule } from '@app/entity/domain/favorite/FavoriteModule';
 import { AuthApiService } from './../../../../src/auth/AuthApiService';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ApiAppModule } from '../../../../src/ApiAppModule';
@@ -9,7 +10,7 @@ describe('AuthApiController', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ApiAppModule],
+      imports: [FavoriteModule, ApiAppModule],
     }).compile();
 
     controller = module.get<AuthApiController>(AuthApiController);

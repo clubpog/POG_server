@@ -1,3 +1,4 @@
+import { FavoriteModule } from '@app/entity/domain/favorite/FavoriteModule';
 import { UserApiService } from '../../../../src/user/UserApiService';
 import { AuthApiService } from '../../../../src/auth/AuthApiService';
 import { Repository } from 'typeorm';
@@ -12,15 +13,18 @@ import {
   TestDatabaseConfig,
   ValidationSchema,
 } from '@app/common-config/config';
+import { Favorite } from '@app/entity/domain/favorite/Favorite.entity';
 
 describe('AuthApiService', () => {
   let userRepository: Repository<User>;
+  let favoriteRepository: Repository<Favorite>;
   let authApiService: AuthApiService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         UserModule,
+        FavoriteModule,
         ConfigModule.forRoot({
           load: [TestDatabaseConfig, AuthConfig],
           isGlobal: true,
@@ -32,11 +36,13 @@ describe('AuthApiService', () => {
     }).compile();
 
     userRepository = module.get('UserRepository');
+    favoriteRepository = module.get('FavoriteRepository');
     authApiService = module.get<AuthApiService>(AuthApiService);
   });
 
   beforeEach(async () => {
-    await userRepository.clear();
+    await userRepository.delete({});
+    await favoriteRepository.delete({});
   });
 
   it('signup', async () => {
