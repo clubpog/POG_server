@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { User } from '@app/entity/domain/user/User.entity';
+import { User } from '@app/entity/domain/user/user.entity';
 import { getConnection, Repository } from 'typeorm';
 import { UserModule } from '@app/entity/domain/user/UserModule';
 import { getPgTestTypeOrmModule } from '../../../getPgTestTypeOrmModule';

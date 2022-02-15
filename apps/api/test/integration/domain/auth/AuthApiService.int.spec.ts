@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserModule } from '@app/entity/domain/user/UserModule';
 
-import { User } from '@app/entity/domain/user/User.entity';
+import { User } from '@app/entity/domain/user/user.entity';
 import { getPgTestTypeOrmModule } from '../../../../../../libs/entity/test/getPgTestTypeOrmModule';
 import { ConfigModule } from '@nestjs/config';
 import {

@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { ApiAppModule } from '../../src/ApiAppModule';
 import { getConnection, Repository } from 'typeorm';
 import { SetNestApp } from '@app/common-config/setNextWebApp';
-import { User } from '@app/entity/domain/user/User.entity';
+import { User } from '@app/entity/domain/user/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
 import { genSalt, hash } from 'bcrypt';

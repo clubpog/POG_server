@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '@app/entity/domain/user/User.entity';
+import { User } from '@app/entity/domain/user/user.entity';
 import { Expose } from 'class-transformer';
 import { IsBoolean, IsNotEmpty, IsString, Matches } from 'class-validator';
 

@@ -1,10 +1,10 @@
-FROM node:14.17.0 AS development
+FROM node:14-alpine AS development
 
 # Create app directory
 WORKDIR /app/pog_server
 
 ## 프로젝트의 모든 파일을 WORKDIR(/app)로 복사한다
-COPY . .
+COPY . /app/pog_server/
 
 
 # Docker 추가적인 공부 필요.
@@ -20,6 +20,7 @@ RUN npm ci
 # Add storage folder to the container (If you want to add other folder contents to the container)
 # ADD storage /var/www/backend/storage
 
+EXPOSE 3000
 # Entrypoint command - Replace `"yarn"` with `"npm", "run"` if you are using NPM as your package manager.
 # You can update this to run other NodeJS apps
 CMD [ "npm", "run", "start"]
