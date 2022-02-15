@@ -46,7 +46,10 @@ export class User extends BaseTimeEntity {
   @Exclude()
   currentHashedRefreshToken?: string;
 
-  @OneToMany(() => Favorite, (favorite: Favorite) => favorite.User)
+  @OneToMany(() => Favorite, (favorite: Favorite) => favorite.User, {
+    eager: false,
+    // cascade: true,
+  })
   Favorite: Favorite[];
 
   static async signup(
