@@ -1,7 +1,8 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
-import { genSalt, hash } from 'bcrypt';
+// import { genSalt, hash } from 'bcrypt';
+import { Favorite } from '../favorite/Favorite.entity';
 
 @Entity()
 export class User extends BaseTimeEntity {
@@ -44,6 +45,9 @@ export class User extends BaseTimeEntity {
   })
   @Exclude()
   currentHashedRefreshToken?: string;
+
+  @OneToMany(() => Favorite, (favorite: Favorite) => favorite.User)
+  Favorite: Favorite[];
 
   static async signup(
     // userId: string,

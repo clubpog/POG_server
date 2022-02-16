@@ -5,7 +5,6 @@ import { AuthApiService } from '../../../../src/auth/AuthApiService';
 
 describe('AuthApiService', () => {
   let authApiService: AuthApiService;
-  let userApiService: UserApiService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -13,14 +12,9 @@ describe('AuthApiService', () => {
     }).compile();
 
     authApiService = module.get<AuthApiService>(AuthApiService);
-    userApiService = module.get<UserApiService>(UserApiService);
   });
 
   it('should be defined', () => {
     expect(authApiService).toBeDefined();
-  });
-
-  it('should be defined', () => {
-    expect(userApiService).toBeDefined();
   });
 });

@@ -1,5 +1,6 @@
 import {
   CreateDateColumn,
+  DeleteDateColumn,
   Generated,
   PrimaryColumn,
   UpdateDateColumn,
@@ -15,4 +16,7 @@ export abstract class BaseTimeEntity {
 
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 }
