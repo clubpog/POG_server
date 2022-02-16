@@ -1,4 +1,3 @@
-import { BadParameterFilter } from './filter/BadParameterFilter';
 import { CustomValidationError } from '@app/common-config/filter/CustomValidationError';
 import {
   BadRequestException,
@@ -8,7 +7,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ForbiddenFilter } from './filter/ForbiddenFilter';
+import { HttpExceptionFilter } from './filter/HttpExceptionFilter';
 
 export function SetNestApp<T extends INestApplication>(app: T): void {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
@@ -26,5 +25,5 @@ export function SetNestApp<T extends INestApplication>(app: T): void {
       validateCustomDecorators: true,
     }),
   );
-  app.useGlobalFilters(new BadParameterFilter(), new ForbiddenFilter());
+  app.useGlobalFilters(new HttpExceptionFilter());
 }
