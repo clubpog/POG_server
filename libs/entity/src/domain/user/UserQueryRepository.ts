@@ -1,5 +1,5 @@
 import { createQueryBuilder, EntityRepository, Repository } from 'typeorm';
-import { User } from './user.entity';
+import { User } from './User.entity';
 import { plainToClass } from 'class-transformer';
 import { UserName } from '@app/entity/domain/user/UserName';
 

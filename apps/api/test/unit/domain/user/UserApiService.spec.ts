@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { ApiAppModule } from './../../../../src/ApiAppModule';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserApiService } from '../../../../src/user/UserApiService';
-import { User } from '@app/entity/domain/user/user.entity';
+import { User } from '@app/entity/domain/user/User.entity';
 
 describe('UserApiService', () => {
   let service: UserApiService;

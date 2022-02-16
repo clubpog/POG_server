@@ -1,6 +1,6 @@
 import { UserApiService } from './../user/UserApiService';
 import { Injectable } from '@nestjs/common';
-import { User } from '@app/entity/domain/user/user.entity';
+import { User } from '@app/entity/domain/user/User.entity';
 
 @Injectable()
 export class AuthApiService {
