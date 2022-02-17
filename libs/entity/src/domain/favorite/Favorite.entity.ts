@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -10,7 +11,7 @@ import { StringValueTransformer } from '../../transformer/StringValueTransformer
 import { User } from '../user/User.entity';
 
 @Entity()
-// @Index('user_id', ['user_id'])
+@Index('idx_favorite_1', ['User'])
 export class Favorite extends BaseTimeEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -64,6 +65,9 @@ export class Favorite extends BaseTimeEntity {
   @ManyToOne(() => User, (user: User) => user.Favorite, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
+    nullable: false,
+    eager: false,
+    // createForeignKeyConstraints: false,
   })
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   User: User[];
