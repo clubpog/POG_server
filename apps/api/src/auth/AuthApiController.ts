@@ -1,6 +1,5 @@
-import { CustomValidationError } from '@app/common-config/filter/CustomValidationError';
 import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
-import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { AuthApiService } from './AuthApiService';
@@ -11,7 +10,9 @@ import {
   ApiInternalServerErrorResponse,
   ApiCreatedResponse,
 } from '@nestjs/swagger';
-import { BadRequestError } from '@app/common-config/response/error/BadRequestError';
+import { BadRequestError } from '@app/common-config/response/swagger/common/error/BadRequestError';
+import { CreatedSuccess } from '@app/common-config/response/swagger/common/CreatedSuccess';
+import { SignupFail } from '@app/common-config/response/swagger/domain/auth/SignupFail';
 
 @Controller('auth')
 export class AuthApiController {
@@ -29,7 +30,7 @@ export class AuthApiController {
   })
   @ApiCreatedResponse({
     description: '회원 가입에 성공했습니다.',
-    type: ResponseEntity,
+    type: CreatedSuccess,
   })
   @ApiBadRequestResponse({
     description: '입력값을 누락한 경우 입니다.',
@@ -37,7 +38,7 @@ export class AuthApiController {
   })
   @ApiInternalServerErrorResponse({
     description: '회원 가입에 실패했습니다. 실제 응답 코드는 201을 받습니다.',
-    type: ResponseEntity,
+    type: SignupFail,
   })
   @Post('/signup')
   async signup(@Body() dto: AuthSignupReq): Promise<ResponseEntity<string>> {
