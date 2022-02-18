@@ -29,6 +29,10 @@ export class ResponseEntity<T> {
     return new ResponseEntity<T>(ResponseStatus.OK, '', data);
   }
 
+  static NotFound(): ResponseEntity<string> {
+    return new ResponseEntity<string>(ResponseStatus.NOT_FOUND, '', '');
+  }
+
   static ERROR(): ResponseEntity<string> {
     return new ResponseEntity<string>(
       ResponseStatus.SERVER_ERROR,
