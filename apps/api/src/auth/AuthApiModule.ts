@@ -9,6 +9,7 @@ import { getWinstonLogger } from '@app/common-config/getWinstonLogger';
 @Module({
   imports: [
     UserModule,
+    UserApiModule,
     WinstonModule.forRoot(getWinstonLogger(process.env.NODE_ENV, 'api')),
   ],
   controllers: [AuthApiController],
