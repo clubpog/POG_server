@@ -80,4 +80,14 @@ export class User extends BaseTimeEntity {
     user.loggedAt = new Date();
     return user;
   }
+
+  static async updateFcmToken(
+    deviceId: string,
+    firebaseToken: string,
+  ): Promise<User> {
+    const user = new User();
+    user.deviceId = deviceId;
+    user.firebaseToken = firebaseToken;
+    return user;
+  }
 }
