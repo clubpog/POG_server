@@ -52,16 +52,6 @@ export class AuthSignupReq {
   @IsString()
   firebaseToken: string;
 
-  @ApiProperty({
-    example: true,
-    description: '회원 가입시 입력 받는 isPush입니다.',
-    required: true,
-  })
-  @Expose()
-  @IsNotEmpty()
-  @IsBoolean()
-  isPush: boolean;
-
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor() {}
 
@@ -71,7 +61,6 @@ export class AuthSignupReq {
       // this.password,
       this.deviceId,
       this.firebaseToken,
-      this.isPush,
     );
   }
 }

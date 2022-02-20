@@ -1,3 +1,4 @@
+import { UserApiModule } from './../../../../src/user/UserApiModule';
 import { FavoriteModule } from '@app/entity/domain/favorite/FavoriteModule';
 import { UserApiService } from '../../../../src/user/UserApiService';
 import { AuthApiService } from '../../../../src/auth/AuthApiService';
@@ -24,6 +25,7 @@ describe('AuthApiService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         UserModule,
+        UserApiModule,
         FavoriteModule,
         ConfigModule.forRoot({
           load: [TestDatabaseConfig, AuthConfig],
@@ -51,11 +53,8 @@ describe('AuthApiService', () => {
     // const password = 'test';
     const deviceId = 'test';
     const firebaseToken = 'test';
-    const isPush = true;
 
-    await authApiService.signup(
-      await User.signup(deviceId, firebaseToken, isPush),
-    );
+    await authApiService.signup(await User.signup(deviceId, firebaseToken));
 
     const user = await userRepository.findOne();
 
