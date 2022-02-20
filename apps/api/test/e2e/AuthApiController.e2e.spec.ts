@@ -46,14 +46,12 @@ describe('AuthApiController (e2e)', () => {
     // const password = 'Test123!';
     const deviceId = 'testtest';
     const firebaseToken = 'test';
-    const isPush = true;
 
     const res = await request(app.getHttpServer()).post('/auth/signup').send({
       // userId,
       // password,
       deviceId,
       firebaseToken,
-      isPush,
     });
     expect(res.status).toBe(HttpStatus.CREATED);
 
@@ -67,7 +65,7 @@ describe('AuthApiController (e2e)', () => {
     // ).toBeTruthy();
     expect(user.deviceId).toBe(deviceId);
     expect(user.firebaseToken).toBe(firebaseToken);
-    expect(user.isPush).toBe(isPush);
+    expect(user.isPush).toBe(false);
   });
 
   // it('/signup 시 이미 가입되어 있는 아이디를 입력하면 에러가 발생한다.', async () => {
@@ -97,13 +95,11 @@ describe('AuthApiController (e2e)', () => {
     // const password = 'test';
     // const deviceId = 'test';
     const firebaseToken = 'test';
-    const isPush = true;
 
     const res = await request(app.getHttpServer()).post('/auth/signup').send({
       // password,
       // deviceId,
       firebaseToken,
-      isPush,
     });
 
     expect(res.status).toBe(HttpStatus.BAD_REQUEST);
