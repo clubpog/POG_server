@@ -29,7 +29,7 @@ export class User extends BaseTimeEntity {
   deviceId: string;
 
   @Column({
-    default: true,
+    default: false,
     nullable: false,
   })
   isPush: boolean;
@@ -63,7 +63,6 @@ export class User extends BaseTimeEntity {
     // password: string,
     deviceId: string,
     firebaseToken: string,
-    isPush: boolean,
   ): Promise<User> {
     // const salt = await genSalt();
 
@@ -72,7 +71,6 @@ export class User extends BaseTimeEntity {
     // user.password = await hash(password, salt);
     user.deviceId = deviceId;
     user.firebaseToken = firebaseToken;
-    user.isPush = isPush;
     return user;
   }
 

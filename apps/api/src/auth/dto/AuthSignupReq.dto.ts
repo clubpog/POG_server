@@ -71,7 +71,6 @@ export class AuthSignupReq {
       // this.password,
       this.deviceId,
       this.firebaseToken,
-      this.isPush,
     );
   }
 }
