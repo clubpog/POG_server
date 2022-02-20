@@ -46,6 +46,12 @@ export class User extends BaseTimeEntity {
   @Exclude()
   currentHashedRefreshToken?: string;
 
+  @Column({
+    nullable: true,
+    type: 'timestamptz',
+  })
+  loggedAt: Date | null;
+
   @OneToMany(() => Favorite, (favorite: Favorite) => favorite.User, {
     eager: false,
     // cascade: true,
@@ -73,6 +79,7 @@ export class User extends BaseTimeEntity {
   static async signin(deviceId: string): Promise<User> {
     const user = new User();
     user.deviceId = deviceId;
+    user.loggedAt = new Date();
     return user;
   }
 }

@@ -14,16 +14,6 @@ export class AuthSigninReq {
   @IsString()
   deviceId: string;
 
-  @ApiProperty({
-    example: 'test',
-    description: '로그인시 입력 받는 firebaseToken입니다.',
-    required: true,
-  })
-  @Expose()
-  @IsNotEmpty()
-  @IsString()
-  firebaseToken: string;
-
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor() {}
 

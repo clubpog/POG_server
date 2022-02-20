@@ -1,3 +1,4 @@
+import { UserApiRepository } from './UserApiRepository';
 import { UserApiQueryRepository } from './UserApiQueryRepository';
 import { Module } from '@nestjs/common';
 import { UserApiService } from './UserApiService';
@@ -7,7 +8,7 @@ import { UserModule } from '@app/entity/domain/user/UserModule';
 @Module({
   imports: [UserModule],
   controllers: [UserApiController],
-  providers: [UserApiService, UserApiQueryRepository],
-  exports: [UserApiQueryRepository],
+  providers: [UserApiService, UserApiQueryRepository, UserApiRepository],
+  exports: [UserApiQueryRepository, UserApiRepository],
 })
 export class UserApiModule {}
