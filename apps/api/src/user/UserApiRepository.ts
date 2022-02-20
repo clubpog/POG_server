@@ -18,4 +18,12 @@ export class UserApiRepository extends Repository<User> {
       .where(`deviceId =:deviceId`, { deviceId });
     return await queryBuilder.execute();
   }
+
+  async updatePush(deviceId: string, isPush: boolean) {
+    const queryBuilder = createQueryBuilder()
+      .update(User)
+      .set({ isPush })
+      .where(`deviceId =:deviceId`, { deviceId });
+    return await queryBuilder.execute();
+  }
 }

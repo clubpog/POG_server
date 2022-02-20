@@ -5,14 +5,23 @@ import { User } from '@app/entity/domain/user/User.entity';
 
 @Injectable()
 export class UserApiService {
-  constructor(private readonly UserApiRepository: UserApiRepository) {}
+  constructor(private readonly userApiRepository: UserApiRepository) {}
 
   async updateFcmToken(fcmTokenUser: User): Promise<UpdateResult> {
-    const isUpdateFcmToken = await this.UserApiRepository.updateFirebaseToken(
+    const isUpdateFcmToken = await this.userApiRepository.updateFirebaseToken(
       fcmTokenUser.firebaseToken,
       fcmTokenUser.deviceId,
     );
     if (isUpdateFcmToken.affected === 0) throw new NotFoundException();
     return isUpdateFcmToken;
+  }
+
+  async updatePush(pushUser: User): Promise<UpdateResult> {
+    const isUpdatePush = await this.userApiRepository.updatePush(
+      pushUser.deviceId,
+      pushUser.isPush,
+    );
+    if (isUpdatePush.affected === 0) throw new NotFoundException();
+    return isUpdatePush;
   }
 }
