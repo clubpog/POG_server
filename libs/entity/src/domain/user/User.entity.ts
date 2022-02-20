@@ -90,4 +90,11 @@ export class User extends BaseTimeEntity {
     user.firebaseToken = firebaseToken;
     return user;
   }
+
+  static async updatePush(deviceId: string, isPush: boolean): Promise<User> {
+    const user = new User();
+    user.deviceId = deviceId;
+    user.isPush = isPush;
+    return user;
+  }
 }
