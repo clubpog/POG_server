@@ -10,4 +10,12 @@ export class UserApiRepository extends Repository<User> {
       .where(`deviceId =:deviceId`, { deviceId });
     return await queryBuilder.execute();
   }
+
+  async updateFirebaseToken(firebaseToken: string, deviceId: string) {
+    const queryBuilder = createQueryBuilder()
+      .update(User)
+      .set({ firebaseToken })
+      .where(`deviceId =:deviceId`, { deviceId });
+    return await queryBuilder.execute();
+  }
 }
