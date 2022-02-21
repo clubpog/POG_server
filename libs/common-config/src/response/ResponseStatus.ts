@@ -5,6 +5,7 @@ export const ResponseStatus = {
   BAD_PARAMETER: 400,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
+  UN_AUTHORIZED: 401,
 } as const;
 
 export type ResponseStatus = typeof ResponseStatus[keyof typeof ResponseStatus];

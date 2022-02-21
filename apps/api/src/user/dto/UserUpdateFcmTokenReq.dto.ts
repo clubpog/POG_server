@@ -6,16 +6,6 @@ import { IsNotEmpty, IsString } from 'class-validator';
 export class UserUpdateFcmTokenReq {
   @ApiProperty({
     example: 'test',
-    description: 'FCM 토큰 수정시 입력 받는 deviceId입니다.',
-    required: true,
-  })
-  @Expose()
-  @IsNotEmpty()
-  @IsString()
-  deviceId: string;
-
-  @ApiProperty({
-    example: 'test',
     description: 'FCM 토큰 수정시 입력 받는 firebaseToken입니다.',
     required: true,
   })
@@ -23,8 +13,4 @@ export class UserUpdateFcmTokenReq {
   @IsNotEmpty()
   @IsString()
   firebaseToken: string;
-
-  toEntity(): Promise<User> {
-    return User.updateFcmToken(this.deviceId, this.firebaseToken);
-  }
 }
