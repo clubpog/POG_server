@@ -81,9 +81,16 @@ export class User extends BaseTimeEntity {
     return user;
   }
 
+  static async jwtUserReq(deviceId: string, userId: number): Promise<User> {
+    const user = new User();
+    user.deviceId = deviceId;
+    user.id = userId;
+    return user;
+  }
+
   static async updateFcmToken(
-    deviceId: string,
     firebaseToken: string,
+    deviceId: string,
   ): Promise<User> {
     const user = new User();
     user.deviceId = deviceId;

@@ -1,9 +1,12 @@
-import { fcmTokenUpdateFail } from './../../../../libs/common-config/src/response/swagger/domain/user/fcmTokenUpdateFail';
-import { OkSuccess } from './../../../../libs/common-config/src/response/swagger/common/OkSuccess';
+import { JwtPayload } from '@app/common-config/jwt/JwtPayload';
+import { CurrentUser } from '@app/common-config/decorator/UserDecorator';
+import { JwtAuthGuard } from '@app/common-config/jwt/JwtGuard';
+import { fcmTokenUpdateFail } from '@app/common-config/response/swagger/domain/user/fcmTokenUpdateFail';
+import { OkSuccess } from '@app/common-config/response/swagger/common/OkSuccess';
 import { UserUpdateFcmTokenReq } from './dto/UserUpdateFcmTokenReq.dto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { UserApiService } from './UserApiService';
-import { Body, Controller, Inject, Put } from '@nestjs/common';
+import { Body, Controller, Inject, Put, UseGuards } from '@nestjs/common';
 import { Logger } from 'winston';
 import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
 import { ResponseStatus } from '@app/common-config/response/ResponseStatus';
@@ -46,15 +49,20 @@ export class UserApiController {
     description: 'FCM 토큰 수정에 실패했습니다.',
     type: fcmTokenUpdateFail,
   })
+  @UseGuards(JwtAuthGuard)
   @Put('/fcmToken')
   async updateFcmToken(
-    @Body() dto: UserUpdateFcmTokenReq,
+    @CurrentUser() userDto: JwtPayload,
+    @Body() userUpdateFcmTokenDto: UserUpdateFcmTokenReq,
   ): Promise<ResponseEntity<string>> {
     try {
-      await this.userApiService.updateFcmToken(await dto.toEntity());
+      await this.userApiService.updateFcmToken(userUpdateFcmTokenDto, userDto);
       return ResponseEntity.OK();
     } catch (error) {
-      this.logger.error(`dto = ${JSON.stringify(dto)}`, error);
+      this.logger.error(
+        `dto = ${JSON.stringify(userUpdateFcmTokenDto)}`,
+        error,
+      );
       if (error.status === ResponseStatus.NOT_FOUND)
         return ResponseEntity.NOT_FOUND_WITH(
           '입력된 deviceId가 존재하지 않습니다.',
