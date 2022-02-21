@@ -4,6 +4,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateResult } from 'typeorm';
 import { User } from '@app/entity/domain/user/User.entity';
 import { JwtPayload } from '@app/common-config/jwt/JwtPayload';
+import { UserUpdatePushReq } from './dto/UserUpdatePushReq.dto';
 
 @Injectable()
 export class UserApiService {
@@ -25,12 +26,18 @@ export class UserApiService {
     return isUpdateFcmToken;
   }
 
-  async updatePush(pushUser: User): Promise<UpdateResult> {
-    const isUpdatePush = await this.userApiRepository.updatePush(
-      pushUser.deviceId,
-      pushUser.isPush,
+  async updatePush(
+    UserUpdatePushDto: UserUpdatePushReq,
+    userDto: JwtPayload,
+  ): Promise<UpdateResult> {
+    const user: User = await User.updatePush(
+      userDto.deviceId,
+      UserUpdatePushDto.isPush,
     );
-    if (isUpdatePush.affected === 0) throw new NotFoundException();
+    const isUpdatePush = await this.userApiRepository.updatePush(
+      user.deviceId,
+      user.isPush,
+    );
     return isUpdatePush;
   }
 }

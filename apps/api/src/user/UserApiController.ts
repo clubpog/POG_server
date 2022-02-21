@@ -9,17 +9,18 @@ import { UserApiService } from './UserApiService';
 import { Body, Controller, Inject, Put, UseGuards } from '@nestjs/common';
 import { Logger } from 'winston';
 import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
-import { ResponseStatus } from '@app/common-config/response/ResponseStatus';
 import {
+  ApiBadRequestResponse,
   ApiInternalServerErrorResponse,
-  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { NotFoundError } from '@app/common-config/response/swagger/common/error/NotFoundError';
 import { UserUpdatePushReq } from './dto/UserUpdatePushReq.dto';
 import { pushUpdateFail } from '@app/common-config/response/swagger/domain/user/pushUpdateFail';
+import { UnauthorizedError } from '@app/common-config/response/swagger/common/error/UnauthorizedError';
+import { BadRequestError } from '@app/common-config/response/swagger/common/error/BadRequestError';
 
 @Controller('user')
 @ApiTags('유저 API')
@@ -34,16 +35,20 @@ export class UserApiController {
     description: `
     FCM 토큰 수정 시 deviceId, firebaseToken를 입력받습니다. \n
     FCM 토큰 수정 시 입력값을 누락한 경우 400 에러를 출력합니다. \n
-    FCM 토큰 수정 시 deviceId가 DB에 저장되어 있지 않다면 404 에러를 출력합니다. \n
+    헤더에 토큰 값을 제대로 설정하지 않으면 401 에러를 출력합니다. \n
     `,
   })
   @ApiOkResponse({
     description: 'FCM 토큰 수정에 성공했습니다.',
     type: OkSuccess,
   })
-  @ApiNotFoundResponse({
-    description: '입력한 deviceId는 DB에 저장되어 있지 않습니다.',
-    type: NotFoundError,
+  @ApiUnauthorizedResponse({
+    description: '잘못된 Authorization입니다.',
+    type: UnauthorizedError,
+  })
+  @ApiBadRequestResponse({
+    description: '입력 값을 누락했습니다.',
+    type: BadRequestError,
   })
   @ApiInternalServerErrorResponse({
     description: 'FCM 토큰 수정에 실패했습니다.',
@@ -63,10 +68,6 @@ export class UserApiController {
         `dto = ${JSON.stringify(userUpdateFcmTokenDto)}`,
         error,
       );
-      if (error.status === ResponseStatus.NOT_FOUND)
-        return ResponseEntity.NOT_FOUND_WITH(
-          '입력된 deviceId가 존재하지 않습니다.',
-        );
       return ResponseEntity.ERROR_WITH('FCM 토큰 수정에 실패했습니다.');
     }
   }
@@ -76,34 +77,36 @@ export class UserApiController {
     description: `
     푸시알림 허용 여부 수정 시 deviceId, isPush를 입력받습니다. \n
     푸시알림 허용 여부 수정 시 입력값을 누락한 경우 400 에러를 출력합니다. \n
-    푸시알림 허용 여부 수정 시 deviceId가 DB에 저장되어 있지 않다면 404 에러를 출력합니다. \n
+    헤더에 토큰 값을 제대로 설정하지 않으면 401 에러를 출력합니다. \n
     `,
   })
   @ApiOkResponse({
     description: '푸시알림 허용 여부 수정에 성공했습니다.',
     type: OkSuccess,
   })
-  @ApiNotFoundResponse({
-    description: '입력한 deviceId는 DB에 저장되어 있지 않습니다.',
-    type: NotFoundError,
+  @ApiUnauthorizedResponse({
+    description: '잘못된 Authorization입니다.',
+    type: UnauthorizedError,
+  })
+  @ApiBadRequestResponse({
+    description: '입력 값을 누락했습니다.',
+    type: BadRequestError,
   })
   @ApiInternalServerErrorResponse({
     description: '푸시알림 허용 여부 수정에 실패했습니다.',
     type: pushUpdateFail,
   })
+  @UseGuards(JwtAuthGuard)
   @Put('/push')
   async updatePush(
-    @Body() dto: UserUpdatePushReq,
+    @CurrentUser() userDto: JwtPayload,
+    @Body() userUpdatePushDto: UserUpdatePushReq,
   ): Promise<ResponseEntity<string>> {
     try {
-      await this.userApiService.updatePush(await dto.toEntity());
+      await this.userApiService.updatePush(userUpdatePushDto, userDto);
       return ResponseEntity.OK();
     } catch (error) {
-      this.logger.error(`dto = ${JSON.stringify(dto)}`, error);
-      if (error.status === ResponseStatus.NOT_FOUND)
-        return ResponseEntity.NOT_FOUND_WITH(
-          '입력된 deviceId가 존재하지 않습니다.',
-        );
+      this.logger.error(`dto = ${JSON.stringify(userUpdatePushDto)}`, error);
       return ResponseEntity.ERROR_WITH(
         '푸시알림 허용 여부 수정에 실패했습니다.',
       );
