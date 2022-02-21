@@ -1,3 +1,4 @@
+import { ResponseStatus } from '@app/common-config/response/ResponseStatus';
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 
 @ApiExtraModels()
@@ -5,7 +6,7 @@ export class OkSuccess {
   @ApiProperty({
     type: 'number',
     description: 'HTTP Error Code입니다.',
-    example: 200,
+    example: ResponseStatus.OK,
   })
   statusCode: number;
 
