@@ -1,4 +1,9 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { instanceToPlain } from 'class-transformer';
 import { ValidationError } from 'class-validator';
@@ -8,13 +13,16 @@ import { ResponseStatus } from '@app/common-config/response/ResponseStatus';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  catch(exception: any, host: ArgumentsHost): any {
+  catch(exception: HttpException, host: ArgumentsHost): any {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
 
-    const responseBody = exception.response;
-
+    const responseBody = exception.getResponse();
+    const ResponseStatusValue =
+      Object.keys(ResponseStatus)[
+        Object.values(ResponseStatus).indexOf(status as ResponseStatus)
+      ];
     const isValidationError = responseBody instanceof ValidationError;
 
     return response
@@ -23,12 +31,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
         instanceToPlain(
           ResponseEntity.ERROR_WITH_DATA<CustomValidationError[]>(
             responseBody['error'] === undefined
-              ? responseBody.message
+              ? responseBody['message']
               : responseBody['error'],
-            ResponseStatus.BAD_PARAMETER,
+            ResponseStatus[ResponseStatusValue],
             isValidationError
               ? [this.toCustomValidationErrorByNest(responseBody)]
-              : (responseBody.message as CustomValidationError[]),
+              : (responseBody['message'] as CustomValidationError[]),
           ),
         ),
       );
