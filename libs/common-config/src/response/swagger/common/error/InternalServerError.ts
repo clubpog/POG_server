@@ -1,3 +1,4 @@
+import { ResponseStatus } from '@app/common-config/response/ResponseStatus';
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 
 @ApiExtraModels()
@@ -5,7 +6,7 @@ export class InternalServerError {
   @ApiProperty({
     type: 'number',
     description: 'HTTP Error Code입니다.',
-    example: 500,
+    example: ResponseStatus.SERVER_ERROR,
   })
   statusCode: number;
 

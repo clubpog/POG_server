@@ -1,3 +1,4 @@
+import { ResponseStatus } from '@app/common-config/response/ResponseStatus';
 import { CustomValidationError } from '@app/common-config/filter/CustomValidationError';
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 
@@ -6,7 +7,7 @@ export class BadRequestError {
   @ApiProperty({
     type: 'number',
     description: 'HTTP Error Code입니다.',
-    example: 400,
+    example: ResponseStatus.BAD_PARAMETER,
   })
   statusCode: number;
 
