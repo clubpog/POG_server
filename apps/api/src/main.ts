@@ -8,7 +8,11 @@ import { ApiAppModule } from './ApiAppModule';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
 import { SetNestApp } from '@app/common-config/setNestApp';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import {
+  SwaggerModule,
+  DocumentBuilder,
+  SwaggerCustomOptions,
+} from '@nestjs/swagger';
 import * as expressBasicAuth from 'express-basic-auth';
 
 class Application {
@@ -44,19 +48,35 @@ class Application {
   }
 
   private setUpOpenAPIMiddleware() {
-    this.server.enableCors();
-    SwaggerModule.setup(
-      'docs',
-      this.server,
-      SwaggerModule.createDocument(
-        this.server,
-        new DocumentBuilder()
-          .setTitle('POG - API')
-          .setDescription('POG API 목록')
-          .setVersion('0.0.1')
-          .build(),
-      ),
-    );
+    this.server.enableCors({
+      origin: '*',
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+      optionsSuccessStatus: 200,
+    });
+    const swaggerCustomOptions: SwaggerCustomOptions = {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    };
+    const options = new DocumentBuilder()
+      .setTitle('POG - API')
+      .setDescription('POG API 목록')
+      .setVersion('0.0.1')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          name: 'JWT',
+          description: 'Enter JWT tokwn',
+          in: 'header',
+        },
+        'Authorization',
+      )
+      .build();
+
+    const document = SwaggerModule.createDocument(this.server, options);
+    SwaggerModule.setup('docs', this.server, document, swaggerCustomOptions);
   }
 
   async bootstrap() {
