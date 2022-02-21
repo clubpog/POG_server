@@ -11,6 +11,7 @@ import { Logger } from 'winston';
 import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
@@ -54,6 +55,7 @@ export class UserApiController {
     description: 'FCM 토큰 수정에 실패했습니다.',
     type: fcmTokenUpdateFail,
   })
+  @ApiBearerAuth('Authorization')
   @UseGuards(JwtAuthGuard)
   @Put('/fcmToken')
   async updateFcmToken(
@@ -96,6 +98,7 @@ export class UserApiController {
     description: '푸시알림 허용 여부 수정에 실패했습니다.',
     type: pushUpdateFail,
   })
+  @ApiBearerAuth('Authorization')
   @UseGuards(JwtAuthGuard)
   @Put('/push')
   async updatePush(
