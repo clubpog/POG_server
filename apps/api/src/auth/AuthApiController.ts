@@ -1,3 +1,4 @@
+import { UserAccessToken } from '../../../../libs/entity/src/domain/user/UserAccessToken';
 import { NotFoundError } from '@app/common-config/response/swagger/common/error/NotFoundError';
 import { SigninFail } from '@app/common-config/response/swagger/domain/auth/SigninFail';
 import { SigninSuccess } from '@app/common-config/response/swagger/domain/auth/SigninSuccess';
@@ -20,7 +21,6 @@ import { BadRequestError } from '@app/common-config/response/swagger/common/erro
 import { CreatedSuccess } from '@app/common-config/response/swagger/common/CreatedSuccess';
 import { SignupFail } from '@app/common-config/response/swagger/domain/auth/SignupFail';
 import { AuthSigninReq, AuthSignupReq } from './dto';
-import { UserId } from '@app/entity/domain/user/UserId';
 
 @Controller('auth')
 @ApiTags('회원가입, 로그인 API')
@@ -84,10 +84,10 @@ export class AuthApiController {
   @Post('/signin')
   async signin(
     @Body() dto: AuthSigninReq,
-  ): Promise<ResponseEntity<UserId | string>> {
+  ): Promise<ResponseEntity<UserAccessToken | string>> {
     try {
       const userId = await this.authApiService.signin(await dto.toEntity());
-      return ResponseEntity.OK_WITH<UserId>(userId);
+      return ResponseEntity.OK_WITH<UserAccessToken>(userId);
     } catch (error) {
       this.logger.error(`dto = ${JSON.stringify(dto)}`, error);
       if (error.status === ResponseStatus.NOT_FOUND)
