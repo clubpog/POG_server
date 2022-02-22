@@ -1,0 +1,20 @@
+name: develop work flow
+
+on:
+  push:
+    branches:
+      - feature/*
+      - develop/*
+      - hotfix/*
+      - release/*
+
+jobs:
+  deploy:
+    name: deploy development
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Latest Dev
+        uses: actions/checkout@development # 코드 가져오기
+
+
+      # 추가 작업 필요 https://www.youtube.com/watch?v=ssVQ7OKdXiM
