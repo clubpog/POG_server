@@ -1,8 +1,7 @@
 import { JwtPayload } from '@app/common-config/jwt/JwtPayload';
 import { CurrentUser } from '@app/common-config/decorator/UserDecorator';
 import { JwtAuthGuard } from '@app/common-config/jwt/JwtGuard';
-import { fcmTokenUpdateFail } from '@app/common-config/response/swagger/domain/user/fcmTokenUpdateFail';
-import { OkSuccess } from '@app/common-config/response/swagger/common/OkSuccess';
+import { FcmTokenUpdateFail } from '@app/common-config/response/swagger/domain/user/FcmTokenUpdateFail';
 import { UserUpdateFcmTokenReq } from './dto/UserUpdateFcmTokenReq.dto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { UserApiService } from './UserApiService';
@@ -19,9 +18,11 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { UserUpdatePushReq } from './dto/UserUpdatePushReq.dto';
-import { pushUpdateFail } from '@app/common-config/response/swagger/domain/user/pushUpdateFail';
+import { PushUpdateFail } from '@app/common-config/response/swagger/domain/user/PushUpdateFail';
 import { UnauthorizedError } from '@app/common-config/response/swagger/common/error/UnauthorizedError';
 import { BadRequestError } from '@app/common-config/response/swagger/common/error/BadRequestError';
+import { FcmTokenUpdateSuccess } from '@app/common-config/response/swagger/domain/user/FcmTokenUpdateSuccess';
+import { PushUpdateSuccess } from '@app/common-config/response/swagger/domain/user/pushUpdateSuccess';
 
 @Controller('user')
 @ApiTags('유저 API')
@@ -41,7 +42,7 @@ export class UserApiController {
   })
   @ApiOkResponse({
     description: 'FCM 토큰 수정에 성공했습니다.',
-    type: OkSuccess,
+    type: FcmTokenUpdateSuccess,
   })
   @ApiUnauthorizedResponse({
     description: '잘못된 Authorization입니다.',
@@ -53,7 +54,7 @@ export class UserApiController {
   })
   @ApiInternalServerErrorResponse({
     description: 'FCM 토큰 수정에 실패했습니다.',
-    type: fcmTokenUpdateFail,
+    type: FcmTokenUpdateFail,
   })
   @ApiBearerAuth('Authorization')
   @UseGuards(JwtAuthGuard)
@@ -64,7 +65,7 @@ export class UserApiController {
   ): Promise<ResponseEntity<string>> {
     try {
       await this.userApiService.updateFcmToken(userUpdateFcmTokenDto, userDto);
-      return ResponseEntity.OK();
+      return ResponseEntity.OK_WITH('FCM 토큰 수정에 성공했습니다.');
     } catch (error) {
       this.logger.error(
         `dto = ${JSON.stringify(userUpdateFcmTokenDto)}`,
@@ -84,7 +85,7 @@ export class UserApiController {
   })
   @ApiOkResponse({
     description: '푸시알림 허용 여부 수정에 성공했습니다.',
-    type: OkSuccess,
+    type: PushUpdateSuccess,
   })
   @ApiUnauthorizedResponse({
     description: '잘못된 Authorization입니다.',
@@ -96,7 +97,7 @@ export class UserApiController {
   })
   @ApiInternalServerErrorResponse({
     description: '푸시알림 허용 여부 수정에 실패했습니다.',
-    type: pushUpdateFail,
+    type: PushUpdateFail,
   })
   @ApiBearerAuth('Authorization')
   @UseGuards(JwtAuthGuard)
@@ -107,7 +108,7 @@ export class UserApiController {
   ): Promise<ResponseEntity<string>> {
     try {
       await this.userApiService.updatePush(userUpdatePushDto, userDto);
-      return ResponseEntity.OK();
+      return ResponseEntity.OK_WITH('푸시알림 허용 여부 수정에 성공했습니다.');
     } catch (error) {
       this.logger.error(`dto = ${JSON.stringify(userUpdatePushDto)}`, error);
       return ResponseEntity.ERROR_WITH(
