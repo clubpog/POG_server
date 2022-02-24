@@ -1,3 +1,4 @@
+import { JwtStrategy } from '@app/common-config/jwt/JwtStrategy';
 import { UserApiModule } from './../../../../src/user/UserApiModule';
 import { FavoriteModule } from '@app/entity/domain/favorite/FavoriteModule';
 import { UserApiService } from '../../../../src/user/UserApiService';
@@ -15,6 +16,8 @@ import {
   ValidationSchema,
 } from '@app/common-config/config';
 import { Favorite } from '@app/entity/domain/favorite/Favorite.entity';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
 
 describe('AuthApiService', () => {
   let userRepository: Repository<User>;
@@ -32,9 +35,16 @@ describe('AuthApiService', () => {
           isGlobal: true,
           validationSchema: ValidationSchema,
         }),
+        PassportModule.register({ defaultStrategy: 'jwt', session: false }),
+        JwtModule.registerAsync({
+          useFactory: async () => ({
+            secret: process.env.JWT_SECRET_KEY,
+            signOptions: { expiresIn: '1y' },
+          }),
+        }),
         getPgTestTypeOrmModule(),
       ],
-      providers: [AuthApiService, UserApiService],
+      providers: [AuthApiService, UserApiService, JwtStrategy],
     }).compile();
 
     userRepository = module.get('UserRepository');

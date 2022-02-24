@@ -1,4 +1,4 @@
-import { UserAccessToken } from '../../../../libs/entity/src/domain/user/UserAccessToken';
+import { UserAccessToken } from '@app/entity/domain/user/UserAccessToken';
 import { NotFoundError } from '@app/common-config/response/swagger/common/error/NotFoundError';
 import { SigninFail } from '@app/common-config/response/swagger/domain/auth/SigninFail';
 import { SigninSuccess } from '@app/common-config/response/swagger/domain/auth/SigninSuccess';
@@ -18,9 +18,9 @@ import {
   ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import { BadRequestError } from '@app/common-config/response/swagger/common/error/BadRequestError';
-import { CreatedSuccess } from '@app/common-config/response/swagger/common/CreatedSuccess';
 import { SignupFail } from '@app/common-config/response/swagger/domain/auth/SignupFail';
 import { AuthSigninReq, AuthSignupReq } from './dto';
+import { SignupSuccess } from '@app/common-config/response/swagger/domain/auth/SignupSuccess';
 
 @Controller('auth')
 @ApiTags('회원가입, 로그인 API')
@@ -39,7 +39,7 @@ export class AuthApiController {
   })
   @ApiCreatedResponse({
     description: '회원 가입에 성공했습니다.',
-    type: CreatedSuccess,
+    type: SignupSuccess,
   })
   @ApiBadRequestResponse({
     description: '입력값을 누락한 경우 입니다.',
@@ -53,7 +53,7 @@ export class AuthApiController {
   async signup(@Body() dto: AuthSignupReq): Promise<ResponseEntity<string>> {
     try {
       await this.authApiService.signup(await dto.toEntity());
-      return ResponseEntity.CREATED();
+      return ResponseEntity.CREATED_WITH('회원 가입에 성공했습니다.');
     } catch (error) {
       this.logger.error(`dto = ${JSON.stringify(dto)}`, error);
       return ResponseEntity.ERROR_WITH('회원 가입에 실패했습니다.');
@@ -87,7 +87,10 @@ export class AuthApiController {
   ): Promise<ResponseEntity<UserAccessToken | string>> {
     try {
       const userId = await this.authApiService.signin(await dto.toEntity());
-      return ResponseEntity.OK_WITH<UserAccessToken>(userId);
+      return ResponseEntity.OK_WITH_DATA<UserAccessToken>(
+        '로그인에 성공했습니다.',
+        userId,
+      );
     } catch (error) {
       this.logger.error(`dto = ${JSON.stringify(dto)}`, error);
       if (error.status === ResponseStatus.NOT_FOUND)
