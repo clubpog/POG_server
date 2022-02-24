@@ -24,11 +24,7 @@ export class AuthApiService {
   ) {}
 
   async signup(signupUser: User): Promise<void> {
-    await this.create(signupUser);
-  }
-
-  async create(user: User): Promise<void> {
-    await this.userRepository.save(user);
+    await this.userRepository.save(signupUser);
   }
 
   async signin(signinUser: User): Promise<UserAccessToken> {

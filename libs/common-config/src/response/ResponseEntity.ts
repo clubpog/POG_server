@@ -30,11 +30,11 @@ export class ResponseEntity<T> {
   }
 
   static CREATED_WITH(message: string): ResponseEntity<string> {
-    return new ResponseEntity<string>(ResponseStatus.OK, message, '');
+    return new ResponseEntity<string>(ResponseStatus.CREATED, message, '');
   }
 
   static CREATED_WITH_DATA<T>(message: string, data: T): ResponseEntity<T> {
-    return new ResponseEntity<T>(ResponseStatus.OK, message, data);
+    return new ResponseEntity<T>(ResponseStatus.CREATED, message, data);
   }
 
   static NOT_FOUND(): ResponseEntity<string> {
