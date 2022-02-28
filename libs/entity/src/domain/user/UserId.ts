@@ -1,6 +1,10 @@
 import { Expose } from 'class-transformer';
 
 export class UserId {
-  @Expose({ name: 'user_id' })
-  userId: number;
+  @Expose({ name: 'id' })
+  id: number;
+
+  constructor(id: number) {
+    this.id = id;
+  }
 }
