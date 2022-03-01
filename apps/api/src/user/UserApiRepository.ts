@@ -8,7 +8,7 @@ export class UserApiRepository extends Repository<User> {
       .update(User)
       .set({ loggedAt })
       .where(`deviceId =:deviceId`, { deviceId });
-    return await queryBuilder.execute();
+    await queryBuilder.execute();
   }
 
   async updateFirebaseToken(firebaseToken: string, deviceId: string) {

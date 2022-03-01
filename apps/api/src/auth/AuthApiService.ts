@@ -17,14 +17,14 @@ import { UserId } from '@app/entity/domain/user/UserId';
 export class AuthApiService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>,
-    private readonly userApiRepository: UserApiRepository,
-    private readonly userApiQueryRepository: UserApiQueryRepository,
-    private readonly jwtService: JwtService,
+    private userRepository?: Repository<User>,
+    private readonly userApiRepository?: UserApiRepository,
+    private readonly userApiQueryRepository?: UserApiQueryRepository,
+    private readonly jwtService?: JwtService,
   ) {}
 
-  async signup(signupUser: User): Promise<void> {
-    await this.userRepository.save(signupUser);
+  async signup(signupUser: User): Promise<User> {
+    return await this.userRepository.save(signupUser);
   }
 
   async signin(signinUser: User): Promise<UserAccessToken> {
@@ -32,7 +32,7 @@ export class AuthApiService {
     if (foundUserId === undefined) throw new NotFoundException();
     await this.updateLoggedAt(signinUser.loggedAt, signinUser.deviceId);
     const payload: JwtPayload = {
-      userId: foundUserId.userId,
+      userId: foundUserId.id,
       deviceId: signinUser.deviceId,
     };
     return { accessToken: this.jwtService.sign(payload) };
@@ -47,10 +47,7 @@ export class AuthApiService {
     return payload;
   }
 
-  async updateLoggedAt(
-    loggedAt: Date,
-    deviceId: string,
-  ): Promise<UpdateResult> {
+  async updateLoggedAt(loggedAt: Date, deviceId: string): Promise<void> {
     return await this.userApiRepository.updateLoggedAtByDeviceId(
       loggedAt,
       deviceId,

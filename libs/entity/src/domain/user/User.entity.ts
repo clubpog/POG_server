@@ -104,4 +104,15 @@ export class User extends BaseTimeEntity {
     user.isPush = isPush;
     return user;
   }
+
+  static async createId(id: number): Promise<User> {
+    const user = new User();
+    user.id = id;
+    return user;
+  }
+
+  static async signinTest(): Promise<User> {
+    const user = new User();
+    return user;
+  }
 }

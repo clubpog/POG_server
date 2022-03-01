@@ -1,21 +1,87 @@
-import { FavoriteModule } from '@app/entity/domain/favorite/FavoriteModule';
-import { UserApiService } from './../../../../src/user/UserApiService';
-import { Test, TestingModule } from '@nestjs/testing';
-import { ApiAppModule } from '../../../../src/ApiAppModule';
-import { AuthApiService } from '../../../../src/auth/AuthApiService';
+import { Logger } from '../../../../../../libs/common-config/test/stub/LoggerStub';
+import { JwtServiceStub } from './../../stub/JwtServiceStub';
+import { AuthApiService } from './../../../../src/auth/AuthApiService';
+import { UserRepositoryStub } from '../../stub/user/UserRepositoryStub';
+import { UserApiRepositoryStub } from '../../stub/user/UserApiRepositoryStub';
+import { UserApiQueryRepositoryStub } from '../../stub/user/UserApiQueryRepositoryStub';
+import { User } from '@app/entity/domain/user/User.entity';
 
 describe('AuthApiService', () => {
-  let authApiService: AuthApiService;
+  let userRepository;
+  let userApiRepository: UserApiRepositoryStub;
+  let userApiQueryRepository: UserApiQueryRepositoryStub;
+  let jwtService;
 
-  beforeAll(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [FavoriteModule, ApiAppModule],
-    }).compile();
+  it('회원가입에 성공했습니다.', async () => {
+    // given
+    userRepository = new UserRepositoryStub();
+    const sut = new AuthApiService(userRepository);
 
-    authApiService = module.get<AuthApiService>(AuthApiService);
+    // when
+    const actual = await sut.signup(await User.signup('test213', 'test'));
+
+    // then
+    expect(actual.deviceId).toBe('test213');
+    expect(actual.firebaseToken).toBe('test');
   });
 
-  it('should be defined', () => {
-    expect(authApiService).toBeDefined();
+  it('동일한 아이디로 회원가입을 했을 때 회원가입에 실패합니다.', async () => {
+    // given
+    userRepository = new UserRepositoryStub();
+    const sut = new AuthApiService(userRepository);
+
+    // when
+    await sut.signup(await User.signup('test213', 'test'));
+    const actual = await sut.signup(await User.signup('test213', 'test'));
+
+    // then
+    expect(actual['severity']).toBe('ERROR');
+    expect(actual['code']).toBe('23505');
+  });
+
+  it('로그인에 성공했습니다.', async () => {
+    // given
+    userRepository = new UserRepositoryStub();
+    userApiRepository = new UserApiRepositoryStub();
+    userApiQueryRepository = new UserApiQueryRepositoryStub();
+    jwtService = new JwtServiceStub(
+      { secret: 'test', signOptions: { expiresIn: '1y' } },
+      new Logger('JwtService', {}),
+    );
+    const sut = new AuthApiService(
+      userRepository,
+      userApiRepository,
+      userApiQueryRepository,
+      jwtService,
+    );
+    // when
+    const actual = await sut.signin(await User.signin('test'));
+    // then
+    expect(Object.keys(actual)).toContain('accessToken');
+  });
+
+  it('DB에 없는 deviceId를 입력하여 로그인에 실패했습니다.', async () => {
+    // given
+    userRepository = new UserRepositoryStub();
+    userApiRepository = new UserApiRepositoryStub();
+    userApiQueryRepository = new UserApiQueryRepositoryStub();
+    jwtService = new JwtServiceStub(
+      { secret: 'test', signOptions: { expiresIn: '1y' } },
+      new Logger('JwtService', {}),
+    );
+    const sut = new AuthApiService(
+      userRepository,
+      userApiRepository,
+      userApiQueryRepository,
+      jwtService,
+    );
+    // when
+    try {
+      await sut.signin(await User.signinTest());
+    } catch (error) {
+      // then
+      expect(error.response.message).toBe('Not Found');
+      expect(error.response.statusCode).toBe(404);
+    }
   });
 });
