@@ -1,20 +1,36 @@
-# name: develop work flow
+name: Deploy dev
+on:
+  push:
+    branches:
+      # - develop
+      - feature/beanstalk-deployment
 
-# on:
-#   push:
-#     branches:
-#       - feature/*
-#       - develop/*
-#       - hotfix/*
-#       - release/*
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@develop
 
-# jobs:
-#   deploy:
-#     name: deploy development
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout Latest Dev
-#         uses: actions/checkout@development # 코드 가져오기
+      - name: Install npm
+        run: npm ci
 
+      - name: Build
+        run: npm run build
 
-      # 추가 작업 필요 https://www.youtube.com/watch?v=ssVQ7OKdXiM
+      - name: Generate deployment package
+        run: zip -r deploy.zip . -x '*.git*' -x node_modules/\*
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v14
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: pog-server
+          environment_name: Pogserver-env
+          region: ap-northeast-2
+          version_label: ${{ github.sha }}
+          deployment_package: deploy.zip
+
+      - name: Success
+        run: echo deployed successfully.
