@@ -115,7 +115,9 @@ export class UserApiController {
     @Body() userUpdatePushDto: UserUpdatePushReq,
   ): Promise<ResponseEntity<string>> {
     try {
-      await this.userApiService.updatePush(userUpdatePushDto, userDto);
+      await this.userApiService.updatePush(
+        await User.updatePush(userDto.deviceId, userUpdatePushDto.isPush),
+      );
       return ResponseEntity.OK_WITH('푸시알림 허용 여부 수정에 성공했습니다.');
     } catch (error) {
       this.logger.error(`dto = ${JSON.stringify(userUpdatePushDto)}`, error);

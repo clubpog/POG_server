@@ -25,11 +25,11 @@ export class UserApiRepository extends Repository<User> {
     await queryBuilder.execute();
   }
 
-  async updatePush(deviceId: string, isPush: boolean) {
+  async updatePush(deviceId: string, isPush: boolean): Promise<void> {
     const queryBuilder = createQueryBuilder()
       .update(User)
       .set({ isPush })
       .where(`deviceId =:deviceId`, { deviceId });
-    return await queryBuilder.execute();
+    await queryBuilder.execute();
   }
 }
