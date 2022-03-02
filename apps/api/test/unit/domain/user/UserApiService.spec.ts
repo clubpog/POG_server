@@ -1,20 +1,20 @@
-import { FavoriteModule } from '@app/entity/domain/favorite/FavoriteModule';
-import { ApiAppModule } from './../../../../src/ApiAppModule';
-import { Test, TestingModule } from '@nestjs/testing';
 import { UserApiService } from '../../../../src/user/UserApiService';
+import { UserApiRepositoryStub } from '../../stub/user/UserApiRepositoryStub';
+import { User } from '@app/entity/domain/user/User.entity';
 
 describe('UserApiService', () => {
-  let service: UserApiService;
+  let userApiRepository: UserApiRepositoryStub;
 
-  beforeAll(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [FavoriteModule, ApiAppModule],
-    }).compile();
+  it('FCM 토큰 업데이트에 성공했습니다.', async () => {
+    // given
+    userApiRepository = new UserApiRepositoryStub();
 
-    service = module.get<UserApiService>(UserApiService);
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+    const sut = new UserApiService(userApiRepository);
+    // when
+    const actual = await sut.updateFcmToken(
+      await User.updateFcmToken('test', 'test213'),
+    );
+    // then
+    expect(actual).toBeUndefined();
   });
 });

@@ -10,4 +10,12 @@ export class UpdateResult {
     updateResult.affected = 1;
     return updateResult;
   }
+
+  static async updateFirebaseToken() {
+    const updateResult = new UpdateResult();
+    updateResult.generatedMaps = [];
+    updateResult.raw = [];
+    updateResult.affected = 1;
+    return updateResult;
+  }
 }

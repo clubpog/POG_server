@@ -23,6 +23,7 @@ import { UnauthorizedError } from '@app/common-config/response/swagger/common/er
 import { BadRequestError } from '@app/common-config/response/swagger/common/error/BadRequestError';
 import { FcmTokenUpdateSuccess } from '@app/common-config/response/swagger/domain/user/FcmTokenUpdateSuccess';
 import { PushUpdateSuccess } from '@app/common-config/response/swagger/domain/user/pushUpdateSuccess';
+import { User } from '@app/entity/domain/user/User.entity';
 
 @Controller('user')
 @ApiTags('유저 API')
@@ -64,11 +65,18 @@ export class UserApiController {
     @Body() userUpdateFcmTokenDto: UserUpdateFcmTokenReq,
   ): Promise<ResponseEntity<string>> {
     try {
-      await this.userApiService.updateFcmToken(userUpdateFcmTokenDto, userDto);
+      await this.userApiService.updateFcmToken(
+        await User.updateFcmToken(
+          userUpdateFcmTokenDto.firebaseToken,
+          userDto.deviceId,
+        ),
+      );
       return ResponseEntity.OK_WITH('FCM 토큰 수정에 성공했습니다.');
     } catch (error) {
       this.logger.error(
-        `dto = ${JSON.stringify(userUpdateFcmTokenDto)}`,
+        `dto = ${JSON.stringify(userUpdateFcmTokenDto)}, ${JSON.stringify(
+          userDto,
+        )} `,
         error,
       );
       return ResponseEntity.ERROR_WITH('FCM 토큰 수정에 실패했습니다.');
