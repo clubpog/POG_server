@@ -6,12 +6,17 @@ export class UserApiRepositoryStub extends UserApiRepository {
     super();
   }
   override async updateLoggedAtByDeviceId(loggedAt: Date, deviceId: string) {
-    await UpdateResult.updateLoggedAtByDeviceId();
+    await UpdateResult.Result();
     return;
   }
 
   override async updateFirebaseToken(firebaseToken: string, deviceId: string) {
-    await UpdateResult.updateFirebaseToken();
+    await UpdateResult.Result();
+    return;
+  }
+
+  override async updatePush(deviceId: string, isPush: boolean) {
+    await UpdateResult.Result();
     return;
   }
 }

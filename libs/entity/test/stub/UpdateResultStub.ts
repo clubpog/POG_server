@@ -1,21 +1,31 @@
 export class UpdateResult {
-  private generatedMaps: string[];
-  private raw: string[];
-  private affected: number;
+  private readonly _generatedMaps: string[];
+  private readonly _raw: string[];
+  private readonly _affected: number;
 
-  static async updateLoggedAtByDeviceId() {
-    const updateResult = new UpdateResult();
-    updateResult.generatedMaps = [];
-    updateResult.raw = [];
-    updateResult.affected = 1;
-    return updateResult;
+  private constructor(
+    generatedMaps: string[],
+    raw: string[],
+    affected: number,
+  ) {
+    this._generatedMaps = generatedMaps;
+    this._raw = raw;
+    this._affected = affected;
   }
 
-  static async updateFirebaseToken() {
-    const updateResult = new UpdateResult();
-    updateResult.generatedMaps = [];
-    updateResult.raw = [];
-    updateResult.affected = 1;
-    return updateResult;
+  get generatedMaps() {
+    return this._generatedMaps;
+  }
+
+  get raw() {
+    return this._raw;
+  }
+
+  get affected() {
+    return this._affected;
+  }
+
+  static async Result(): Promise<UpdateResult> {
+    return new UpdateResult([], [], 1);
   }
 }

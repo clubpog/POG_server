@@ -10,10 +10,23 @@ describe('UserApiService', () => {
     userApiRepository = new UserApiRepositoryStub();
 
     const sut = new UserApiService(userApiRepository);
+
     // when
     const actual = await sut.updateFcmToken(
       await User.updateFcmToken('test', 'test213'),
     );
+    // then
+    expect(actual).toBeUndefined();
+  });
+
+  it('푸시알림 허용 여부 수정에 성공했습니다.', async () => {
+    // given
+    userApiRepository = new UserApiRepositoryStub();
+
+    const sut = new UserApiService(userApiRepository);
+
+    // when
+    const actual = await sut.updatePush(await User.updatePush('test', true));
     // then
     expect(actual).toBeUndefined();
   });
