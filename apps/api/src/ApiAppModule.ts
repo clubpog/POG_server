@@ -1,4 +1,3 @@
-import { TestDatabaseConfig } from './../../../libs/common-config/src/config/testDatabaseConfig';
 import { HealthCheckController } from './health-check/HealthCheckController';
 import { getTypeOrmModule } from '../../../libs/entity/getTypeOrmModule';
 import { LoggingModule } from '@app/common-config/logging/logging.module';
@@ -7,18 +6,14 @@ import { ConfigModule } from '@nestjs/config';
 import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
 
-import {
-  AuthConfig,
-  DatabaseConfig,
-  ValidationSchema,
-} from '@app/common-config/config';
+import { AuthConfig, ValidationSchema } from '@app/common-config/config';
 import { AuthApiModule } from './auth/AuthApiModule';
 import { UserApiModule } from './user/UserApiModule';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [DatabaseConfig, AuthConfig, TestDatabaseConfig],
+      load: [AuthConfig],
       isGlobal: true,
       validationSchema: ValidationSchema,
     }),

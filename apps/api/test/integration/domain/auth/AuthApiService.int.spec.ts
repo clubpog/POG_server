@@ -9,11 +9,7 @@ import { UserModule } from '@app/entity/domain/user/UserModule';
 
 import { User } from '@app/entity/domain/user/User.entity';
 import { ConfigModule } from '@nestjs/config';
-import {
-  AuthConfig,
-  TestDatabaseConfig,
-  ValidationSchema,
-} from '@app/common-config/config';
+import { AuthConfig, ValidationSchema } from '@app/common-config/config';
 import { Favorite } from '@app/entity/domain/favorite/Favorite.entity';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
@@ -31,7 +27,7 @@ describe('AuthApiService', () => {
         UserApiModule,
         FavoriteModule,
         ConfigModule.forRoot({
-          load: [TestDatabaseConfig, AuthConfig],
+          load: [AuthConfig],
           isGlobal: true,
           validationSchema: ValidationSchema,
         }),
