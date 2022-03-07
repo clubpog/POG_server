@@ -1,7 +1,6 @@
 import { TestDatabaseConfig } from './../../../libs/common-config/src/config/testDatabaseConfig';
 import { HealthCheckController } from './health-check/HealthCheckController';
-import { getRealTypeOrmModule } from '../../../libs/entity/getTypeOrmModule';
-import { getPgTestTypeOrmModule } from '../../../libs/entity/test/getPgTestTypeOrmModule';
+import { getTypeOrmModule } from '../../../libs/entity/getTypeOrmModule';
 import { LoggingModule } from '@app/common-config/logging/logging.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -23,8 +22,7 @@ import { UserApiModule } from './user/UserApiModule';
       isGlobal: true,
       validationSchema: ValidationSchema,
     }),
-    getRealTypeOrmModule(),
-    // getPgTestTypeOrmModule(),
+    getTypeOrmModule(),
     LoggingModule,
     AuthApiModule,
     UserApiModule,

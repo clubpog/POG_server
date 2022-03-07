@@ -4,13 +4,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '@app/entity/domain/user/User.entity';
 import { getConnection, Repository } from 'typeorm';
 import { UserModule } from '@app/entity/domain/user/UserModule';
-import { getPgTestTypeOrmModule } from '../../../getPgTestTypeOrmModule';
 import { ConfigModule } from '@nestjs/config';
 import {
   AuthConfig,
   TestDatabaseConfig,
   ValidationSchema,
 } from '@app/common-config/config';
+import { getTypeOrmModule } from '../../../../getTypeOrmModule';
 
 describe('UserRepository', () => {
   let userRepository: Repository<User>;
@@ -26,7 +26,7 @@ describe('UserRepository', () => {
           isGlobal: true,
           validationSchema: ValidationSchema,
         }),
-        getPgTestTypeOrmModule(),
+        getTypeOrmModule(),
       ],
     }).compile();
 

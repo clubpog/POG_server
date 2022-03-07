@@ -8,7 +8,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserModule } from '@app/entity/domain/user/UserModule';
 
 import { User } from '@app/entity/domain/user/User.entity';
-import { getPgTestTypeOrmModule } from '../../../../../../libs/entity/test/getPgTestTypeOrmModule';
 import { ConfigModule } from '@nestjs/config';
 import {
   AuthConfig,
@@ -18,6 +17,7 @@ import {
 import { Favorite } from '@app/entity/domain/favorite/Favorite.entity';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import { getTypeOrmModule } from '../../../../../../libs/entity/getTypeOrmModule';
 
 describe('AuthApiService', () => {
   let userRepository: Repository<User>;
@@ -42,7 +42,7 @@ describe('AuthApiService', () => {
             signOptions: { expiresIn: '1y' },
           }),
         }),
-        getPgTestTypeOrmModule(),
+        getTypeOrmModule(),
       ],
       providers: [AuthApiService, UserApiService, JwtStrategy],
     }).compile();
