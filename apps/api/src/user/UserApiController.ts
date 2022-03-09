@@ -22,7 +22,7 @@ import { PushUpdateFail } from '@app/common-config/response/swagger/domain/user/
 import { UnauthorizedError } from '@app/common-config/response/swagger/common/error/UnauthorizedError';
 import { BadRequestError } from '@app/common-config/response/swagger/common/error/BadRequestError';
 import { FcmTokenUpdateSuccess } from '@app/common-config/response/swagger/domain/user/FcmTokenUpdateSuccess';
-import { PushUpdateSuccess } from '@app/common-config/response/swagger/domain/user/pushUpdateSuccess';
+import { PushUpdateSuccess } from '@app/common-config/response/swagger/domain/user/PushUpdateSuccess';
 import { User } from '@app/entity/domain/user/User.entity';
 
 @Controller('user')
