@@ -13,36 +13,36 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Create env
-        run: | 
-        touch .env 
-        echo NODE_ENV=development >> .env
-        echo PORT=3000 >> .env
-        echo ADMIN_USER=${{ secrets.ADMIN_USER }} >> .env
-        echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }} >> .env
-        echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
-        echo DB_HOST=${{ secrets.DB_HOST }} >> .env
-        echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-        echo DB_NAME=${{ secrets.DB_NAME }} >> .env
-        echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
-        echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
-        echo LOGGING=true >> .env
-        echo SYNCHRONIZE=true >> .env
-        echo DB_TEST_HOST=${{ secrets.DB_TEST_HOST }} >> .env
-        echo DB_TEST_PORT=${{ secrets.DB_TEST_PORT }} >> .env
-        echo DB_TEST_NAME=${{ secrets.DB_TEST_NAME }} >> .env
-        echo DB_TEST_USERNAME=${{ secrets.DB_TEST_USERNAME }} >> .env
-        echo DB_TEST_PASSWORD=${{ secrets.DB_TEST_PASSWORD }} >> .env
-        echo TEST_LOGGING=true >> .env
-        echo TEST_SYNCHRONIZE=true >> .env
-        echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
-        echo DB_DEV_HOST=${{ secrets.DB_DEV_HOST }} >> .env
-        echo DB_DEV_PORT=${{ secrets.DB_DEV_PORT }} >> .env
-        echo DB_DEV_NAME=${{ secrets.DB_DEV_NAME }} >> .env
-        echo DB_DEV_USERNAME=${{ secrets.DB_DEV_USERNAME }} >> .env
-        echo DB_DEV_PASSWORD=${{ secrets.DB_DEV_PASSWORD }} >> .env
-        echo DEV_LOGGING=true >> .env
-        echo DEV_SYNCHRONIZE=true >> .env
-        cat .env
+        run: |
+          touch .env 
+          echo NODE_ENV=development >> .env
+          echo PORT=8081 >> .env
+          echo ADMIN_USER=${{ secrets.ADMIN_USER }} >> .env
+          echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }} >> .env
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+          echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+          echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+          echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+          echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+          echo LOGGING=true >> .env
+          echo SYNCHRONIZE=true >> .env
+          echo DB_TEST_HOST=${{ secrets.DB_TEST_HOST }} >> .env
+          echo DB_TEST_PORT=${{ secrets.DB_TEST_PORT }} >> .env
+          echo DB_TEST_NAME=${{ secrets.DB_TEST_NAME }} >> .env
+          echo DB_TEST_USERNAME=${{ secrets.DB_TEST_USERNAME }} >> .env
+          echo DB_TEST_PASSWORD=${{ secrets.DB_TEST_PASSWORD }} >> .env
+          echo TEST_LOGGING=true >> .env
+          echo TEST_SYNCHRONIZE=true >> .env
+          echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
+          echo DB_DEV_HOST=${{ secrets.DB_DEV_HOST }} >> .env
+          echo DB_DEV_PORT=${{ secrets.DB_DEV_PORT }} >> .env
+          echo DB_DEV_NAME=${{ secrets.DB_DEV_NAME }} >> .env
+          echo DB_DEV_USERNAME=${{ secrets.DB_DEV_USERNAME }} >> .env
+          echo DB_DEV_PASSWORD=${{ secrets.DB_DEV_PASSWORD }} >> .env
+          echo DEV_LOGGING=true >> .env
+          echo DEV_SYNCHRONIZE=true >> .env
+          cat .env
 
       - name: Install npm
         run: npm ci
