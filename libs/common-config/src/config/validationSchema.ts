@@ -10,9 +10,13 @@ export const ValidationSchema = Joi.object({
   LOGGING: Joi.string().required(),
   SYNCHRONIZE: Joi.string().required(),
 
-  DB_DEV_NAME: Joi.string().required(),
-  DEV_LOGGING: Joi.string().required(),
-  DEV_SYNCHRONIZE: Joi.string().required(),
+  DB_TEST_HOST: Joi.string().required(),
+  DB_TEST_PORT: Joi.string().required(),
+  DB_TEST_NAME: Joi.string().required(),
+  DB_TEST_USERNAME: Joi.string().required(),
+  DB_TEST_PASSWORD: Joi.string().required(),
+  TEST_LOGGING: Joi.string().required(),
+  TEST_SYNCHRONIZE: Joi.string().required(),
 
   JWT_SECRET_KEY: Joi.string().required(),
 });
