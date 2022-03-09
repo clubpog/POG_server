@@ -10,7 +10,6 @@ import { User } from '@app/entity/domain/user/User.entity';
 
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
-import { genSalt, hash } from 'bcrypt';
 
 describe('AuthApiController (e2e)', () => {
   let app: INestApplication;
