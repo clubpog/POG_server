@@ -16,7 +16,7 @@ jobs:
         run: |
           touch .env 
           echo NODE_ENV=development >> .env
-          echo PORT=8080 >> .env
+          echo PORT=3000 >> .env
           echo ADMIN_USER=${{ secrets.ADMIN_USER }} >> .env
           echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }} >> .env
           echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
