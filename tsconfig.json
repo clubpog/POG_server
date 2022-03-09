@@ -17,6 +17,8 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
+    "esModuleInterop": true,
+    "moduleResolution": "Node",
     "paths": {
       "@app/entity": [
         "libs/entity/src"
