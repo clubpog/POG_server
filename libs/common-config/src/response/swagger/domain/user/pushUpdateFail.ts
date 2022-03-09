@@ -2,7 +2,7 @@ import { InternalServerError } from '../../common/error/InternalServerError';
 import { ApiExtraModels, ApiProperty, PickType } from '@nestjs/swagger';
 
 @ApiExtraModels()
-export class pushUpdateFail extends PickType(InternalServerError, [
+export class PushUpdateFail extends PickType(InternalServerError, [
   'statusCode',
   'data',
 ] as const) {

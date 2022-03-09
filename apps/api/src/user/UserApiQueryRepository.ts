@@ -12,7 +12,7 @@ export class UserApiQueryRepository extends Repository<User> {
 
   private async findOneByDeviceId(deviceId: string) {
     const queryBuilder = createQueryBuilder()
-      .select(['user.id'])
+      .select(['id'])
       .from(User, 'user')
       .where(`user.deviceId =:deviceId`, { deviceId });
 

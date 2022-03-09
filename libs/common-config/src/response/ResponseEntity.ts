@@ -17,16 +17,24 @@ export class ResponseEntity<T> {
     return new ResponseEntity<string>(ResponseStatus.OK, '', '');
   }
 
-  static OK_WITH<T>(data: T): ResponseEntity<T> {
-    return new ResponseEntity<T>(ResponseStatus.OK, '', data);
+  static OK_WITH(message: string): ResponseEntity<string> {
+    return new ResponseEntity<string>(ResponseStatus.OK, message, '');
+  }
+
+  static OK_WITH_DATA<T>(message: string, data: T): ResponseEntity<T> {
+    return new ResponseEntity<T>(ResponseStatus.OK, message, data);
   }
 
   static CREATED(): ResponseEntity<string> {
     return new ResponseEntity<string>(ResponseStatus.CREATED, '', '');
   }
 
-  static CREATED_WITH<T>(data: T): ResponseEntity<T> {
-    return new ResponseEntity<T>(ResponseStatus.OK, '', data);
+  static CREATED_WITH(message: string): ResponseEntity<string> {
+    return new ResponseEntity<string>(ResponseStatus.CREATED, message, '');
+  }
+
+  static CREATED_WITH_DATA<T>(message: string, data: T): ResponseEntity<T> {
+    return new ResponseEntity<T>(ResponseStatus.CREATED, message, data);
   }
 
   static NOT_FOUND(): ResponseEntity<string> {
