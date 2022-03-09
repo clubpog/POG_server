@@ -1,77 +1,8 @@
-# name: Deploy dev
-# on:
-#   push:
-#     branches:
-#       # - develop
-#       - feature/beanstalk-deployment
-
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout source code
-#         uses: actions/checkout@v2
-
-#       - name: Create env
-#         run: |
-#           touch .env
-#           echo NODE_ENV=development >> .env
-#           echo PORT=3000 >> .env
-#           echo ADMIN_USER=${{ secrets.ADMIN_USER }} >> .env
-#           echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }} >> .env
-#           echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
-#           echo DB_HOST=${{ secrets.DB_HOST }} >> .env
-#           echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-#           echo DB_NAME=${{ secrets.DB_NAME }} >> .env
-#           echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
-#           echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
-#           echo LOGGING=true >> .env
-#           echo SYNCHRONIZE=true >> .env
-#           echo DB_TEST_HOST=${{ secrets.DB_TEST_HOST }} >> .env
-#           echo DB_TEST_PORT=${{ secrets.DB_TEST_PORT }} >> .env
-#           echo DB_TEST_NAME=${{ secrets.DB_TEST_NAME }} >> .env
-#           echo DB_TEST_USERNAME=${{ secrets.DB_TEST_USERNAME }} >> .env
-#           echo DB_TEST_PASSWORD=${{ secrets.DB_TEST_PASSWORD }} >> .env
-#           echo TEST_LOGGING=true >> .env
-#           echo TEST_SYNCHRONIZE=true >> .env
-#           echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
-#           echo DB_DEV_HOST=${{ secrets.DB_DEV_HOST }} >> .env
-#           echo DB_DEV_PORT=${{ secrets.DB_DEV_PORT }} >> .env
-#           echo DB_DEV_NAME=${{ secrets.DB_DEV_NAME }} >> .env
-#           echo DB_DEV_USERNAME=${{ secrets.DB_DEV_USERNAME }} >> .env
-#           echo DB_DEV_PASSWORD=${{ secrets.DB_DEV_PASSWORD }} >> .env
-#           echo DEV_LOGGING=true >> .env
-#           echo DEV_SYNCHRONIZE=true >> .env
-#           cat .env
-
-#       - name: Install npm
-#         run: npm ci
-
-#       - name: Build
-#         run: npm run build
-
-#       - name: Generate deployment package
-#         run: zip -r deploy.zip . -x '*.git*' -x node_modules/\*
-
-#       - name: Deploy to EB
-#         uses: einaregilsson/beanstalk-deploy@v14
-#         with:
-#           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#           application_name: pog-server
-#           environment_name: Pogserver-env
-#           region: ap-northeast-2
-#           version_label: ${{ github.sha }}
-#           deployment_package: deploy.zip
-
-#       - name: Success
-#         run: echo deployed successfully.
-
 name: Deploy dev Docker
 on:
   push:
     branches:
-      - feature/beanstalk-deployment
+      - develop
 
 jobs:
   build:
