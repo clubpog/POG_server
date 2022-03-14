@@ -1,7 +1,6 @@
 import { Exclude } from 'class-transformer';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
-// import { genSalt, hash } from 'bcrypt';
 import { Favorite } from '../favorite/Favorite.entity';
 
 @Entity()
