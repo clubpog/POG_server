@@ -11,8 +11,8 @@ import { StringValueTransformer } from '../../transformer/StringValueTransformer
 import { User } from '../user/User.entity';
 
 @Entity()
-@Index('idx_favorite_1', ['User'])
-export class Favorite extends BaseTimeEntity {
+@Index('idx_record_1', ['User'])
+export class Record extends BaseTimeEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -62,7 +62,7 @@ export class Favorite extends BaseTimeEntity {
   })
   rank: string;
 
-  @ManyToOne(() => User, (user: User) => user.Favorite, {
+  @ManyToOne(() => User, (user: User) => user.Record, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
     nullable: false,

@@ -1,11 +1,11 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
-import { Favorite } from './Favorite.entity';
+import { Record } from './Record.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Favorite])],
+  imports: [TypeOrmModule.forFeature([Record])],
   exports: [TypeOrmModule],
   providers: [],
   controllers: [],
 })
-export class FavoriteModule {}
+export class RecordModule {}
