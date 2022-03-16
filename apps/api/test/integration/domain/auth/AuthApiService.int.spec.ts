@@ -1,6 +1,6 @@
 // import { JwtStrategy } from '@app/common-config/jwt/JwtStrategy';
 // import { UserApiModule } from './../../../../src/user/UserApiModule';
-// import { FavoriteModule } from '@app/entity/domain/favorite/FavoriteModule';
+// import { RecordModule } from '@app/entity/domain/record/RecordModule';
 // import { UserApiService } from '../../../../src/user/UserApiService';
 // import { AuthApiService } from '../../../../src/auth/AuthApiService';
 // import { Repository } from 'typeorm';
@@ -10,14 +10,14 @@
 // import { User } from '@app/entity/domain/user/User.entity';
 // import { ConfigModule } from '@nestjs/config';
 // import { AuthConfig, ValidationSchema } from '@app/common-config/config';
-// import { Favorite } from '@app/entity/domain/favorite/Favorite.entity';
+// import { Record } from '@app/entity/domain/record/Record.entity';
 // import { PassportModule } from '@nestjs/passport';
 // import { JwtModule } from '@nestjs/jwt';
 // import { getTypeOrmModule } from '../../../../../../libs/entity/getTypeOrmModule';
 
 // describe('AuthApiService', () => {
 //   let userRepository: Repository<User>;
-//   let favoriteRepository: Repository<Favorite>;
+//   let favoriteRepository: Repository<Record>;
 //   let authApiService: AuthApiService;
 
 //   beforeAll(async () => {
@@ -25,7 +25,7 @@
 //       imports: [
 //         UserModule,
 //         UserApiModule,
-//         FavoriteModule,
+//         RecordModule,
 //         ConfigModule.forRoot({
 //           load: [AuthConfig],
 //           isGlobal: true,
