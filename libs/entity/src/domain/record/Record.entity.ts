@@ -1,17 +1,9 @@
-import {
-  Column,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
 import { StringValueTransformer } from '../../transformer/StringValueTransformer';
-import { User } from '../user/User.entity';
+import { Follow } from '../follow/Follow.entity';
 
 @Entity()
-@Index('idx_record_1', ['User'])
 export class Record extends BaseTimeEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -49,8 +41,9 @@ export class Record extends BaseTimeEntity {
 
   @Column({
     type: 'varchar',
+    unique: true,
   })
-  lolId: string;
+  summonerId: string;
 
   @Column({
     type: 'int',
@@ -62,13 +55,8 @@ export class Record extends BaseTimeEntity {
   })
   rank: string;
 
-  @ManyToOne(() => User, (user: User) => user.Record, {
-    onDelete: 'SET NULL',
-    onUpdate: 'CASCADE',
-    nullable: false,
+  @OneToMany(() => Follow, (follow: Follow) => follow.Record, {
     eager: false,
-    // createForeignKeyConstraints: false,
   })
-  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
-  User: User[];
+  Follow: Follow[];
 }

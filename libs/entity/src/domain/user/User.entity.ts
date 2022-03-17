@@ -1,7 +1,7 @@
 import { Exclude } from 'class-transformer';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
-import { Record } from '../record/Record.entity';
+import { Follow } from '../follow/Follow.entity';
 
 @Entity()
 export class User extends BaseTimeEntity {
@@ -51,11 +51,11 @@ export class User extends BaseTimeEntity {
   })
   loggedAt: Date | null;
 
-  @OneToMany(() => Record, (record: Record) => record.User, {
+  @OneToMany(() => Follow, (follow: Follow) => follow.User, {
     eager: false,
-    // cascade: true,
+    onUpdate: 'CASCADE',
   })
-  Record: Record[];
+  Follow: Follow[];
 
   static async signup(
     // userId: string,
