@@ -1,9 +1,16 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
 import { StringValueTransformer } from '../../transformer/StringValueTransformer';
 import { FavoriteSummoner } from '../favoriteSummoner/FavoriteSummoner.entity';
 
 @Entity()
+@Index('idx_summonerRecord_1', ['summonerId'])
 export class SummonerRecord extends BaseTimeEntity {
   @PrimaryGeneratedColumn()
   id: number;

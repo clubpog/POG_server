@@ -10,8 +10,8 @@ import { SummonerRecord } from '../summonerRecord/SummonerRecord.entity';
 import { User } from '../user/User.entity';
 
 @Entity()
-@Index('idx_follow_1', ['User'])
-@Index('idx_follow_2', ['SummonerRecord'])
+@Index('idx_favoriteSummoner_1', ['User'])
+@Index('idx_favoriteSummoner_2', ['SummonerRecord'])
 export class FavoriteSummoner extends BaseTimeEntity {
   @PrimaryGeneratedColumn()
   id: number;
