@@ -11,6 +11,8 @@ import { UserReq } from '../user/dto/UserReq.dto';
 
 @Injectable()
 export class FavoriteSummonerApiService {
+  private readonly favoriteSummonerLimitCount = 3;
+
   constructor(
     @InjectRepository(FavoriteSummoner)
     private favoriteSummonerRepository?: Repository<FavoriteSummoner>,
@@ -34,17 +36,7 @@ export class FavoriteSummonerApiService {
 
     if (foundSummonerRecordId === undefined) {
       await this.summonerRecordRepository.save(
-        await SummonerRecord.createSummonerRecord(
-          'test',
-          'test',
-          1,
-          1,
-          'test',
-          'test',
-          favoriteSummonerDto.summonerId,
-          1,
-          'test',
-        ),
+        await favoriteSummonerDto.toSummonerRecordEntity(),
       );
     }
 
@@ -56,7 +48,7 @@ export class FavoriteSummonerApiService {
       ))
     ) {
       await this.favoriteSummonerRepository.save(
-        await favoriteSummonerDto.toEntity(userDto.userId),
+        await favoriteSummonerDto.toFavoriteSummonerEntity(userDto.userId),
       );
     }
   }
@@ -81,6 +73,6 @@ export class FavoriteSummonerApiService {
 
   async isLimitCountFavoriteSummonerId(userId: number): Promise<any> {
     const count = await this.favoriteSummonerApiQueryRepository.countId(userId);
-    return count >= 4 ? true : false;
+    return count >= this.favoriteSummonerLimitCount ? true : false;
   }
 }
