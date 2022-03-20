@@ -5,7 +5,9 @@ import { SummonerRecordId } from '@app/entity/domain/summonerRecord/SummonerReco
 
 @EntityRepository(SummonerRecord)
 export class SummonerRecordApiQueryRepository extends Repository<SummonerRecord> {
-  async findUserIdByDeviceId(summonerId: string): Promise<SummonerRecordId> {
+  async findSummonerRecordIdBySummonerId(
+    summonerId: string,
+  ): Promise<SummonerRecordId> {
     const row = await this.findOneBySummonerId(summonerId);
     return plainToInstance(SummonerRecordId, row);
   }

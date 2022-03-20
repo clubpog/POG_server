@@ -1,12 +1,13 @@
+import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRepository';
 import { SummonerRecordId } from './../../../../libs/entity/src/domain/summonerRecord/SummonerRecordId';
-import { JwtPayload } from '@app/common-config/jwt/JwtPayload';
 import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FavoriteSummoner } from '@app/entity/domain/favoriteSummoner/FavoriteSummoner.entity';
 import { SummonerRecordApiQueryRepository } from '../summonerRecord/SummonerRecordApiQueryRepository';
 import { SummonerRecord } from '@app/entity/domain/summonerRecord/SummonerRecord.entity';
+import { UserReq } from '../user/dto/UserReq.dto';
 
 @Injectable()
 export class FavoriteSummonerApiService {
@@ -16,18 +17,23 @@ export class FavoriteSummonerApiService {
     @InjectRepository(SummonerRecord)
     private summonerRecordRepository?: Repository<SummonerRecord>,
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
+    private readonly favoriteSummonerApiQueryRepository?: FavoriteSummonerApiQueryRepository,
   ) {}
 
   async createFavoriteSummoner(
-    userDto: JwtPayload,
+    userDto: UserReq,
     favoriteSummonerDto: FavoriteSummonerIdReq,
   ): Promise<void> {
+    if (await this.isLimitCountFavoriteSummonerId(userDto.userId)) {
+      throw new BadRequestException('즐겨찾기 한도가 초과되었습니다.');
+    }
+
     const foundSummonerRecordId = await this.findSummonerRecordBySummonerId(
       favoriteSummonerDto.summonerId,
     );
-    console.log(foundSummonerRecordId);
+
     if (foundSummonerRecordId === undefined) {
-      this.summonerRecordRepository.save(
+      await this.summonerRecordRepository.save(
         await SummonerRecord.createSummonerRecord(
           'test',
           'test',
@@ -42,23 +48,39 @@ export class FavoriteSummonerApiService {
       );
     }
 
-    // summonerId를 활용해서 먼저 summonerRecord 테이블의 데이터가 있는지 확인한다.
-    // 만약 데이터가 없다면, 라이엇 API를 활용해서 조회한다.
-    // 라이엇 API를 통해서 얻은 데이터를 활용해서 SummonerRecord 엔티티로 변환한 후, summonerRecord에 데이터를 저장한다.
-    // 데이터가 있다면, 바로 저장.
-    const toEntity = await FavoriteSummoner.createFavoriteSummoner(
-      userDto.userId,
-      favoriteSummonerDto.summonerId,
-    );
-    console.log(toEntity);
-    await this.favoriteSummonerRepository.save(toEntity);
+    // favorite_summoner 테이블에서, user_id, summoner_id가 있더라도, deleted_at이 데이터가 있으면, 다시 추가 가능. or deleted_at를 다시 null로 설정.
+    if (
+      !(await this.isFavoriteSummoner(
+        userDto.userId,
+        favoriteSummonerDto.summonerId,
+      ))
+    ) {
+      await this.favoriteSummonerRepository.save(
+        await favoriteSummonerDto.toEntity(userDto.userId),
+      );
+    }
   }
 
   async findSummonerRecordBySummonerId(
     summonerId: string,
   ): Promise<SummonerRecordId> {
-    return await this.summonerRecordApiQueryRepository.findUserIdByDeviceId(
+    return await this.summonerRecordApiQueryRepository.findSummonerRecordIdBySummonerId(
       summonerId,
     );
+  }
+
+  async isFavoriteSummoner(
+    userId: number,
+    summonerId: string,
+  ): Promise<boolean> {
+    return await this.favoriteSummonerApiQueryRepository.isFavoriteSummoner(
+      userId,
+      summonerId,
+    );
+  }
+
+  async isLimitCountFavoriteSummonerId(userId: number): Promise<any> {
+    const count = await this.favoriteSummonerApiQueryRepository.countId(userId);
+    return count >= 4 ? true : false;
   }
 }

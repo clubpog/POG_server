@@ -13,4 +13,8 @@ export class FavoriteSummonerIdReq {
   @IsNotEmpty()
   @IsString()
   summonerId: string;
+
+  toEntity(userId: number): Promise<FavoriteSummoner> {
+    return FavoriteSummoner.createFavoriteSummoner(userId, this.summonerId);
+  }
 }

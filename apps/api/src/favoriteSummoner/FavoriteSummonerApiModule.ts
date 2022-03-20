@@ -7,6 +7,7 @@ import { FavoriteSummonerApiRepository } from './FavoriteSummonerApiRepository';
 import { FavoriteSummonerModule } from '@app/entity/domain/favoriteSummoner/FavoriteSummonerModule';
 import { SummonerRecordApiModule } from '../summonerRecord/SummonerRecordApiModule';
 import { SummonerRecordModule } from '@app/entity/domain/summonerRecord/SummonerRecordModule';
+import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRepository';
 
 @Module({
   imports: [
@@ -16,6 +17,10 @@ import { SummonerRecordModule } from '@app/entity/domain/summonerRecord/Summoner
     SummonerRecordApiModule,
   ],
   controllers: [FavoriteSummonerApiController],
-  providers: [FavoriteSummonerApiService, FavoriteSummonerApiRepository],
+  providers: [
+    FavoriteSummonerApiService,
+    FavoriteSummonerApiRepository,
+    FavoriteSummonerApiQueryRepository,
+  ],
 })
 export class FavoriteSummonerApiModule {}

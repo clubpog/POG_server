@@ -1,4 +1,3 @@
-import { JwtPayload } from '@app/common-config/jwt/JwtPayload';
 import { CurrentUser } from '@app/common-config/decorator/UserDecorator';
 import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
 import { JwtAuthGuard } from '@app/common-config/jwt/JwtGuard';
@@ -16,7 +15,8 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { FavoriteSummonerApiService } from './FavoriteSummonerApiService';
-import { SummonerRecord } from '@app/entity/domain/summonerRecord/SummonerRecord.entity';
+import { UserReq } from '../user/dto/UserReq.dto';
+import { ResponseStatus } from '@app/common-config/response/ResponseStatus';
 
 @Controller('favoriteSummoner')
 @ApiTags('소환사 즐겨찾기 API')
@@ -29,7 +29,7 @@ export class FavoriteSummonerApiController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async createFollow(
-    @CurrentUser() userDto: JwtPayload,
+    @CurrentUser() userDto: UserReq,
     @Body() favoriteSummonerIdDto: FavoriteSummonerIdReq,
   ) {
     try {
@@ -45,6 +45,9 @@ export class FavoriteSummonerApiController {
         `dto = ${JSON.stringify(favoriteSummonerIdDto)}`,
         error,
       );
+      if (error.status === ResponseStatus.BAD_REQUEST) {
+        return ResponseEntity.BAD_REQUEST_WITH(error.message);
+      }
       return ResponseEntity.ERROR_WITH('소환사 즐겨찾기 추가에 실패했습니다.');
     }
   }
