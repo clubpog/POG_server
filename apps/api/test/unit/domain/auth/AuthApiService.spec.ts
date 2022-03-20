@@ -5,6 +5,7 @@ import { UserRepositoryStub } from '../../stub/user/UserRepositoryStub';
 import { UserApiRepositoryStub } from '../../stub/user/UserApiRepositoryStub';
 import { UserApiQueryRepositoryStub } from '../../stub/user/UserApiQueryRepositoryStub';
 import { User } from '@app/entity/domain/user/User.entity';
+import { NotFoundException } from '@nestjs/common';
 
 describe('AuthApiService', () => {
   let userRepository;
@@ -75,13 +76,12 @@ describe('AuthApiService', () => {
       userApiQueryRepository,
       jwtService,
     );
-    // when
-    try {
+
+    await expect(async () => {
+      // when
       await sut.signin(await User.signinTest());
-    } catch (error) {
+
       // then
-      expect(error.response.message).toBe('Not Found');
-      expect(error.response.statusCode).toBe(404);
-    }
+    }).rejects.toThrowError(new NotFoundException());
   });
 });
