@@ -23,7 +23,6 @@ import { UnauthorizedError } from '@app/common-config/response/swagger/common/er
 import { BadRequestError } from '@app/common-config/response/swagger/common/error/BadRequestError';
 import { FcmTokenUpdateSuccess } from '@app/common-config/response/swagger/domain/user/FcmTokenUpdateSuccess';
 import { PushUpdateSuccess } from '@app/common-config/response/swagger/domain/user/PushUpdateSuccess';
-import { User } from '@app/entity/domain/user/User.entity';
 
 @Controller('user')
 @ApiTags('유저 API')
@@ -66,10 +65,7 @@ export class UserApiController {
   ): Promise<ResponseEntity<string>> {
     try {
       await this.userApiService.updateFcmToken(
-        await User.updateFcmToken(
-          userUpdateFcmTokenDto.firebaseToken,
-          userDto.deviceId,
-        ),
+        await userUpdateFcmTokenDto.toEntity(userDto.deviceId),
       );
       return ResponseEntity.OK_WITH('FCM 토큰 수정에 성공했습니다.');
     } catch (error) {
@@ -116,7 +112,7 @@ export class UserApiController {
   ): Promise<ResponseEntity<string>> {
     try {
       await this.userApiService.updatePush(
-        await User.updatePush(userDto.deviceId, userUpdatePushDto.isPush),
+        await userUpdatePushDto.toEntity(userDto.deviceId),
       );
       return ResponseEntity.OK_WITH('푸시알림 허용 여부 수정에 성공했습니다.');
     } catch (error) {

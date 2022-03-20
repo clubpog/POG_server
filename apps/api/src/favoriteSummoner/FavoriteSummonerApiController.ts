@@ -37,7 +37,7 @@ export class FavoriteSummonerApiController {
     description: `
     소환사 즐겨찾기 추가 시 name, tier, win, lose, profileIconId, puuid, summonerId, leaguePoint, rank를 입력받습니다. \n
     소환사 즐겨찾기 추가 시 입력값을 누락한 경우 400 에러를 출력합니다. \n
-    소환사 즐겨찾기 추가 시 즐겨찾기 한도가 초과된 경우 400 에러를 출력합니다. \n
+    소환사 즐겨찾기 추가 시 즐겨찾기 한도가 초과된 경우 403 에러를 출력합니다. \n
     헤더에 토큰 값을 제대로 설정하지 않으면 401 에러를 출력합니다. \n
     `,
   })
