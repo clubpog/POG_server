@@ -1,11 +1,11 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
-import { Favorite } from './Favorite.entity';
+import { FavoriteSummoner } from './FavoriteSummoner.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Favorite])],
+  imports: [TypeOrmModule.forFeature([FavoriteSummoner])],
   exports: [TypeOrmModule],
   providers: [],
   controllers: [],
 })
-export class FavoriteModule {}
+export class FavoriteSummonerModule {}
