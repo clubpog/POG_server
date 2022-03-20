@@ -13,4 +13,8 @@ export class UserUpdateFcmTokenReq {
   @IsNotEmpty()
   @IsString()
   firebaseToken: string;
+
+  toEntity(deviceId: string): Promise<User> {
+    return User.updateFcmToken(this.firebaseToken, deviceId);
+  }
 }
