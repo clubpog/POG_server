@@ -1,15 +1,11 @@
 import { SummonerRecord } from '@app/entity/domain/summonerRecord/SummonerRecord.entity';
 import { createQueryBuilder, EntityRepository, Repository } from 'typeorm';
-import { plainToInstance } from 'class-transformer';
-import { SummonerRecordId } from '@app/entity/domain/summonerRecord/SummonerRecordId';
 
 @EntityRepository(SummonerRecord)
 export class SummonerRecordApiQueryRepository extends Repository<SummonerRecord> {
-  async findSummonerRecordIdBySummonerId(
-    summonerId: string,
-  ): Promise<SummonerRecordId> {
+  async isSummonerRecordIdBySummonerId(summonerId: string): Promise<boolean> {
     const row = await this.findOneBySummonerId(summonerId);
-    return plainToInstance(SummonerRecordId, row);
+    return row !== undefined ? true : false;
   }
 
   private async findOneBySummonerId(summonerId: string) {

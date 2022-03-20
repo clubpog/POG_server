@@ -1,7 +1,6 @@
 import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRepository';
-import { SummonerRecordId } from './../../../../libs/entity/src/domain/summonerRecord/SummonerRecordId';
 import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FavoriteSummoner } from '@app/entity/domain/favoriteSummoner/FavoriteSummoner.entity';
@@ -11,7 +10,7 @@ import { UserReq } from '../user/dto/UserReq.dto';
 
 @Injectable()
 export class FavoriteSummonerApiService {
-  private readonly favoriteSummonerLimitCount = 3;
+  private readonly favoriteSummonerLimitCount: number = 3;
 
   constructor(
     @InjectRepository(FavoriteSummoner)
@@ -27,36 +26,34 @@ export class FavoriteSummonerApiService {
     favoriteSummonerDto: FavoriteSummonerIdReq,
   ): Promise<void> {
     if (await this.isLimitCountFavoriteSummonerId(userDto.userId)) {
-      throw new BadRequestException('즐겨찾기 한도가 초과되었습니다.');
+      throw new ForbiddenException('즐겨찾기 한도가 초과되었습니다.');
     }
 
-    const foundSummonerRecordId = await this.findSummonerRecordBySummonerId(
+    const isFindSummonerRecordId = await this.isSummonerRecordBySummonerId(
       favoriteSummonerDto.summonerId,
     );
 
-    if (foundSummonerRecordId === undefined) {
+    if (!isFindSummonerRecordId) {
       await this.summonerRecordRepository.save(
         await favoriteSummonerDto.toSummonerRecordEntity(),
       );
     }
 
+    const isFindFavoriteSummoner = await this.isFavoriteSummoner(
+      userDto.userId,
+      favoriteSummonerDto.summonerId,
+    );
+
     // favorite_summoner 테이블에서, user_id, summoner_id가 있더라도, deleted_at이 데이터가 있으면, 다시 추가 가능. or deleted_at를 다시 null로 설정.
-    if (
-      !(await this.isFavoriteSummoner(
-        userDto.userId,
-        favoriteSummonerDto.summonerId,
-      ))
-    ) {
+    if (!isFindFavoriteSummoner) {
       await this.favoriteSummonerRepository.save(
         await favoriteSummonerDto.toFavoriteSummonerEntity(userDto.userId),
       );
     }
   }
 
-  async findSummonerRecordBySummonerId(
-    summonerId: string,
-  ): Promise<SummonerRecordId> {
-    return await this.summonerRecordApiQueryRepository.findSummonerRecordIdBySummonerId(
+  async isSummonerRecordBySummonerId(summonerId: string): Promise<boolean> {
+    return await this.summonerRecordApiQueryRepository.isSummonerRecordIdBySummonerId(
       summonerId,
     );
   }
@@ -71,7 +68,7 @@ export class FavoriteSummonerApiService {
     );
   }
 
-  async isLimitCountFavoriteSummonerId(userId: number): Promise<any> {
+  async isLimitCountFavoriteSummonerId(userId: number): Promise<boolean> {
     const count = await this.favoriteSummonerApiQueryRepository.countId(userId);
     return count >= this.favoriteSummonerLimitCount ? true : false;
   }
