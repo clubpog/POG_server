@@ -1,14 +1,16 @@
 import { FavoriteSummoner } from '@app/entity/domain/favoriteSummoner/FavoriteSummoner.entity';
+import { FavoriteSummonerId } from '@app/entity/domain/favoriteSummoner/FavoriteSummonerId';
+import { plainToInstance } from 'class-transformer';
 import { createQueryBuilder, EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(FavoriteSummoner)
 export class FavoriteSummonerApiQueryRepository extends Repository<FavoriteSummoner> {
-  async isFavoriteSummoner(
+  async findFavoriteSummonerWithSoftDelete(
     userId: number,
     summonerId: string,
-  ): Promise<boolean> {
-    const row = await this.findOneByUserAndSummonerId(userId, summonerId);
-    return row !== undefined ? true : false;
+  ): Promise<FavoriteSummonerId> {
+    const row = await this.findOneSoftDelete(userId, summonerId);
+    return plainToInstance(FavoriteSummonerId, row);
   }
 
   async countId(userId: number): Promise<number> {
@@ -16,9 +18,28 @@ export class FavoriteSummonerApiQueryRepository extends Repository<FavoriteSummo
     return Number(row[0]['count']);
   }
 
+  async findFavoriteSummonerId(
+    userId: number,
+    summonerId: string,
+  ): Promise<FavoriteSummonerId> {
+    const row = await this.findOneByUserAndSummonerId(userId, summonerId);
+    return plainToInstance(FavoriteSummonerId, row);
+  }
+
   private async findOneByUserAndSummonerId(userId: number, summonerId: string) {
     const queryBuilder = createQueryBuilder()
       .select(['id'])
+      .from(FavoriteSummoner, 'favoriteSummoner')
+      .where(`favoriteSummoner.user_id =:userId`, { userId })
+      .andWhere(`favoriteSummoner.summoner_id =:summonerId`, { summonerId });
+
+    return await queryBuilder.getRawOne();
+  }
+
+  private async findOneSoftDelete(userId: number, summonerId: string) {
+    const queryBuilder = createQueryBuilder()
+      .select(['id'])
+      .withDeleted()
       .from(FavoriteSummoner, 'favoriteSummoner')
       .where(`favoriteSummoner.user_id =:userId`, { userId })
       .andWhere(`favoriteSummoner.summoner_id =:summonerId`, { summonerId });

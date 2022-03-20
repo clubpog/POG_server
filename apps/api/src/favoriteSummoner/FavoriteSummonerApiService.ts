@@ -1,12 +1,18 @@
 import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRepository';
-import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { FavoriteSummonerReq } from './dto/FavoriteSummonerReq.dto';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FavoriteSummoner } from '@app/entity/domain/favoriteSummoner/FavoriteSummoner.entity';
 import { SummonerRecordApiQueryRepository } from '../summonerRecord/SummonerRecordApiQueryRepository';
 import { SummonerRecord } from '@app/entity/domain/summonerRecord/SummonerRecord.entity';
 import { UserReq } from '../user/dto/UserReq.dto';
+import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
+import { FavoriteSummonerId } from '@app/entity/domain/favoriteSummoner/FavoriteSummonerId';
 
 @Injectable()
 export class FavoriteSummonerApiService {
@@ -23,7 +29,7 @@ export class FavoriteSummonerApiService {
 
   async createFavoriteSummoner(
     userDto: UserReq,
-    favoriteSummonerDto: FavoriteSummonerIdReq,
+    favoriteSummonerDto: FavoriteSummonerReq,
   ): Promise<void> {
     if (await this.isLimitCountFavoriteSummonerId(userDto.userId)) {
       throw new ForbiddenException('즐겨찾기 한도가 초과되었습니다.');
@@ -39,37 +45,69 @@ export class FavoriteSummonerApiService {
       );
     }
 
-    const isFindFavoriteSummoner = await this.isFavoriteSummoner(
-      userDto.userId,
-      favoriteSummonerDto.summonerId,
-    );
+    const findFavoriteSummonerId =
+      await this.findFavoriteSummonerIdWithSoftDelete(
+        userDto.userId,
+        favoriteSummonerDto.summonerId,
+      );
 
-    // favorite_summoner 테이블에서, user_id, summoner_id가 있더라도, deleted_at이 데이터가 있으면, 다시 추가 가능. or deleted_at를 다시 null로 설정.
-    if (!isFindFavoriteSummoner) {
+    if (!findFavoriteSummonerId) {
       await this.favoriteSummonerRepository.save(
         await favoriteSummonerDto.toFavoriteSummonerEntity(userDto.userId),
       );
+    } else {
+      await this.favoriteSummonerRepository.restore(findFavoriteSummonerId.id);
     }
   }
 
-  async isSummonerRecordBySummonerId(summonerId: string): Promise<boolean> {
+  async deleteFavoriteSummoner(
+    userDto: UserReq,
+    favoriteSummonerIdDto: FavoriteSummonerIdReq,
+  ): Promise<void> {
+    const favoriteSummonerId = await this.findFavoriteSummonerId(
+      userDto.userId,
+      favoriteSummonerIdDto.summonerId,
+    );
+
+    if (!favoriteSummonerId) {
+      throw new NotFoundException('삭제할 즐겨찾기를 조회할 수 없습니다.');
+    }
+
+    await this.favoriteSummonerRepository.softDelete(favoriteSummonerId.id);
+  }
+
+  private async isSummonerRecordBySummonerId(
+    summonerId: string,
+  ): Promise<boolean> {
     return await this.summonerRecordApiQueryRepository.isSummonerRecordIdBySummonerId(
       summonerId,
     );
   }
 
-  async isFavoriteSummoner(
+  private async isLimitCountFavoriteSummonerId(
+    userId: number,
+  ): Promise<boolean> {
+    const count = await this.favoriteSummonerApiQueryRepository.countId(userId);
+    return count >= this.favoriteSummonerLimitCount ? true : false;
+  }
+
+  private async findFavoriteSummonerIdWithSoftDelete(
     userId: number,
     summonerId: string,
-  ): Promise<boolean> {
-    return await this.favoriteSummonerApiQueryRepository.isFavoriteSummoner(
+  ): Promise<FavoriteSummonerId> {
+    return await this.favoriteSummonerApiQueryRepository.findFavoriteSummonerWithSoftDelete(
       userId,
       summonerId,
     );
   }
 
-  async isLimitCountFavoriteSummonerId(userId: number): Promise<boolean> {
-    const count = await this.favoriteSummonerApiQueryRepository.countId(userId);
-    return count >= this.favoriteSummonerLimitCount ? true : false;
+  private async findFavoriteSummonerId(
+    userId: number,
+    summonerId: string,
+  ): Promise<FavoriteSummonerId> {
+    return await this.favoriteSummonerApiQueryRepository.findFavoriteSummonerId(
+      userId,
+      summonerId,
+    );
   }
 }
