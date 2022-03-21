@@ -17,6 +17,7 @@ import {
   ApiBearerAuth,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -31,6 +32,9 @@ import { BadRequestError } from '@app/common-config/response/swagger/common/erro
 import { FavoriteSummonerCreateLimitFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerCreateLimitFail';
 import { FavoriteSummonerCreateFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerCreateFail';
 import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
+import { FavoriteSummonerDeleteSuccess } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteSuccess';
+import { FavoriteSummonerDeleteFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteFail';
+import { FavoriteSummonerDeleteNotFound } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteNotFound';
 
 @Controller('favoriteSummoner')
 @ApiTags('소환사 즐겨찾기 API')
@@ -66,7 +70,7 @@ export class FavoriteSummonerApiController {
     type: FavoriteSummonerCreateLimitFail,
   })
   @ApiInternalServerErrorResponse({
-    description: 'FCM 토큰 수정에 실패했습니다.',
+    description: '소환사 즐겨찾기 추가에 실패했습니다.',
     type: FavoriteSummonerCreateFail,
   })
   @ApiBearerAuth('Authorization')
@@ -93,6 +97,38 @@ export class FavoriteSummonerApiController {
     }
   }
 
+  @ApiOperation({
+    summary: '소환사 즐겨찾기 취소',
+    description: `
+    소환사 즐겨찾기 취소 시 summonerId를 입력받습니다. \n
+    소환사 즐겨찾기 취소 시 입력값을 누락한 경우 400 에러를 출력합니다. \n
+    소환사 즐겨찾기 취소 시 즐겨찾기 한도가 초과된 경우 403 에러를 출력합니다. \n
+    헤더에 토큰 값을 제대로 설정하지 않으면 401 에러를 출력합니다. \n
+    소환사 즐겨찾기 취소 시 삭제할 즐겨찾기를 조회할 수 없다면 404 에러를 출력합니다. \n
+    `,
+  })
+  @ApiOkResponse({
+    description: '소환사 즐겨찾기 취소에 성공했습니다.',
+    type: FavoriteSummonerDeleteSuccess,
+  })
+  @ApiUnauthorizedResponse({
+    description: '잘못된 Authorization입니다.',
+    type: UnauthorizedError,
+  })
+  @ApiBadRequestResponse({
+    description: '입력 값을 누락했습니다.',
+    type: BadRequestError,
+  })
+  @ApiNotFoundResponse({
+    description:
+      '소환사 즐겨찾기 취소 시 삭제할 즐겨찾기를 조회할 수 없습니다.',
+    type: FavoriteSummonerDeleteNotFound,
+  })
+  @ApiInternalServerErrorResponse({
+    description: '소환사 즐겨찾기 취소에 실패했습니다.',
+    type: FavoriteSummonerDeleteFail,
+  })
+  @ApiBearerAuth('Authorization')
   @UseGuards(JwtAuthGuard)
   @Delete()
   async deleteFollow(
