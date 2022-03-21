@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 
-export class SummonerRecordId {
+export class FavoriteSummonerId {
   @Expose({ name: 'id' })
   id: number;
 
