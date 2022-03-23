@@ -22,6 +22,7 @@ export class SummonerRecord extends BaseTimeEntity {
 
   @Column({
     type: 'varchar',
+    nullable: true,
   })
   tier: string;
 
@@ -38,6 +39,7 @@ export class SummonerRecord extends BaseTimeEntity {
   @Column({
     type: 'varchar',
     transformer: new StringValueTransformer(),
+    nullable: true,
   })
   profileIconId: string;
 
@@ -59,6 +61,7 @@ export class SummonerRecord extends BaseTimeEntity {
 
   @Column({
     type: 'varchar',
+    nullable: true,
   })
   rank: string;
 
@@ -84,14 +87,14 @@ export class SummonerRecord extends BaseTimeEntity {
   ): Promise<SummonerRecord> {
     const summonerRecord = new SummonerRecord();
     summonerRecord.name = name;
-    summonerRecord.tier = tier;
+    summonerRecord.tier = tier ? tier : null;
     summonerRecord.win = win;
     summonerRecord.lose = lose;
-    summonerRecord.profileIconId = profileIconId;
+    summonerRecord.profileIconId = profileIconId ? profileIconId : null;
     summonerRecord.puuid = puuid;
     summonerRecord.summonerId = summonerId;
     summonerRecord.leaguePoint = leaguePoint;
-    summonerRecord.rank = rank;
+    summonerRecord.rank = rank ? rank : null;
     return summonerRecord;
   }
 }

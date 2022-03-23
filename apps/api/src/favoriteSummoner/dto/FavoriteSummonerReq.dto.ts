@@ -21,7 +21,6 @@ export class FavoriteSummonerReq {
     required: true,
   })
   @Expose()
-  @IsNotEmpty()
   @IsString()
   tier: string;
 
@@ -51,7 +50,6 @@ export class FavoriteSummonerReq {
     required: true,
   })
   @Expose()
-  @IsNotEmpty()
   @IsString()
   profileIconId: string;
 
@@ -92,7 +90,6 @@ export class FavoriteSummonerReq {
     required: true,
   })
   @Expose()
-  @IsNotEmpty()
   @IsString()
   rank: string;
 
