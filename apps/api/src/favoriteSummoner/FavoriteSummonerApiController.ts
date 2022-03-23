@@ -6,6 +6,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Inject,
   Post,
   UseGuards,
@@ -35,6 +36,7 @@ import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
 import { FavoriteSummonerDeleteSuccess } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteSuccess';
 import { FavoriteSummonerDeleteFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteFail';
 import { FavoriteSummonerDeleteNotFound } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteNotFound';
+import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
 
 @Controller('favoriteSummoner')
 @ApiTags('소환사 즐겨찾기 API')
@@ -150,6 +152,25 @@ export class FavoriteSummonerApiController {
         return ResponseEntity.NOT_FOUND_WITH(error.message);
       }
       return ResponseEntity.ERROR_WITH('소환사 즐겨찾기 취소에 실패했습니다.');
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async getFollow(@CurrentUser() userDto: UserReq) {
+    try {
+      const data: FavoriteSummonerRes[] =
+        await this.favoriteSummonerApiService.getFavoriteSummoner(
+          await userDto.toEntity(),
+        );
+
+      return ResponseEntity.OK_WITH_DATA(
+        '소환사 즐겨찾기 조회에 성공했습니다.',
+        data,
+      );
+    } catch (error) {
+      this.logger.error(`dto = ${JSON.stringify(userDto)}`, error);
+      return ResponseEntity.ERROR_WITH('소환사 즐겨찾기 조회에 실패했습니다.');
     }
   }
 }

@@ -13,6 +13,8 @@ import { SummonerRecord } from '@app/entity/domain/summonerRecord/SummonerRecord
 import { UserReq } from '../user/dto/UserReq.dto';
 import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
 import { FavoriteSummonerId } from '@app/entity/domain/favoriteSummoner/FavoriteSummonerId';
+import { User } from '@app/entity/domain/user/User.entity';
+import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
 
 @Injectable()
 export class FavoriteSummonerApiService {
@@ -76,6 +78,10 @@ export class FavoriteSummonerApiService {
     await this.favoriteSummonerRepository.softDelete(favoriteSummonerId.id);
   }
 
+  async getFavoriteSummoner(userDto: User): Promise<FavoriteSummonerRes[]> {
+    return await this.findAllFavoriteSummoners(userDto.id);
+  }
+
   private async isSummonerRecordBySummonerId(
     summonerId: string,
   ): Promise<boolean> {
@@ -108,6 +114,19 @@ export class FavoriteSummonerApiService {
     return await this.favoriteSummonerApiQueryRepository.findFavoriteSummonerId(
       userId,
       summonerId,
+    );
+  }
+
+  private async findAllFavoriteSummoners(
+    userId: number,
+  ): Promise<FavoriteSummonerRes[]> {
+    const favoriteSummonerJoinSummonerRecords =
+      await this.favoriteSummonerApiQueryRepository.findAllFavoriteSummoners(
+        userId,
+      );
+    return favoriteSummonerJoinSummonerRecords.map(
+      favoriteSummonerJoinSummonerRecord =>
+        new FavoriteSummonerRes(favoriteSummonerJoinSummonerRecord),
     );
   }
 }
