@@ -21,6 +21,7 @@ import { BadRequestError } from '@app/common-config/response/swagger/common/erro
 import { SignupFail } from '@app/common-config/response/swagger/domain/auth/SignupFail';
 import { AuthSigninReq, AuthSignupReq } from './dto';
 import { SignupSuccess } from '@app/common-config/response/swagger/domain/auth/SignupSuccess';
+import { SigninNotFoundFail } from '@app/common-config/response/swagger/domain/auth/SigninNotFoundFail';
 
 @Controller('auth')
 @ApiTags('회원가입, 로그인 API')
@@ -74,7 +75,7 @@ export class AuthApiController {
   })
   @ApiNotFoundResponse({
     description: '입력한 deviceId는 DB에 저장되어 있지 않습니다.',
-    type: NotFoundError,
+    type: SigninNotFoundFail,
   })
   @ApiInternalServerErrorResponse({
     description: '로그인에 실패했습니다.',
@@ -94,9 +95,7 @@ export class AuthApiController {
     } catch (error) {
       this.logger.error(`dto = ${JSON.stringify(dto)}`, error);
       if (error.status === ResponseStatus.NOT_FOUND)
-        return ResponseEntity.NOT_FOUND_WITH(
-          '입력된 deviceId가 존재하지 않습니다.',
-        );
+        return ResponseEntity.NOT_FOUND_WITH(error.message);
       return ResponseEntity.ERROR_WITH('로그인에 실패했습니다.');
     }
   }

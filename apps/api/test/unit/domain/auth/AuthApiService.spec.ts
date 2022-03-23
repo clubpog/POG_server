@@ -82,6 +82,8 @@ describe('AuthApiService', () => {
       await sut.signin(await User.signinTest());
 
       // then
-    }).rejects.toThrowError(new NotFoundException());
+    }).rejects.toThrowError(
+      new NotFoundException('입력된 deviceId가 존재하지 않습니다.'),
+    );
   });
 });
