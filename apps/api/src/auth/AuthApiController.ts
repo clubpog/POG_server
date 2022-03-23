@@ -1,5 +1,4 @@
 import { UserAccessToken } from '@app/entity/domain/user/UserAccessToken';
-import { NotFoundError } from '@app/common-config/response/swagger/common/error/NotFoundError';
 import { SigninFail } from '@app/common-config/response/swagger/domain/auth/SigninFail';
 import { SigninSuccess } from '@app/common-config/response/swagger/domain/auth/SigninSuccess';
 import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
