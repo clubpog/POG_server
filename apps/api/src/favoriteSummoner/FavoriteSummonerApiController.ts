@@ -37,6 +37,8 @@ import { FavoriteSummonerDeleteSuccess } from '@app/common-config/response/swagg
 import { FavoriteSummonerDeleteFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteFail';
 import { FavoriteSummonerDeleteNotFound } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteNotFound';
 import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
+import { FavoriteSummonerReadFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerReadFail';
+import { FavoriteSummonerReadSuccess } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerReadSuccess';
 
 @Controller('favoriteSummoner')
 @ApiTags('소환사 즐겨찾기 API')
@@ -155,6 +157,27 @@ export class FavoriteSummonerApiController {
     }
   }
 
+  @ApiOperation({
+    summary: '소환사 즐겨찾기 조회',
+    description: `
+    헤더에 토큰 값을 제대로 설정하지 않으면 401 에러를 출력합니다. \n
+    소환사 즐겨찾기 조회 시 조회를 실패하면 500 에러를 출력합니다. \n
+    소환사 즐겨찾기 조회 시 조회를 성공하면 200 코드를 출력합니다. \n
+    `,
+  })
+  @ApiOkResponse({
+    description: '소환사 즐겨찾기 조회에 성공했습니다.',
+    type: FavoriteSummonerReadSuccess,
+  })
+  @ApiUnauthorizedResponse({
+    description: '잘못된 Authorization입니다.',
+    type: UnauthorizedError,
+  })
+  @ApiInternalServerErrorResponse({
+    description: '소환사 즐겨찾기 조회에 실패했습니다.',
+    type: FavoriteSummonerReadFail,
+  })
+  @ApiBearerAuth('Authorization')
   @UseGuards(JwtAuthGuard)
   @Get()
   async getFollow(@CurrentUser() userDto: UserReq) {

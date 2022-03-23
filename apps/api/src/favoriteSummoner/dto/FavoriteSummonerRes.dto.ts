@@ -33,46 +33,55 @@ export class FavoriteSummonerRes {
     return this._id;
   }
 
+  @ApiProperty()
   @Expose()
   get name(): string {
     return this._name;
   }
 
+  @ApiProperty()
   @Expose()
   get tier(): string {
     return this._tier;
   }
 
+  @ApiProperty()
   @Expose()
   get win(): number {
     return this._win;
   }
 
+  @ApiProperty()
   @Expose()
   get lose(): number {
     return this._lose;
   }
 
+  @ApiProperty()
   @Expose()
   get puuid(): string {
     return this._puuid;
   }
 
+  @ApiProperty()
   @Expose()
   get rank(): string {
     return this._rank;
   }
 
+  @ApiProperty()
   @Expose()
   get profileIconId(): string {
     return this._profileIconId;
   }
 
+  @ApiProperty()
   @Expose()
   get summonerId(): string {
     return this._summonerId;
   }
 
+  @ApiProperty()
   @Expose()
   get leaguePoint(): number {
     return this._leaguePoint;
