@@ -4,6 +4,7 @@ import { FavoriteSummonerApiQueryRepository } from '../../../../src/favoriteSumm
 export class FavoriteSummonerApiQueryRepositoryStub extends FavoriteSummonerApiQueryRepository {
   private readonly favoriteSummonerLimitCount: number = 5;
   private readonly favoriteSummonerNonLimitCount: number = 1;
+  private readonly notFindFavoriteSummonerId: number = 2;
 
   constructor() {
     super();
@@ -19,6 +20,15 @@ export class FavoriteSummonerApiQueryRepositoryStub extends FavoriteSummonerApiQ
     userId: number,
     summonerId: string,
   ): Promise<FavoriteSummonerId> {
+    const dto = FavoriteSummonerId.from(1);
+    return dto;
+  }
+
+  override async findFavoriteSummonerId(
+    userId: number,
+    summonerId: string,
+  ): Promise<FavoriteSummonerId> {
+    if (userId === this.notFindFavoriteSummonerId) return;
     const dto = FavoriteSummonerId.from(1);
     return dto;
   }

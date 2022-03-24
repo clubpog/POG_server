@@ -22,6 +22,10 @@ export class FavoriteSummonerRepositoryStub {
     }
   }
 
+  softDelete() {
+    return UpdateResult.Result();
+  }
+
   restore() {
     return UpdateResult.Result();
   }
