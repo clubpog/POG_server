@@ -45,4 +45,12 @@ export class UserReq {
   toEntity(): Promise<User> {
     return User.jwtUserReq(this.deviceId, this.userId);
   }
+
+  static of(deviceId: string, userId: number): UserReq {
+    const dto = new UserReq();
+    dto.deviceId = deviceId;
+    dto.userId = userId;
+
+    return dto;
+  }
 }

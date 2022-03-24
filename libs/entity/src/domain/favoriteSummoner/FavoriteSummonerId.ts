@@ -4,7 +4,9 @@ export class FavoriteSummonerId {
   @Expose({ name: 'id' })
   id: number;
 
-  constructor(id: number) {
-    this.id = id;
+  static from(id: number): FavoriteSummonerId {
+    const dto = new FavoriteSummonerId();
+    dto.id = id;
+    return dto;
   }
 }
