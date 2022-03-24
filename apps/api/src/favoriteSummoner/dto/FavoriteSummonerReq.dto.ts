@@ -51,7 +51,7 @@ export class FavoriteSummonerReq {
   })
   @Expose()
   @IsNotEmpty()
-  @IsString()
+  @IsNumber()
   profileIconId: number;
 
   @ApiProperty({
