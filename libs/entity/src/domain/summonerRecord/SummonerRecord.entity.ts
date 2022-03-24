@@ -26,12 +26,12 @@ export class SummonerRecord extends BaseTimeEntity {
   tier: string;
 
   @Column({
-    type: 'bigint',
+    type: 'int',
   })
   win: number;
 
   @Column({
-    type: 'bigint',
+    type: 'int',
   })
   lose: number;
 
