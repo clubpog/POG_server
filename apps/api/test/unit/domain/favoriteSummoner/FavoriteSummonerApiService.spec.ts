@@ -5,7 +5,7 @@ import { SummonerRecordApiQueryRepositoryStub } from '../../stub/summonerRecord/
 import { FavoriteSummonerApiQueryRepositoryStub } from '../../stub/favoriteSummoner/FavoriteSummonerApiQueryRepositoryStub';
 import { FavoriteSummonerReq } from '../../../../../../apps/api/src/favoriteSummoner/dto/FavoriteSummonerReq.dto';
 import { UserReq } from '../../../../../../apps/api/src/user/dto/UserReq.dto';
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
 describe('FavoriteSummonerApiService', () => {
   let favoriteSummonerRepository;
@@ -81,7 +81,7 @@ describe('FavoriteSummonerApiService', () => {
       );
       // then
     }).rejects.toThrowError(
-      new NotFoundException('즐겨찾기 한도가 초과되었습니다.'),
+      new ForbiddenException('즐겨찾기 한도가 초과되었습니다.'),
     );
   });
 
@@ -119,7 +119,7 @@ describe('FavoriteSummonerApiService', () => {
     expect(actual).toBeUndefined();
   });
 
-  it('즐겨찾기 한도가 초과되었습니다.', async () => {
+  it('삭제할 즐겨찾기를 조회할 수 없습니다.', async () => {
     // given
     favoriteSummonerRepository = new FavoriteSummonerRepositoryStub();
     summonerRecordRepository = new SummonerRecordRepositoryStub();
