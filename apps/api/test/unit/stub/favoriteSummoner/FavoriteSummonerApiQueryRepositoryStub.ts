@@ -2,7 +2,7 @@ import { FavoriteSummonerId } from '@app/entity/domain/favoriteSummoner/Favorite
 import { FavoriteSummonerApiQueryRepository } from '../../../../src/favoriteSummoner/FavoriteSummonerApiQueryRepository';
 
 export class FavoriteSummonerApiQueryRepositoryStub extends FavoriteSummonerApiQueryRepository {
-  private readonly favoriteSummonerLimitCount: number = 3;
+  private readonly favoriteSummonerLimitCount: number = 5;
   private readonly favoriteSummonerNonLimitCount: number = 1;
 
   constructor() {

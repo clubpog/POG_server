@@ -18,7 +18,7 @@ import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
 
 @Injectable()
 export class FavoriteSummonerApiService {
-  private readonly favoriteSummonerLimitCount: number = 3;
+  private readonly favoriteSummonerLimitCount: number = 5;
 
   constructor(
     @InjectRepository(FavoriteSummoner)
