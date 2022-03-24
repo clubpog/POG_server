@@ -33,7 +33,7 @@ export class AuthApiController {
   @ApiOperation({
     summary: '회원 가입',
     description: `
-    회원 가입할 때 deviceId, firebaseToken, isPush을 입력받습니다. \n
+    회원 가입할 때 deviceId, firebaseToken을 입력받습니다. \n
     회원 가입할 때 입력값을 누락한 경우 에러를 출력합니다. \n
     `,
   })
