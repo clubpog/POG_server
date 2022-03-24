@@ -23,7 +23,7 @@ export class FavoriteSummonerJoinSummonerRecord {
   rank: string;
 
   @Expose({ name: 'summonerRecord_profile_icon_id' })
-  profileIconId: string;
+  profileIconId: number;
 
   @Expose({ name: 'summonerRecord_summoner_id' })
   summonerId: string;
