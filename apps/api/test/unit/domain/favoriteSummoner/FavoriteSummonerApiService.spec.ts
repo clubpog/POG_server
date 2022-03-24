@@ -5,7 +5,8 @@ import { SummonerRecordApiQueryRepositoryStub } from '../../stub/summonerRecord/
 import { FavoriteSummonerApiQueryRepositoryStub } from '../../stub/favoriteSummoner/FavoriteSummonerApiQueryRepositoryStub';
 import { FavoriteSummonerReq } from '../../../../../../apps/api/src/favoriteSummoner/dto/FavoriteSummonerReq.dto';
 import { UserReq } from '../../../../../../apps/api/src/user/dto/UserReq.dto';
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { User } from '@app/entity/domain/user/User.entity';
 
 describe('FavoriteSummonerApiService', () => {
   let favoriteSummonerRepository;
@@ -81,7 +82,7 @@ describe('FavoriteSummonerApiService', () => {
       );
       // then
     }).rejects.toThrowError(
-      new NotFoundException('즐겨찾기 한도가 초과되었습니다.'),
+      new ForbiddenException('즐겨찾기 한도가 초과되었습니다.'),
     );
   });
 
@@ -119,7 +120,7 @@ describe('FavoriteSummonerApiService', () => {
     expect(actual).toBeUndefined();
   });
 
-  it('즐겨찾기 한도가 초과되었습니다.', async () => {
+  it('삭제할 즐겨찾기를 조회할 수 없습니다.', async () => {
     // given
     favoriteSummonerRepository = new FavoriteSummonerRepositoryStub();
     summonerRecordRepository = new SummonerRecordRepositoryStub();
@@ -155,5 +156,37 @@ describe('FavoriteSummonerApiService', () => {
     }).rejects.toThrowError(
       new NotFoundException('삭제할 즐겨찾기를 조회할 수 없습니다.'),
     );
+  });
+
+  it('즐겨찾기 조회에 성공했습니다.', async () => {
+    // given
+    favoriteSummonerRepository = new FavoriteSummonerRepositoryStub();
+    summonerRecordRepository = new SummonerRecordRepositoryStub();
+    summonerRecordApiQueryRepository =
+      new SummonerRecordApiQueryRepositoryStub();
+    favoriteSummonerApiQueryRepository =
+      new FavoriteSummonerApiQueryRepositoryStub();
+
+    const sut = new FavoriteSummonerApiService(
+      favoriteSummonerRepository,
+      summonerRecordRepository,
+      summonerRecordApiQueryRepository,
+      favoriteSummonerApiQueryRepository,
+    );
+    // when
+    const actual = await sut.getFavoriteSummoner(
+      await User.jwtUserReq('test', 1),
+    );
+    // then
+    expect(actual[0].id).toBe(1);
+    expect(actual[0].name).toBe('test');
+    expect(actual[0].tier).toBe('test');
+    expect(actual[0].win).toBe(1);
+    expect(actual[0].lose).toBe(1);
+    expect(actual[0].puuid).toBe('test');
+    expect(actual[0].rank).toBe('test');
+    expect(actual[0].profileIconId).toBe(1);
+    expect(actual[0].summonerId).toBe('test');
+    expect(actual[0].leaguePoint).toBe(1);
   });
 });

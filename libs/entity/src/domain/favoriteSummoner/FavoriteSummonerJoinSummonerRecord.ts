@@ -30,4 +30,30 @@ export class FavoriteSummonerJoinSummonerRecord {
 
   @Expose({ name: 'summonerRecord_league_point' })
   leaguePoint: number;
+
+  static of(
+    id: number,
+    name: string,
+    tier: string,
+    win: number,
+    lose: number,
+    puuid: string,
+    rank: string,
+    profileIconId: number,
+    summonerId: string,
+    leaguePoint: number,
+  ): FavoriteSummonerJoinSummonerRecord {
+    const dto = new FavoriteSummonerJoinSummonerRecord();
+    dto.id = id;
+    dto.name = name;
+    dto.tier = tier;
+    dto.win = win;
+    dto.lose = lose;
+    dto.puuid = puuid;
+    dto.rank = rank;
+    dto.profileIconId = profileIconId;
+    dto.summonerId = summonerId;
+    dto.leaguePoint = leaguePoint;
+    return dto;
+  }
 }
