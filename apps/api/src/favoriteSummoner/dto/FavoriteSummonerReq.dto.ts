@@ -110,4 +110,28 @@ export class FavoriteSummonerReq {
       this.rank,
     );
   }
+
+  static of(
+    name: string,
+    tier: string,
+    win: number,
+    lose: number,
+    profileIconId: string,
+    puuid: string,
+    summonerId: string,
+    leaguePoint: number,
+    rank: string,
+  ): FavoriteSummonerReq {
+    const dto = new FavoriteSummonerReq();
+    dto.name = name;
+    dto.tier = tier;
+    dto.win = win;
+    dto.lose = lose;
+    dto.profileIconId = profileIconId;
+    dto.puuid = puuid;
+    dto.summonerId = summonerId;
+    dto.leaguePoint = leaguePoint;
+    dto.rank = rank;
+    return dto;
+  }
 }
