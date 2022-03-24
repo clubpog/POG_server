@@ -18,7 +18,7 @@ export class FavoriteSummonerReq {
   @ApiProperty({
     example: 'CHALLENGER',
     description: '즐겨찾기 API를 위해 입력 받는 tier입니다.',
-    required: true,
+    required: false,
   })
   @Expose()
   @IsString()
@@ -45,13 +45,14 @@ export class FavoriteSummonerReq {
   lose: number;
 
   @ApiProperty({
-    example: '6',
+    example: 6,
     description: '즐겨찾기 API를 위해 입력 받는 profileIconId입니다.',
     required: true,
   })
   @Expose()
+  @IsNotEmpty()
   @IsString()
-  profileIconId: string;
+  profileIconId: number;
 
   @ApiProperty({
     example:
@@ -87,7 +88,7 @@ export class FavoriteSummonerReq {
   @ApiProperty({
     example: 'I',
     description: '즐겨찾기 API를 위해 입력 받는 rank입니다.',
-    required: true,
+    required: false,
   })
   @Expose()
   @IsString()
@@ -116,7 +117,7 @@ export class FavoriteSummonerReq {
     tier: string,
     win: number,
     lose: number,
-    profileIconId: string,
+    profileIconId: number,
     puuid: string,
     summonerId: string,
     leaguePoint: number,

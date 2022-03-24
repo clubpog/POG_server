@@ -6,7 +6,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
-import { StringValueTransformer } from '../../transformer/StringValueTransformer';
 import { FavoriteSummoner } from '../favoriteSummoner/FavoriteSummoner.entity';
 
 @Entity()
@@ -37,11 +36,9 @@ export class SummonerRecord extends BaseTimeEntity {
   lose: number;
 
   @Column({
-    type: 'varchar',
-    transformer: new StringValueTransformer(),
-    nullable: true,
+    type: 'int',
   })
-  profileIconId: string;
+  profileIconId: number;
 
   @Column({
     type: 'varchar',
@@ -79,7 +76,7 @@ export class SummonerRecord extends BaseTimeEntity {
     tier: string,
     win: number,
     lose: number,
-    profileIconId: string,
+    profileIconId: number,
     puuid: string,
     summonerId: string,
     leaguePoint: number,

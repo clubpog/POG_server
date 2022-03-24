@@ -10,7 +10,7 @@ export class FavoriteSummonerRes {
   @Exclude() private readonly _lose: number;
   @Exclude() private readonly _puuid: string;
   @Exclude() private readonly _rank: string;
-  @Exclude() private readonly _profileIconId: string;
+  @Exclude() private readonly _profileIconId: number;
   @Exclude() private readonly _summonerId: string;
   @Exclude() private readonly _leaguePoint: number;
 
@@ -71,7 +71,7 @@ export class FavoriteSummonerRes {
 
   @ApiProperty()
   @Expose()
-  get profileIconId(): string {
+  get profileIconId(): number {
     return this._profileIconId;
   }
 
