@@ -59,7 +59,7 @@ jobs:
         run: npm ci
 
       - name: Install RDB Dependencies
-        run: apt-get update && apt-get install -y postgresql-client-12
+        run: apt-get update && apt-get install -y postgresql-client
 
       # - name: Initialize RDB PostgreSQL
       #   run:
