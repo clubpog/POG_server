@@ -40,7 +40,8 @@ jobs:
     services:
       rdb:
         image: postgres:12
-        ports: ['5432:5432']
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -67,7 +68,7 @@ jobs:
         run: apt-get update && apt-get install -y postgresql-client
 
       - name: Initialize RDB PostgreSQL
-        run: psql -h localhost -p 5432 -U pogTest
+        run: psql -h 127.0.0.1 -p 5432 -U pogTest
 
       - name: Test with DB
         run: npx jest --runInBand --detectOpenHandles --forceExit
