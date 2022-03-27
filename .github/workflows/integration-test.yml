@@ -44,7 +44,7 @@ jobs:
           POSTGRES_USER: pogTest
           POSTGRES_PASSWORD: pogTest123
         ports:
-          - 5432:5432
+          - 5432: 5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -71,7 +71,7 @@ jobs:
       #   run:
 
       - name: Test with DB
-        run: npm run test
+        run: npx jest --runInBand --detectOpenHandles --forceExit
 
       - name: Success
         run: echo Test Completed Successfully.
