@@ -4,7 +4,7 @@ on:
     branches:
       - develop
       - master
-  commit:
+  push:
     branches:
       - feature/pr-test
 
