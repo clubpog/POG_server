@@ -41,6 +41,8 @@ jobs:
           echo DB_DEV_PASSWORD=${{ secrets.DB_DEV_PASSWORD }} >> .env
           echo DEV_LOGGING=true >> .env
           echo DEV_SYNCHRONIZE=false >> .env
+          echo REDIS_ENDPOINT=${{ secrets.REDIS_ENDPOINT }} >> .env
+          echo API_KEY=${{ secrets.API_KEY }} >> .env
           cat .env
 
       - name: Generate deployment package
