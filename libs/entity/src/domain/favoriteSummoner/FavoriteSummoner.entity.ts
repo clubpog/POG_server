@@ -8,6 +8,8 @@ import { User } from '../user/User.entity';
 @Index('idx_favoriteSummoner_2', ['SummonerRecord'])
 export class FavoriteSummoner extends BaseTimeEntity {
   @ManyToOne(() => User, (user: User) => user.FavoriteSummoner, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
     nullable: false,
   })
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
@@ -16,6 +18,10 @@ export class FavoriteSummoner extends BaseTimeEntity {
   @ManyToOne(
     () => SummonerRecord,
     (summonerRecord: SummonerRecord) => summonerRecord.FavoriteSummoner,
+    {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
   )
   @JoinColumn({ name: 'summoner_id', referencedColumnName: 'summonerId' })
   SummonerRecord: SummonerRecord[] | SummonerRecord | string;
