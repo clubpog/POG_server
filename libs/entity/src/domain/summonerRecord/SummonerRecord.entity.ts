@@ -56,9 +56,6 @@ export class SummonerRecord extends BaseTimeEntity {
   @OneToMany(
     () => FavoriteSummoner,
     (favoriteSummoner: FavoriteSummoner) => favoriteSummoner.SummonerRecord,
-    {
-      eager: false,
-    },
   )
   FavoriteSummoner: FavoriteSummoner[];
 
