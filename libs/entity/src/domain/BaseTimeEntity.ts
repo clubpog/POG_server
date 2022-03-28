@@ -7,10 +7,11 @@ import {
 } from 'typeorm';
 import { LocalDateTime } from 'js-joda';
 import { DateTimeUtil } from '../util/DateTimeUtil';
+import { BigintValueTransformer } from '../transformer/BigintValueTransformer';
 
 export abstract class BaseTimeEntity {
   @Generated('increment')
-  @PrimaryColumn({ type: 'bigint' })
+  @PrimaryColumn({ type: 'bigint', transformer: new BigintValueTransformer() })
   id: number;
 
   @CreateDateColumn({ type: 'timestamptz', nullable: false })
