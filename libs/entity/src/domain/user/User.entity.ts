@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
 import { FavoriteSummoner } from '../favoriteSummoner/FavoriteSummoner.entity';
 
