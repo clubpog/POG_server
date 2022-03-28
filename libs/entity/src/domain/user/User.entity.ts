@@ -51,10 +51,6 @@ export class User extends BaseTimeEntity {
   @OneToMany(
     () => FavoriteSummoner,
     (favoriteSummoner: FavoriteSummoner) => favoriteSummoner.User,
-    {
-      eager: false,
-      onUpdate: 'CASCADE',
-    },
   )
   FavoriteSummoner: FavoriteSummoner[];
 
