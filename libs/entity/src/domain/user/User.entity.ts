@@ -5,9 +5,6 @@ import { FavoriteSummoner } from '../favoriteSummoner/FavoriteSummoner.entity';
 
 @Entity()
 export class User extends BaseTimeEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
   @Column({
     unique: true,
     nullable: true,

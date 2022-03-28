@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
 import { SummonerRecord } from '../summonerRecord/SummonerRecord.entity';
 import { User } from '../user/User.entity';
@@ -13,9 +7,6 @@ import { User } from '../user/User.entity';
 @Index('idx_favoriteSummoner_1', ['User'])
 @Index('idx_favoriteSummoner_2', ['SummonerRecord'])
 export class FavoriteSummoner extends BaseTimeEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
   @ManyToOne(() => User, (user: User) => user.FavoriteSummoner, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',

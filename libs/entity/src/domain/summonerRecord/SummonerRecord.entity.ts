@@ -1,19 +1,10 @@
-import {
-  Column,
-  Entity,
-  Index,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, Index, OneToMany } from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
 import { FavoriteSummoner } from '../favoriteSummoner/FavoriteSummoner.entity';
 
 @Entity()
 @Index('idx_summonerRecord_1', ['summonerId'])
 export class SummonerRecord extends BaseTimeEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
   @Column({
     type: 'varchar',
   })
