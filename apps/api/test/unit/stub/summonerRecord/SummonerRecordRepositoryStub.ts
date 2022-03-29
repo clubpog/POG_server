@@ -1,3 +1,4 @@
+import { DeleteResult } from './../../../../../../libs/entity/test/stub/DeleteResultStub';
 import { SummonerRecord } from '@app/entity/domain/summonerRecord/SummonerRecord.entity';
 import { UpdateResult } from '../../../../../../libs/entity/test/stub/UpdateResultStub';
 
@@ -24,5 +25,9 @@ export class SummonerRecordRepositoryStub {
 
   softDelete(summonerId: string) {
     return UpdateResult.Result();
+  }
+
+  delete() {
+    return DeleteResult.Result();
   }
 }
