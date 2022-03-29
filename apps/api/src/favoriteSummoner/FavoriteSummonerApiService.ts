@@ -45,6 +45,19 @@ export class FavoriteSummonerApiService {
     userDto: UserReq,
     favoriteSummonerIdDto: FavoriteSummonerIdReq,
   ): Promise<void> {
+    await this.checkNotFoundFavoriteSummoner(userDto, favoriteSummonerIdDto);
+    await this.softDeleteFavoriteSummoner(userDto, favoriteSummonerIdDto);
+    await this.deleteNoUseSummonerRecord(favoriteSummonerIdDto);
+  }
+
+  async getFavoriteSummoner(userDto: User): Promise<FavoriteSummonerRes[]> {
+    return await this.findAllFavoriteSummoners(userDto.id);
+  }
+
+  private async checkNotFoundFavoriteSummoner(
+    userDto: UserReq,
+    favoriteSummonerIdDto: FavoriteSummonerIdReq,
+  ) {
     const favoriteSummonerId = await this.findFavoriteSummonerId(
       userDto.userId,
       favoriteSummonerIdDto.summonerId,
@@ -53,19 +66,30 @@ export class FavoriteSummonerApiService {
     if (!favoriteSummonerId) {
       throw new NotFoundException('삭제할 즐겨찾기를 조회할 수 없습니다.');
     }
-    await this.favoriteSummonerRepository.softDelete(favoriteSummonerId.id);
+  }
+
+  private async deleteNoUseSummonerRecord(
+    favoriteSummonerIdDto: FavoriteSummonerIdReq,
+  ): Promise<void> {
     if (!(await this.isUsedSummonerRecordId(favoriteSummonerIdDto.summonerId)))
       await this.deleteSummonerRecord(favoriteSummonerIdDto.summonerId);
   }
 
-  async getFavoriteSummoner(userDto: User): Promise<FavoriteSummonerRes[]> {
-    return await this.findAllFavoriteSummoners(userDto.id);
+  private async softDeleteFavoriteSummoner(
+    userDto: UserReq,
+    favoriteSummonerIdDto: FavoriteSummonerIdReq,
+  ): Promise<void> {
+    const favoriteSummonerId = await this.findFavoriteSummonerId(
+      userDto.userId,
+      favoriteSummonerIdDto.summonerId,
+    );
+    await this.favoriteSummonerRepository.softDelete(favoriteSummonerId.id);
   }
 
   private async saveFavoriteSummoner(
     favoriteSummonerDto: FavoriteSummonerReq,
     userDto: UserReq,
-  ) {
+  ): Promise<void> {
     if (
       !(await this.findFavoriteSummonerIdWithSoftDelete(
         userDto.userId,
@@ -80,7 +104,7 @@ export class FavoriteSummonerApiService {
   private async restoreFavoriteSummoner(
     favoriteSummonerDto: FavoriteSummonerReq,
     userDto: UserReq,
-  ) {
+  ): Promise<void> {
     const favoriteSummonerId = await this.findFavoriteSummonerIdWithSoftDelete(
       userDto.userId,
       favoriteSummonerDto.summonerId,
@@ -89,7 +113,7 @@ export class FavoriteSummonerApiService {
       await this.favoriteSummonerRepository.restore(favoriteSummonerId.id);
   }
 
-  private async checkLimitFavoriteSummoner(userId: number) {
+  private async checkLimitFavoriteSummoner(userId: number): Promise<void> {
     if (await this.isLimitCountFavoriteSummonerId(userId)) {
       throw new ForbiddenException('즐겨찾기 한도가 초과되었습니다.');
     }
@@ -101,7 +125,9 @@ export class FavoriteSummonerApiService {
     );
   }
 
-  private async saveSummonerRecord(favoriteSummonerDto: FavoriteSummonerReq) {
+  private async saveSummonerRecord(
+    favoriteSummonerDto: FavoriteSummonerReq,
+  ): Promise<void> {
     const isFindSummonerRecordId = await this.isSummonerRecordBySummonerId(
       favoriteSummonerDto.summonerId,
     );
