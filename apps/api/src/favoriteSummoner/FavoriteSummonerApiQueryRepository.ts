@@ -20,6 +20,11 @@ export class FavoriteSummonerApiQueryRepository extends Repository<FavoriteSummo
     return Number(row[0]['count']);
   }
 
+  async countSummonerId(summonerId: string): Promise<number> {
+    const row = await this.countIdBySummonerId(summonerId);
+    return Number(row[0]['count']);
+  }
+
   async findFavoriteSummonerId(
     userId: number,
     summonerId: string,
@@ -88,6 +93,15 @@ export class FavoriteSummonerApiQueryRepository extends Repository<FavoriteSummo
       .select('COUNT(id)')
       .from(FavoriteSummoner, 'favoriteSummoner')
       .where(`favoriteSummoner.user_id =:userId`, { userId });
+
+    return await queryBuilder.getRawMany();
+  }
+
+  private async countIdBySummonerId(summonerId: string) {
+    const queryBuilder = createQueryBuilder()
+      .select('COUNT(id)')
+      .from(FavoriteSummoner, 'favoriteSummoner')
+      .where(`favoriteSummoner.summoner_id =:summonerId`, { summonerId });
 
     return await queryBuilder.getRawMany();
   }

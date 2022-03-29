@@ -7,6 +7,8 @@ export class FavoriteSummonerApiQueryRepositoryStub extends FavoriteSummonerApiQ
   private readonly favoriteSummonerLimitCount: number = 5;
   private readonly favoriteSummonerNonLimitCount: number = 1;
   private readonly notFindFavoriteSummonerId: number = 2;
+  private readonly nonUsedSummonerIdCount: number = 0;
+  private readonly usedSummonerIdCount: number = 1;
 
   constructor() {
     super();
@@ -16,6 +18,12 @@ export class FavoriteSummonerApiQueryRepositoryStub extends FavoriteSummonerApiQ
     return userId === 1
       ? this.favoriteSummonerNonLimitCount
       : this.favoriteSummonerLimitCount;
+  }
+
+  override async countSummonerId(summonerId: string): Promise<number> {
+    return summonerId === 'test'
+      ? this.nonUsedSummonerIdCount
+      : this.usedSummonerIdCount;
   }
 
   override async findFavoriteSummonerWithSoftDelete(

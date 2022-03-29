@@ -1,4 +1,5 @@
 import { SummonerRecord } from '@app/entity/domain/summonerRecord/SummonerRecord.entity';
+import { UpdateResult } from '../../../../../../libs/entity/test/stub/UpdateResultStub';
 
 export class SummonerRecordRepositoryStub {
   private static database = new Map<number, SummonerRecord>();
@@ -19,5 +20,9 @@ export class SummonerRecordRepositoryStub {
     } else {
       return { severity: 'ERROR', code: '23505' };
     }
+  }
+
+  softDelete(summonerId: string) {
+    return UpdateResult.Result();
   }
 }
