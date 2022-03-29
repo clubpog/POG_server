@@ -1,3 +1,4 @@
+import { SummonerRecordId } from '@app/entity/domain/summonerRecord/SummonerRecordId';
 import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRepository';
 import { FavoriteSummonerReq } from './dto/FavoriteSummonerReq.dto';
 import {
@@ -19,6 +20,7 @@ import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
 @Injectable()
 export class FavoriteSummonerApiService {
   private readonly favoriteSummonerLimitCount: number = 5;
+  private readonly nonUsedSummonerIdCount: number = 0;
 
   constructor(
     @InjectRepository(FavoriteSummoner)
@@ -60,6 +62,8 @@ export class FavoriteSummonerApiService {
     } else {
       await this.favoriteSummonerRepository.restore(findFavoriteSummonerId.id);
     }
+
+    // 그 후 summoner_record 테이블에 softDelete처리된 테이블이 있다면, 다시 살리는 로직 추가.
   }
 
   async deleteFavoriteSummoner(
@@ -76,10 +80,22 @@ export class FavoriteSummonerApiService {
     }
 
     await this.favoriteSummonerRepository.softDelete(favoriteSummonerId.id);
+    if (
+      (await this.isUsedSummonerRecordId(favoriteSummonerIdDto.summonerId)) ===
+      false
+    ) {
+      await this.softDeleteSummonerRecord(favoriteSummonerIdDto.summonerId);
+    }
   }
 
   async getFavoriteSummoner(userDto: User): Promise<FavoriteSummonerRes[]> {
     return await this.findAllFavoriteSummoners(userDto.id);
+  }
+
+  private async softDeleteSummonerRecord(summonerId: string): Promise<void> {
+    await this.summonerRecordRepository.softDelete(
+      await this.findSummonerRecordBySummonerId(summonerId),
+    );
   }
 
   private async isSummonerRecordBySummonerId(
@@ -90,11 +106,26 @@ export class FavoriteSummonerApiService {
     );
   }
 
+  private async findSummonerRecordBySummonerId(
+    summonerId: string,
+  ): Promise<SummonerRecordId> {
+    return await this.summonerRecordApiQueryRepository.findSummonerRecordIdBySummonerId(
+      summonerId,
+    );
+  }
+
   private async isLimitCountFavoriteSummonerId(
     userId: number,
   ): Promise<boolean> {
     const count = await this.favoriteSummonerApiQueryRepository.countId(userId);
     return count >= this.favoriteSummonerLimitCount ? true : false;
+  }
+
+  private async isUsedSummonerRecordId(summonerId: string): Promise<boolean> {
+    const count = await this.favoriteSummonerApiQueryRepository.countSummonerId(
+      summonerId,
+    );
+    return count !== this.nonUsedSummonerIdCount ? true : false;
   }
 
   private async findFavoriteSummonerIdWithSoftDelete(
