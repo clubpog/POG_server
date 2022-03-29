@@ -37,20 +37,8 @@ export class FavoriteSummonerApiService {
   ): Promise<void> {
     await this.checkLimitFavoriteSummoner(userDto.userId);
     await this.saveSummonerRecord(favoriteSummonerDto);
-
-    const findFavoriteSummonerId =
-      await this.findFavoriteSummonerIdWithSoftDelete(
-        userDto.userId,
-        favoriteSummonerDto.summonerId,
-      );
-
-    if (!findFavoriteSummonerId) {
-      await this.favoriteSummonerRepository.save(
-        await favoriteSummonerDto.toFavoriteSummonerEntity(userDto.userId),
-      );
-    } else {
-      await this.favoriteSummonerRepository.restore(findFavoriteSummonerId.id);
-    }
+    await this.saveFavoriteSummoner(favoriteSummonerDto, userDto);
+    await this.restoreFavoriteSummoner(favoriteSummonerDto, userDto);
   }
 
   async deleteFavoriteSummoner(
@@ -72,6 +60,33 @@ export class FavoriteSummonerApiService {
 
   async getFavoriteSummoner(userDto: User): Promise<FavoriteSummonerRes[]> {
     return await this.findAllFavoriteSummoners(userDto.id);
+  }
+
+  private async saveFavoriteSummoner(
+    favoriteSummonerDto: FavoriteSummonerReq,
+    userDto: UserReq,
+  ) {
+    if (
+      !(await this.findFavoriteSummonerIdWithSoftDelete(
+        userDto.userId,
+        favoriteSummonerDto.summonerId,
+      ))
+    )
+      await this.favoriteSummonerRepository.save(
+        await favoriteSummonerDto.toFavoriteSummonerEntity(userDto.userId),
+      );
+  }
+
+  private async restoreFavoriteSummoner(
+    favoriteSummonerDto: FavoriteSummonerReq,
+    userDto: UserReq,
+  ) {
+    const favoriteSummonerId = await this.findFavoriteSummonerIdWithSoftDelete(
+      userDto.userId,
+      favoriteSummonerDto.summonerId,
+    );
+    if (favoriteSummonerId)
+      await this.favoriteSummonerRepository.restore(favoriteSummonerId.id);
   }
 
   private async checkLimitFavoriteSummoner(userId: number) {
