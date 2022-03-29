@@ -5,11 +5,6 @@ import { SummonerRecordId } from '@app/entity/domain/summonerRecord/SummonerReco
 
 @EntityRepository(SummonerRecord)
 export class SummonerRecordApiQueryRepository extends Repository<SummonerRecord> {
-  async isSummonerRecordIdBySummonerId(summonerId: string): Promise<boolean> {
-    const row = await this.findOneBySummonerId(summonerId);
-    return row !== undefined ? true : false;
-  }
-
   async findSummonerRecordIdBySummonerId(
     summonerId: string,
   ): Promise<SummonerRecordId> {
@@ -17,9 +12,25 @@ export class SummonerRecordApiQueryRepository extends Repository<SummonerRecord>
     return plainToInstance(SummonerRecordId, row);
   }
 
+  async findSummonerRecordWithSoftDelete(
+    summonerId: string,
+  ): Promise<SummonerRecordId> {
+    const row = await this.findOneSoftDelete(summonerId);
+    return plainToInstance(SummonerRecordId, row);
+  }
+
   private async findOneBySummonerId(summonerId: string) {
     const queryBuilder = createQueryBuilder()
       .select(['id'])
+      .from(SummonerRecord, 'summonerRecord')
+      .where(`summonerRecord.summonerId =:summonerId`, { summonerId });
+    return await queryBuilder.getRawOne();
+  }
+
+  private async findOneSoftDelete(summonerId: string) {
+    const queryBuilder = createQueryBuilder()
+      .select(['id'])
+      .withDeleted()
       .from(SummonerRecord, 'summonerRecord')
       .where(`summonerRecord.summonerId =:summonerId`, { summonerId });
     return await queryBuilder.getRawOne();

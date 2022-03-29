@@ -5,14 +5,14 @@ export class SummonerRecordApiQueryRepositoryStub extends SummonerRecordApiQuery
   constructor() {
     super();
   }
-
-  override async isSummonerRecordIdBySummonerId(
+  override async findSummonerRecordIdBySummonerId(
     summonerId: string,
-  ): Promise<boolean> {
-    return true;
+  ): Promise<SummonerRecordId> {
+    const dto = SummonerRecordId.from(1);
+    return dto;
   }
 
-  override async findSummonerRecordIdBySummonerId(
+  override async findSummonerRecordWithSoftDelete(
     summonerId: string,
   ): Promise<SummonerRecordId> {
     const dto = SummonerRecordId.from(1);
