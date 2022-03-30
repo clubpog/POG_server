@@ -1,3 +1,4 @@
+import { PushApiModule } from './push/PushApiModule';
 import { getBullModule } from '../../../libs/entity/getBullModule';
 import { HealthCheckController } from './health-check/HealthCheckController';
 import { getTypeOrmModule } from '../../../libs/entity/getTypeOrmModule';
@@ -21,6 +22,7 @@ import { AuthConfig, ValidationSchema } from '@app/common-config/config';
     LoggingModule,
     TerminusModule,
     HttpModule,
+    PushApiModule,
   ],
   controllers: [HealthCheckController],
 })
