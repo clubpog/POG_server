@@ -1,3 +1,4 @@
+import { getBullModule } from '../../../libs/entity/getBullModule';
 import { HealthCheckController } from './health-check/HealthCheckController';
 import { getTypeOrmModule } from '../../../libs/entity/getTypeOrmModule';
 import { LoggingModule } from '@app/common-config/logging/logging.module';
@@ -16,6 +17,7 @@ import { AuthConfig, ValidationSchema } from '@app/common-config/config';
       validationSchema: ValidationSchema,
     }),
     getTypeOrmModule(),
+    getBullModule(),
     LoggingModule,
     TerminusModule,
     HttpModule,
