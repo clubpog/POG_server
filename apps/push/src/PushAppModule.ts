@@ -9,6 +9,7 @@ import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
 
 import { AuthConfig, ValidationSchema } from '@app/common-config/config';
+import { BullMonitorModule } from '../../../libs/entity/queue/src/bull-monitor/BullMonitorModule';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AuthConfig, ValidationSchema } from '@app/common-config/config';
     }),
     getTypeOrmModule(),
     getBullModule(),
+    BullMonitorModule,
     LoggingModule,
     TerminusModule,
     HttpModule,
