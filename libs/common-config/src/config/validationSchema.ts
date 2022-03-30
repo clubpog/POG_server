@@ -2,6 +2,8 @@ import * as Joi from 'joi';
 
 export const ValidationSchema = Joi.object({
   PORT: Joi.string().required(),
+  PUSH_PORT: Joi.string().required(),
+
   DB_HOST: Joi.string().required(),
   DB_PORT: Joi.string().required(),
   DB_NAME: Joi.string().required(),
@@ -17,6 +19,14 @@ export const ValidationSchema = Joi.object({
   DB_TEST_PASSWORD: Joi.string().required(),
   TEST_LOGGING: Joi.string().required(),
   TEST_SYNCHRONIZE: Joi.string().required(),
+
+  REDIS_HOST: Joi.string().required(),
+  REDIS_PORT: Joi.string().required(),
+
+  REDIS_TEST_HOST: Joi.string().required(),
+  REDIS_TEST_PORT: Joi.string().required(),
+
+  API_KEY: Joi.string().required(),
 
   JWT_SECRET_KEY: Joi.string().required(),
 });
