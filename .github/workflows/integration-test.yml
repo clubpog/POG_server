@@ -17,16 +17,11 @@ jobs:
     env:
       NODE_ENV: development
       PORT: 3000
-      DB_HOST: ${{ secrets.DB_HOST }}
-      DB_PORT: ${{ secrets.DB_PORT }}
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       LOGGING: false
       SYNCHRONIZE: false
-      DB_TEST_HOST: 127.0.0.1
+      DB_TEST_HOST: rdb
       DB_TEST_PORT: 5432
-      DB_TEST_NAME: rdb
+      DB_TEST_NAME: postgres
       DB_TEST_USERNAME: pogTest
       DB_TEST_PASSWORD: pogTest123
       TEST_LOGGING: false
@@ -49,7 +44,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 5432:5432
+          - 5432/tcp
 
 
       cache:
