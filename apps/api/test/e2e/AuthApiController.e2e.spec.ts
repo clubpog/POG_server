@@ -12,6 +12,10 @@
 // import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
 // import { genSalt, hash } from 'bcrypt';
 
+describe('AuthApiController (e2e)', () => {
+  test.todo('pass');
+});
+
 // describe('AuthApiController (e2e)', () => {
 //   let app: INestApplication;
 //   let userRepository: Repository<User>;

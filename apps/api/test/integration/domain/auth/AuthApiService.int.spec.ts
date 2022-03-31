@@ -15,6 +15,9 @@
 // import { JwtModule } from '@nestjs/jwt';
 // import { getTypeOrmModule } from '../../../../../../libs/entity/getTypeOrmModule';
 
+describe('AuthApiService', () => {
+  test.todo('pass');
+});
 // describe('AuthApiService', () => {
 //   let userRepository: Repository<User>;
 //   let favoriteRepository: Repository<Record>;
