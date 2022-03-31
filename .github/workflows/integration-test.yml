@@ -40,8 +40,6 @@ jobs:
     services:
       rdb:
         image: postgres:12
-        # ports:
-        #   - 5432:5432
         env:
           POSTGRES_USER: pogTest
           POSTGRES_PASSWORD: pogTest123
@@ -50,6 +48,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 5432:5432
 
 
       cache:
@@ -68,8 +68,8 @@ jobs:
       - name: Install RDB Dependencies
         run: apt-get update && apt-get install -y postgresql-client
 
-      - name: Initialize RDB PostgreSQL
-        run: psql -h 127.0.0.1 -p 5432 -U pogTest -W pogTest123
+      # - name: Initialize RDB PostgreSQL
+      #   run: psql -h localhost -p 5432 -U pogTest -W pogTest123
 
       - name: Test with DB
         run: npx jest --runInBand --detectOpenHandles --forceExit
