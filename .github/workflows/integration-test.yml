@@ -40,8 +40,8 @@ jobs:
     services:
       rdb:
         image: postgres:12
-        ports:
-          - 5432:5432
+        # ports:
+        #   - 5432:5432
         env:
           POSTGRES_USER: pogTest
           POSTGRES_PASSWORD: pogTest123
