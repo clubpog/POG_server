@@ -1,5 +1,6 @@
 import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import { Job } from 'bull';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { PushApiService } from './PushApiService';
@@ -12,13 +13,26 @@ export class PushApiController {
   ) {}
 
   @Post('queue')
-  async addMessage(@Body() data: number): Promise<ResponseEntity<string>> {
+  async addMessage(
+    @Body() data: number,
+  ): Promise<ResponseEntity<Job | string>> {
     try {
-      await this.pushApiService.addMessageQueue(data);
-      return ResponseEntity.OK_WITH('메시지 전송에 성공했습니다.');
+      const res = await this.pushApiService.addMessageQueue(data);
+      return ResponseEntity.OK_WITH_DATA('메시지 전송에 성공했습니다.', res);
     } catch (error) {
       this.logger.error(`dto = ${JSON.stringify(data)}`, error);
       return ResponseEntity.ERROR_WITH('메시지 전송에 실패했습니다.');
+    }
+  }
+
+  @Get('cache')
+  async getCache(): Promise<ResponseEntity<string>> {
+    try {
+      const res = await this.pushApiService.cacheTest();
+      return ResponseEntity.OK_WITH_DATA('캐시 테스트에 성공했습니다.', res);
+    } catch (error) {
+      this.logger.error(error);
+      return ResponseEntity.ERROR_WITH('캐시 테스트에 실패했습니다.');
     }
   }
 }
