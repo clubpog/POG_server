@@ -5,14 +5,16 @@ import { PushApiController } from './PushApiController';
 import { PushApiService } from './PushApiService';
 import { getBullQueue } from '../../../../libs/entity/queue/getBullQueue';
 import { PushApiConsumer } from './PushApiConsumer';
+import { getCacheModule } from '../../../../libs/entity/geCacheModule';
 
 @Module({
   imports: [
     WinstonModule.forRoot(getWinstonLogger(process.env.NODE_ENV, 'push')),
     getBullQueue(),
+    getCacheModule(),
   ],
   controllers: [PushApiController],
   providers: [PushApiService, PushApiConsumer],
-  exports: [getBullQueue()],
+  exports: [getBullQueue(), getCacheModule()],
 })
 export class PushApiModule {}
