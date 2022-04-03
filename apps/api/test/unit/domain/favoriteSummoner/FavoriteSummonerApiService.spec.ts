@@ -97,12 +97,14 @@ describe('FavoriteSummonerApiService', () => {
       new SummonerRecordApiQueryRepositoryStub();
     favoriteSummonerApiQueryRepository =
       new FavoriteSummonerApiQueryRepositoryStub();
+    cacheManager = new CacheStub();
 
     const sut = new FavoriteSummonerApiService(
       favoriteSummonerRepository,
       summonerRecordRepository,
       summonerRecordApiQueryRepository,
       favoriteSummonerApiQueryRepository,
+      cacheManager,
     );
     // when
     const actual = await sut.deleteFavoriteSummoner(
