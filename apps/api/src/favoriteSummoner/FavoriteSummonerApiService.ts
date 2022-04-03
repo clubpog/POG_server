@@ -128,6 +128,9 @@ export class FavoriteSummonerApiService {
     await this.summonerRecordRepository.delete(
       await this.findSummonerRecordBySummonerId(summonerId),
     );
+    await this.cacheManager.del(`summonerId:${summonerId}:win`);
+    await this.cacheManager.del(`summonerId:${summonerId}:lose`);
+    await this.cacheManager.del(`summonerId:${summonerId}:tier`);
   }
 
   private async saveCacheSummonerRecord(
