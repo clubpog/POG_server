@@ -8,6 +8,7 @@ import { FavoriteSummonerModule } from '@app/entity/domain/favoriteSummoner/Favo
 import { SummonerRecordApiModule } from '../summonerRecord/SummonerRecordApiModule';
 import { SummonerRecordModule } from '@app/entity/domain/summonerRecord/SummonerRecordModule';
 import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRepository';
+import { getCacheModule } from '../../../../libs/entity/geCacheModule';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRe
     SummonerRecordModule,
     WinstonModule.forRoot(getWinstonLogger(process.env.NODE_ENV, 'api')),
     SummonerRecordApiModule,
+    getCacheModule(),
   ],
   controllers: [FavoriteSummonerApiController],
   providers: [
