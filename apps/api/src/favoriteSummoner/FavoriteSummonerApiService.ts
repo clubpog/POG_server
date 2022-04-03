@@ -141,7 +141,7 @@ export class FavoriteSummonerApiService {
       await this.cacheManager.set(
         `summonerId:${favoriteSummonerDto.summonerId}:win`,
         favoriteSummonerDto.win,
-        { ttl: 100000 },
+        { ttl: 0 },
       );
     }
 
@@ -153,7 +153,7 @@ export class FavoriteSummonerApiService {
       await this.cacheManager.set(
         `summonerId:${favoriteSummonerDto.summonerId}:lose`,
         favoriteSummonerDto.lose,
-        { ttl: 100000 },
+        { ttl: 0 },
       );
     }
 
@@ -165,7 +165,7 @@ export class FavoriteSummonerApiService {
       await this.cacheManager.set(
         `summonerId:${favoriteSummonerDto.summonerId}:tier`,
         favoriteSummonerDto.tier,
-        { ttl: 100000 },
+        { ttl: 0 },
       );
     }
   }
