@@ -1,3 +1,4 @@
+import { CacheStub } from './../../../../../../libs/entity/test/stub/CacheManagerStub';
 import { FavoriteSummonerApiService } from './../../../../src/favoriteSummoner/FavoriteSummonerApiService';
 import { FavoriteSummonerRepositoryStub } from '../../stub/favoriteSummoner/FavoriteSummonerRepositoryStub';
 import { SummonerRecordRepositoryStub } from '../../stub/summonerRecord/SummonerRecordRepositoryStub';
@@ -13,7 +14,7 @@ describe('FavoriteSummonerApiService', () => {
   let summonerRecordRepository;
   let summonerRecordApiQueryRepository: SummonerRecordApiQueryRepositoryStub;
   let favoriteSummonerApiQueryRepository: FavoriteSummonerApiQueryRepositoryStub;
-
+  let cacheManager;
   it('즐겨찾기 추가에 성공했습니다.', async () => {
     // given
     favoriteSummonerRepository = new FavoriteSummonerRepositoryStub();
@@ -22,12 +23,14 @@ describe('FavoriteSummonerApiService', () => {
       new SummonerRecordApiQueryRepositoryStub();
     favoriteSummonerApiQueryRepository =
       new FavoriteSummonerApiQueryRepositoryStub();
+    cacheManager = new CacheStub();
 
     const sut = new FavoriteSummonerApiService(
       favoriteSummonerRepository,
       summonerRecordRepository,
       summonerRecordApiQueryRepository,
       favoriteSummonerApiQueryRepository,
+      cacheManager,
     );
     // when
     const actual = await sut.createFavoriteSummoner(
