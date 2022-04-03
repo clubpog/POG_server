@@ -29,7 +29,8 @@ export class AuthApiService {
 
   async signin(signinUser: User): Promise<UserAccessToken> {
     const foundUserId = await this.findUserByDeviceId(signinUser.deviceId);
-    if (foundUserId === undefined) throw new NotFoundException();
+    if (!foundUserId)
+      throw new NotFoundException('입력된 deviceId가 존재하지 않습니다.');
     await this.updateLoggedAt(signinUser.loggedAt, signinUser.deviceId);
     const payload: JwtPayload = {
       userId: foundUserId.id,

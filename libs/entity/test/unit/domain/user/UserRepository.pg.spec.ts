@@ -8,6 +8,9 @@
 // import { AuthConfig, ValidationSchema } from '@app/common-config/config';
 // import { getTypeOrmModule } from '../../../../getTypeOrmModule';
 
+describe('UserRepository', () => {
+  test.todo('pass');
+});
 // describe('UserRepository', () => {
 //   let userRepository: Repository<User>;
 //   let favoriteRepository: Repository<Favorite>;

@@ -45,6 +45,22 @@ export class ResponseEntity<T> {
     return new ResponseEntity(ResponseStatus.NOT_FOUND, message, '');
   }
 
+  static BAD_REQUEST(): ResponseEntity<string> {
+    return new ResponseEntity<string>(ResponseStatus.BAD_REQUEST, '', '');
+  }
+
+  static BAD_REQUEST_WITH(message: string): ResponseEntity<string> {
+    return new ResponseEntity(ResponseStatus.BAD_REQUEST, message, '');
+  }
+
+  static FORBIDDEN(): ResponseEntity<string> {
+    return new ResponseEntity<string>(ResponseStatus.FORBIDDEN, '', '');
+  }
+
+  static FORBIDDEN_WITH(message: string): ResponseEntity<string> {
+    return new ResponseEntity(ResponseStatus.FORBIDDEN, message, '');
+  }
+
   static ERROR(): ResponseEntity<string> {
     return new ResponseEntity<string>(
       ResponseStatus.SERVER_ERROR,

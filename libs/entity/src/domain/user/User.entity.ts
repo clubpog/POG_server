@@ -1,13 +1,10 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
-import { Favorite } from '../favorite/Favorite.entity';
+import { FavoriteSummoner } from '../favoriteSummoner/FavoriteSummoner.entity';
 
 @Entity()
 export class User extends BaseTimeEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
   @Column({
     unique: true,
     nullable: true,
@@ -51,11 +48,11 @@ export class User extends BaseTimeEntity {
   })
   loggedAt: Date | null;
 
-  @OneToMany(() => Favorite, (favorite: Favorite) => favorite.User, {
-    eager: false,
-    // cascade: true,
-  })
-  Favorite: Favorite[];
+  @OneToMany(
+    () => FavoriteSummoner,
+    (favoriteSummoner: FavoriteSummoner) => favoriteSummoner.User,
+  )
+  FavoriteSummoner: FavoriteSummoner[];
 
   static async signup(
     // userId: string,

@@ -1,3 +1,4 @@
+import { User } from '@app/entity/domain/user/User.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { IsNotEmpty, IsBoolean } from 'class-validator';
@@ -12,4 +13,8 @@ export class UserUpdatePushReq {
   @IsNotEmpty()
   @IsBoolean()
   isPush: boolean;
+
+  toEntity(deviceId: string): Promise<User> {
+    return User.updatePush(deviceId, this.isPush);
+  }
 }

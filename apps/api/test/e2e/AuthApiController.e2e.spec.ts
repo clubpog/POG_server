@@ -1,8 +1,8 @@
-// import { FavoriteModule } from '@app/entity/domain/favorite/FavoriteModule';
-// import { Favorite } from '@app/entity/domain/favorite/Favorite.entity';
+// import { RecordModule } from '@app/entity/domain/record/RecordModule';
+// import { Record } from '@app/entity/domain/record/Record.entity';
 // import { Test, TestingModule } from '@nestjs/testing';
 // import { HttpStatus, INestApplication } from '@nestjs/common';
-// import * as request from 'supertest';
+// import request from 'supertest';
 // import { ApiAppModule } from '../../src/ApiAppModule';
 // import { getConnection, Repository } from 'typeorm';
 // import { SetNestApp } from '@app/common-config/setNestApp';
@@ -12,19 +12,23 @@
 // import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
 // import { genSalt, hash } from 'bcrypt';
 
+describe('AuthApiController (e2e)', () => {
+  test.todo('pass');
+});
+
 // describe('AuthApiController (e2e)', () => {
 //   let app: INestApplication;
 //   let userRepository: Repository<User>;
-//   let favoriteRepository: Repository<Favorite>;
+//   let favoriteRepository: Repository<Record>;
 
 //   beforeAll(async () => {
 //     const module: TestingModule = await Test.createTestingModule({
-//       imports: [FavoriteModule, ApiAppModule],
+//       imports: [RecordModule, ApiAppModule],
 //     }).compile();
 
 //     app = module.createNestApplication();
 //     userRepository = module.get(getRepositoryToken(User));
-//     favoriteRepository = module.get(getRepositoryToken(Favorite));
+//     favoriteRepository = module.get(getRepositoryToken(Record));
 
 //     SetNestApp(app); // ClassSerializerInterceptor 적용
 //     await app.init();
