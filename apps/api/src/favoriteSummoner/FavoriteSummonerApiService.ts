@@ -2,7 +2,9 @@ import { SummonerRecordId } from '@app/entity/domain/summonerRecord/SummonerReco
 import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRepository';
 import { FavoriteSummonerReq } from './dto/FavoriteSummonerReq.dto';
 import {
+  CACHE_MANAGER,
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -16,6 +18,7 @@ import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
 import { FavoriteSummonerId } from '@app/entity/domain/favoriteSummoner/FavoriteSummonerId';
 import { User } from '@app/entity/domain/user/User.entity';
 import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class FavoriteSummonerApiService {
@@ -29,6 +32,7 @@ export class FavoriteSummonerApiService {
     private summonerRecordRepository?: Repository<SummonerRecord>,
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
     private readonly favoriteSummonerApiQueryRepository?: FavoriteSummonerApiQueryRepository,
+    @Inject(CACHE_MANAGER) private cacheManager?: Cache,
   ) {}
 
   async createFavoriteSummoner(
@@ -36,6 +40,7 @@ export class FavoriteSummonerApiService {
     favoriteSummonerDto: FavoriteSummonerReq,
   ): Promise<void> {
     await this.checkLimitFavoriteSummoner(userDto.userId);
+    await this.saveCacheSummonerRecord(favoriteSummonerDto);
     await this.saveSummonerRecord(favoriteSummonerDto);
     await this.saveFavoriteSummoner(favoriteSummonerDto, userDto);
     await this.restoreFavoriteSummoner(favoriteSummonerDto, userDto);
@@ -123,6 +128,46 @@ export class FavoriteSummonerApiService {
     await this.summonerRecordRepository.delete(
       await this.findSummonerRecordBySummonerId(summonerId),
     );
+  }
+
+  private async saveCacheSummonerRecord(
+    favoriteSummonerDto: FavoriteSummonerReq,
+  ): Promise<void> {
+    const isCachedSummonerRecordWin = await this.cacheManager.get<number>(
+      `summonerId:${favoriteSummonerDto.summonerId}:win`,
+    );
+
+    if (!isCachedSummonerRecordWin) {
+      await this.cacheManager.set(
+        `summonerId:${favoriteSummonerDto.summonerId}:win`,
+        favoriteSummonerDto.win,
+        { ttl: 0 },
+      );
+    }
+
+    const isCachedSummonerRecordLose = await this.cacheManager.get<number>(
+      `summonerId:${favoriteSummonerDto.summonerId}:lose`,
+    );
+
+    if (!isCachedSummonerRecordLose) {
+      await this.cacheManager.set(
+        `summonerId:${favoriteSummonerDto.summonerId}:lose`,
+        favoriteSummonerDto.lose,
+        { ttl: 0 },
+      );
+    }
+
+    const isCachedSummonerRecordTier = await this.cacheManager.get<string>(
+      `summonerId:${favoriteSummonerDto.summonerId}:tier`,
+    );
+
+    if (!isCachedSummonerRecordTier) {
+      await this.cacheManager.set(
+        `summonerId:${favoriteSummonerDto.summonerId}:tier`,
+        favoriteSummonerDto.tier,
+        { ttl: 0 },
+      );
+    }
   }
 
   private async saveSummonerRecord(
