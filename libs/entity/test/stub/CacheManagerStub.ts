@@ -6,4 +6,8 @@ export class CacheStub {
   async set(): Promise<string> {
     return 'OK';
   }
+
+  async del(key: string): Promise<any> {
+    return;
+  }
 }
