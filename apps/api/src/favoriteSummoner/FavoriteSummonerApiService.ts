@@ -2,9 +2,7 @@ import { SummonerRecordId } from '@app/entity/domain/summonerRecord/SummonerReco
 import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRepository';
 import { FavoriteSummonerReq } from './dto/FavoriteSummonerReq.dto';
 import {
-  CACHE_MANAGER,
   ForbiddenException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -18,7 +16,8 @@ import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
 import { FavoriteSummonerId } from '@app/entity/domain/favoriteSummoner/FavoriteSummonerId';
 import { User } from '@app/entity/domain/user/User.entity';
 import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
-import { Cache } from 'cache-manager';
+import { RedisService } from 'nestjs-redis';
+import { Redis } from 'ioredis';
 
 @Injectable()
 export class FavoriteSummonerApiService {
@@ -32,7 +31,7 @@ export class FavoriteSummonerApiService {
     private summonerRecordRepository?: Repository<SummonerRecord>,
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
     private readonly favoriteSummonerApiQueryRepository?: FavoriteSummonerApiQueryRepository,
-    @Inject(CACHE_MANAGER) private cacheManager?: Cache,
+    private readonly redisService?: RedisService,
   ) {}
 
   async createFavoriteSummoner(
@@ -128,49 +127,46 @@ export class FavoriteSummonerApiService {
     await this.summonerRecordRepository.delete(
       await this.findSummonerRecordBySummonerId(summonerId),
     );
-    await this.cacheManager.del(`summonerId:${summonerId}:win`);
-    await this.cacheManager.del(`summonerId:${summonerId}:lose`);
-    await this.cacheManager.del(`summonerId:${summonerId}:tier`);
+    const redisClient = await this.getRedisClient();
+
+    await redisClient.multi({ pipeline: false });
+    await redisClient.del(`summonerId:${summonerId}:win`);
+    await redisClient.del(`summonerId:${summonerId}:lose`);
+    await redisClient.del(`summonerId:${summonerId}:tier`);
+    await redisClient.exec();
   }
 
   private async saveCacheSummonerRecord(
     favoriteSummonerDto: FavoriteSummonerReq,
   ): Promise<void> {
-    const isCachedSummonerRecordWin = await this.cacheManager.get<number>(
+    const redisClient = await this.getRedisClient();
+    const [win, lose, tier] = await redisClient.mget(
       `summonerId:${favoriteSummonerDto.summonerId}:win`,
-    );
-
-    if (!isCachedSummonerRecordWin) {
-      await this.cacheManager.set(
-        `summonerId:${favoriteSummonerDto.summonerId}:win`,
-        favoriteSummonerDto.win,
-        { ttl: 0 },
-      );
-    }
-
-    const isCachedSummonerRecordLose = await this.cacheManager.get<number>(
       `summonerId:${favoriteSummonerDto.summonerId}:lose`,
-    );
-
-    if (!isCachedSummonerRecordLose) {
-      await this.cacheManager.set(
-        `summonerId:${favoriteSummonerDto.summonerId}:lose`,
-        favoriteSummonerDto.lose,
-        { ttl: 0 },
-      );
-    }
-
-    const isCachedSummonerRecordTier = await this.cacheManager.get<string>(
       `summonerId:${favoriteSummonerDto.summonerId}:tier`,
     );
 
-    if (!isCachedSummonerRecordTier) {
-      await this.cacheManager.set(
+    if (!win)
+      await redisClient.set(
+        `summonerId:${favoriteSummonerDto.summonerId}:win`,
+        favoriteSummonerDto.win,
+      );
+
+    if (!lose)
+      await redisClient.set(
+        `summonerId:${favoriteSummonerDto.summonerId}:lose`,
+        favoriteSummonerDto.lose,
+      );
+
+    if (!tier)
+      await redisClient.set(
         `summonerId:${favoriteSummonerDto.summonerId}:tier`,
         favoriteSummonerDto.tier,
-        { ttl: 0 },
       );
-    }
+  }
+
+  private async getRedisClient(): Promise<Redis> {
+    return this.redisService.getClient();
   }
 
   private async saveSummonerRecord(
