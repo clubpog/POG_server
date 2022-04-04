@@ -8,8 +8,11 @@ const [host, port] =
     ? [process.env.REDIS_HOST, process.env.REDIS_PORT]
     : [process.env.REDIS_TEST_HOST, process.env.REDIS_TEST_PORT];
 
-const RedisConfig: QueueOptions = {
+export const RedisConfig: QueueOptions = {
   redis: { host, port: Number(port) },
 };
 
-export = RedisConfig;
+export const RedisModuleConfig = {
+  host,
+  port: Number(port),
+};
