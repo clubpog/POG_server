@@ -39,7 +39,7 @@ export class FavoriteSummonerApiService {
     favoriteSummonerDto: FavoriteSummonerReq,
   ): Promise<void> {
     await this.checkLimitFavoriteSummoner(userDto.userId);
-    await this.saveCacheSummonerRecord(favoriteSummonerDto);
+    await this.saveRedisSummonerRecord(favoriteSummonerDto);
     await this.saveSummonerRecord(favoriteSummonerDto);
     await this.saveFavoriteSummoner(favoriteSummonerDto, userDto);
     await this.restoreFavoriteSummoner(favoriteSummonerDto, userDto);
@@ -123,20 +123,26 @@ export class FavoriteSummonerApiService {
     }
   }
 
-  private async deleteSummonerRecord(summonerId: string): Promise<void> {
-    await this.summonerRecordRepository.delete(
-      await this.findSummonerRecordBySummonerId(summonerId),
-    );
-    const redisClient = await this.getRedisClient();
-
+  private async removeTransactionRedis(
+    redisClient: Redis,
+    summonerId: string,
+  ): Promise<void> {
     await redisClient.multi({ pipeline: false });
     await redisClient.del(`summonerId:${summonerId}:win`);
     await redisClient.del(`summonerId:${summonerId}:lose`);
     await redisClient.del(`summonerId:${summonerId}:tier`);
+    await redisClient.srem('summonerId', summonerId);
     await redisClient.exec();
   }
 
-  private async saveCacheSummonerRecord(
+  private async deleteSummonerRecord(summonerId: string): Promise<void> {
+    await this.summonerRecordRepository.delete(
+      await this.findSummonerRecordBySummonerId(summonerId),
+    );
+    await this.removeTransactionRedis(await this.getRedisClient(), summonerId);
+  }
+
+  private async saveRedisSummonerRecord(
     favoriteSummonerDto: FavoriteSummonerReq,
   ): Promise<void> {
     const redisClient = await this.getRedisClient();
@@ -163,6 +169,8 @@ export class FavoriteSummonerApiService {
         `summonerId:${favoriteSummonerDto.summonerId}:tier`,
         favoriteSummonerDto.tier,
       );
+
+    await redisClient.sadd('summonerId', favoriteSummonerDto.summonerId);
   }
 
   private async getRedisClient(): Promise<Redis> {

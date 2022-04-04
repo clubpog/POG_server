@@ -18,4 +18,7 @@ export class RedisStub {
   async exec(): Promise<boolean> {
     return null;
   }
+
+  async srem(): Promise<void> {}
+  async sadd(): Promise<void> {}
 }
