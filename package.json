@@ -48,6 +48,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "express-basic-auth": "^1.2.1",
+    "firebase-admin": "^10.0.2",
     "joi": "^17.5.0",
     "js-joda": "^1.11.0",
     "nest-winston": "^1.6.2",

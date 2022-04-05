@@ -1,3 +1,4 @@
+import { PushJobService } from './../../../../libs/common-config/src/job/src/PushJobService';
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
@@ -6,8 +7,11 @@ import { Job } from 'bull';
 export class PushApiConsumer {
   private readonly logger = new Logger(PushApiConsumer.name);
 
+  constructor(private readonly pushJobService: PushJobService) {}
+
   @Process('summonerList')
-  getSummonerIdQueue(job: Job) {
-    this.logger.log(`${job.id} 번 작업을 수신했습니다.`);
+  async getSummonerIdQueue(job: Job) {
+    await this.pushJobService.send(job.data['summonerId']);
+    this.logger.log(`${job.data['summonerId']} topic 푸시를 전송했습니다.`);
   }
 }
