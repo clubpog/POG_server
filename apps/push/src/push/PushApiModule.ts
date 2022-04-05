@@ -5,11 +5,14 @@ import { PushApiController } from './PushApiController';
 import { PushApiService } from './PushApiService';
 import { getBullQueue } from '../../../../libs/entity/queue/getBullQueue';
 import { PushApiConsumer } from './PushApiConsumer';
+import { RedisModule } from 'nestjs-redis';
+import { RedisModuleConfig } from '../../../../libs/entity/config/redisConfig';
 
 @Module({
   imports: [
     WinstonModule.forRoot(getWinstonLogger(process.env.NODE_ENV, 'push')),
     getBullQueue(),
+    RedisModule.register(RedisModuleConfig),
   ],
   controllers: [PushApiController],
   providers: [PushApiService, PushApiConsumer],
