@@ -5,7 +5,8 @@ import { RiotApiJobs } from './../../../../libs/common-config/src/job/RiotApi';
 import { RedisService } from 'nestjs-redis';
 import { InjectQueue } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
-import { Queue, Job } from 'bull';
+import { Queue } from 'bull';
+import { Interval } from '@nestjs/schedule';
 
 @Injectable()
 export class PushApiService {
@@ -15,6 +16,7 @@ export class PushApiService {
     private readonly redisService: RedisService,
   ) {}
 
+  @Interval('pushCronTask', 10000)
   async addMessageQueue(): Promise<void> {
     const redisClient: Redis = this.redisService.getClient();
     const summonerIds = await redisClient.smembers('summonerId');
@@ -32,7 +34,6 @@ export class PushApiService {
         riotApiResponse,
         redisResponse,
       );
-
       if (isChangeRecord) {
         await this.addPushQueue();
         await this.changeRecord(riotApiResponse, redisClient, summonerId);
