@@ -1,3 +1,4 @@
+import { PushJobModule } from './../../../../libs/common-config/src/job/src/PushJobModule';
 import { Module } from '@nestjs/common';
 import { WinstonModule } from 'nest-winston';
 import { getWinstonLogger } from '@app/common-config/getWinstonLogger';
@@ -11,6 +12,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    PushJobModule,
     WinstonModule.forRoot(getWinstonLogger(process.env.NODE_ENV, 'push')),
     getBullQueue(),
     RedisModule.register(RedisModuleConfig),
