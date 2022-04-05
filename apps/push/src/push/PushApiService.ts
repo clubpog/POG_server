@@ -1,35 +1,77 @@
+import { Redis } from 'ioredis';
+import { PushRiotApi } from './dto/PushRiotApi';
+import { plainToInstance } from 'class-transformer';
+import { RiotApiJobs } from './../../../../libs/common-config/src/job/RiotApi';
+import { RedisService } from 'nestjs-redis';
 import { InjectQueue } from '@nestjs/bull';
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Queue, Job } from 'bull';
-import { Cache } from 'cache-manager';
 
 @Injectable()
 export class PushApiService {
   constructor(
-    @InjectQueue('testQueue')
-    private testQueue: Queue,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @InjectQueue('PushQueue')
+    private pushQueue: Queue,
+    private readonly redisService: RedisService,
   ) {}
 
-  async addMessageQueue(data: number): Promise<Job> {
-    const job = await this.testQueue.add(
-      'task',
-      {
-        dataId: data,
-      },
-      { delay: 3000 },
-    );
+  async addMessageQueue(): Promise<void> {
+    const redisClient: Redis = this.redisService.getClient();
+    const summonerIds = await redisClient.smembers('summonerId');
+    summonerIds.map(async summonerId => {
+      const riotApiResponse = plainToInstance(
+        PushRiotApi,
+        await RiotApiJobs(summonerId),
+      );
+      const redisResponse = await redisClient.mget(
+        `summonerId:${summonerId}:win`,
+        `summonerId:${summonerId}:lose`,
+        `summonerId:${summonerId}:tier`,
+      );
+      const isChangeRecord = await this.compareRecord(
+        riotApiResponse,
+        redisResponse,
+      );
 
-    return job;
+      if (isChangeRecord) {
+        await this.addPushQueue();
+        await this.changeRecord(riotApiResponse, redisClient, summonerId);
+      }
+    });
   }
 
-  async cacheTest(): Promise<string> {
-    const savedTime = await this.cacheManager.get<number>('time');
-    if (savedTime) {
-      return 'saved time : ' + savedTime;
-    }
-    const now = new Date().getTime();
-    await this.cacheManager.set<number>('time', now);
-    return 'save new time : ' + now;
+  private async compareRecord(
+    riotApiResponse: PushRiotApi,
+    redisResponse: string[],
+  ): Promise<boolean> {
+    const [win, lose, tier] = redisResponse;
+    if (riotApiResponse.tier !== tier) return true;
+    if (riotApiResponse.win !== Number(win)) return true;
+    if (riotApiResponse.lose !== Number(lose)) return true;
+  }
+
+  private async addPushQueue() {
+    await this.pushQueue.add(
+      'summonerList',
+      {
+        dataId: 1,
+      },
+      { delay: 10000, removeOnComplete: true },
+    );
+  }
+
+  private async changeRecord(
+    riotApiResponse: PushRiotApi,
+    redisClient: Redis,
+    summonerId: string,
+  ) {
+    await redisClient.mset(
+      `summonerId:${summonerId}:win`,
+      riotApiResponse.win,
+      `summonerId:${summonerId}:lose`,
+      riotApiResponse.lose,
+      `summonerId:${summonerId}:tier`,
+      riotApiResponse.tier,
+    );
   }
 }

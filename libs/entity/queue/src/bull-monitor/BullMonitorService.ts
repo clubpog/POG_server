@@ -6,7 +6,7 @@ import { BullAdapter } from '@bull-monitor/root/dist/bull-adapter';
 
 @Injectable()
 export class BullMonitorService extends BullMonitorExpress {
-  constructor(@InjectQueue('testQueue') testQueue: Queue) {
-    super({ queues: [new BullAdapter(testQueue)] });
+  constructor(@InjectQueue('PushQueue') pushQueue: Queue) {
+    super({ queues: [new BullAdapter(pushQueue)] });
   }
 }
