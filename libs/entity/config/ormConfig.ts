@@ -26,6 +26,10 @@ const OrmConfig: TypeOrmModuleOptions = {
   logging: logging === 'false' ? false : Boolean(logging),
   keepConnectionAlive: true,
   namingStrategy: new SnakeNamingStrategy(),
+  maxQueryExecutionTime: Number(process.env.DB_CONNECTION_TIMEOUT),
+  extra: {
+    statement_timeout: Number(process.env.DB_CONNECTION_TIMEOUT),
+  },
 };
 
 export = OrmConfig;
