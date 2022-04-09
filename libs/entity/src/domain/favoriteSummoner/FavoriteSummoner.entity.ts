@@ -4,8 +4,7 @@ import { SummonerRecord } from '../summonerRecord/SummonerRecord.entity';
 import { User } from '../user/User.entity';
 
 @Entity()
-@Index('idx_favoriteSummoner_1', ['SummonerRecord'])
-@Index('idx_favoriteSummoner_2', ['User'])
+@Index('idx_favoriteSummoner_1', ['User'])
 export class FavoriteSummoner extends BaseTimeEntity {
   @ManyToOne(() => User, (user: User) => user.FavoriteSummoner, {
     onDelete: 'CASCADE',
