@@ -7,6 +7,7 @@ import { InjectQueue } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
 import { Queue } from 'bull';
 import { Interval } from '@nestjs/schedule';
+import { SummonerRecordApiQueryRepository } from '../../../api/src/summonerRecord/SummonerRecordApiQueryRepository';
 
 @Injectable()
 export class PushApiService {
@@ -14,11 +15,12 @@ export class PushApiService {
     @InjectQueue('PushQueue')
     private pushQueue: Queue,
     private readonly redisService: RedisService,
+    private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
   ) {}
 
   // @Interval('pushCronTask', 10000)
   async addMessageQueue(): Promise<void> {
-    const redisClient: Redis = this.redisService.getClient();
+    const redisClient: Redis = await this.getRedisClient();
     const summonerIds = await redisClient.smembers('summonerId');
     // summonerIds.map(async summonerId => {
     // const riotApiResponse = plainToInstance(
@@ -60,6 +62,21 @@ export class PushApiService {
     // }
   }
 
+  async recoverRedis(): Promise<void> {
+    const summonerIds =
+      await this.summonerRecordApiQueryRepository.findAllSummonerRecordId();
+
+    await Promise.all(
+      summonerIds.map(async summonerId => {
+        await this.recoverRedisQueue(summonerId.summonerId);
+      }),
+    );
+  }
+
+  public async getRedisClient(): Promise<Redis> {
+    return this.redisService.getClient();
+  }
+
   private async compareRecord(
     riotApiResponse: PushRiotApi,
     redisResponse: string[],
@@ -80,7 +97,17 @@ export class PushApiService {
     );
   }
 
-  private async changeRecord(
+  private async recoverRedisQueue(summonerId: string) {
+    return await this.pushQueue.add(
+      'recoverList',
+      {
+        summonerId,
+      },
+      { delay: 10000, removeOnComplete: true },
+    );
+  }
+
+  public async changeRecord(
     riotApiResponse: PushRiotApi,
     redisClient: Redis,
     summonerId: string,
@@ -93,5 +120,9 @@ export class PushApiService {
       `summonerId:${summonerId}:tier`,
       riotApiResponse.tier,
     );
+  }
+
+  public async addRedisSet(redisClient: Redis, summonerId: string) {
+    await redisClient.sadd('summonerId', summonerId);
   }
 }
