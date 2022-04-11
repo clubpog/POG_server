@@ -16,6 +16,8 @@ import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
 import { FavoriteSummonerId } from '@app/entity/domain/favoriteSummoner/FavoriteSummonerId';
 import { User } from '@app/entity/domain/user/User.entity';
 import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
+import { RedisService } from 'nestjs-redis';
+import { Redis } from 'ioredis';
 
 @Injectable()
 export class FavoriteSummonerApiService {
@@ -29,6 +31,7 @@ export class FavoriteSummonerApiService {
     private summonerRecordRepository?: Repository<SummonerRecord>,
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
     private readonly favoriteSummonerApiQueryRepository?: FavoriteSummonerApiQueryRepository,
+    private readonly redisService?: RedisService,
   ) {}
 
   async createFavoriteSummoner(
@@ -36,6 +39,7 @@ export class FavoriteSummonerApiService {
     favoriteSummonerDto: FavoriteSummonerReq,
   ): Promise<void> {
     await this.checkLimitFavoriteSummoner(userDto.userId);
+    await this.saveRedisSummonerRecord(favoriteSummonerDto);
     await this.saveSummonerRecord(favoriteSummonerDto);
     await this.saveFavoriteSummoner(favoriteSummonerDto, userDto);
     await this.restoreFavoriteSummoner(favoriteSummonerDto, userDto);
@@ -119,10 +123,58 @@ export class FavoriteSummonerApiService {
     }
   }
 
+  private async removeTransactionRedis(
+    redisClient: Redis,
+    summonerId: string,
+  ): Promise<void> {
+    await redisClient.multi({ pipeline: false });
+    await redisClient.del(`summonerId:${summonerId}:win`);
+    await redisClient.del(`summonerId:${summonerId}:lose`);
+    await redisClient.del(`summonerId:${summonerId}:tier`);
+    await redisClient.srem('summonerId', summonerId);
+    await redisClient.exec();
+  }
+
   private async deleteSummonerRecord(summonerId: string): Promise<void> {
     await this.summonerRecordRepository.delete(
       await this.findSummonerRecordBySummonerId(summonerId),
     );
+    await this.removeTransactionRedis(await this.getRedisClient(), summonerId);
+  }
+
+  private async saveRedisSummonerRecord(
+    favoriteSummonerDto: FavoriteSummonerReq,
+  ): Promise<void> {
+    const redisClient = await this.getRedisClient();
+    const [win, lose, tier] = await redisClient.mget(
+      `summonerId:${favoriteSummonerDto.summonerId}:win`,
+      `summonerId:${favoriteSummonerDto.summonerId}:lose`,
+      `summonerId:${favoriteSummonerDto.summonerId}:tier`,
+    );
+
+    if (!win)
+      await redisClient.set(
+        `summonerId:${favoriteSummonerDto.summonerId}:win`,
+        favoriteSummonerDto.win,
+      );
+
+    if (!lose)
+      await redisClient.set(
+        `summonerId:${favoriteSummonerDto.summonerId}:lose`,
+        favoriteSummonerDto.lose,
+      );
+
+    if (!tier)
+      await redisClient.set(
+        `summonerId:${favoriteSummonerDto.summonerId}:tier`,
+        favoriteSummonerDto.tier,
+      );
+
+    await redisClient.sadd('summonerId', favoriteSummonerDto.summonerId);
+  }
+
+  private async getRedisClient(): Promise<Redis> {
+    return this.redisService.getClient();
   }
 
   private async saveSummonerRecord(

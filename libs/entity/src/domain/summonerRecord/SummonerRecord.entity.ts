@@ -3,7 +3,6 @@ import { BaseTimeEntity } from '../BaseTimeEntity';
 import { FavoriteSummoner } from '../favoriteSummoner/FavoriteSummoner.entity';
 
 @Entity()
-@Index('idx_summonerRecord_1', ['summonerId'])
 export class SummonerRecord extends BaseTimeEntity {
   @Column({
     type: 'varchar',
