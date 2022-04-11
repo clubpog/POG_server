@@ -2,6 +2,7 @@ import { plainToInstance } from 'class-transformer';
 import { SummonerRecord } from '@app/entity/domain/summonerRecord/SummonerRecord.entity';
 import { createQueryBuilder, EntityRepository, Repository } from 'typeorm';
 import { SummonerRecordId } from '@app/entity/domain/summonerRecord/SummonerRecordId';
+import { SummonerRecordSummonerId } from '@app/entity/domain/summonerRecord/SummonerRecordSummonerId';
 
 @EntityRepository(SummonerRecord)
 export class SummonerRecordApiQueryRepository extends Repository<SummonerRecord> {
@@ -19,6 +20,11 @@ export class SummonerRecordApiQueryRepository extends Repository<SummonerRecord>
     return plainToInstance(SummonerRecordId, row);
   }
 
+  async findAllSummonerRecordId(): Promise<SummonerRecordSummonerId[]> {
+    const row = await this.findAllSummonerId();
+    return plainToInstance(SummonerRecordSummonerId, row);
+  }
+
   private async findOneBySummonerId(summonerId: string) {
     const queryBuilder = createQueryBuilder()
       .select(['id'])
@@ -34,5 +40,13 @@ export class SummonerRecordApiQueryRepository extends Repository<SummonerRecord>
       .from(SummonerRecord, 'summonerRecord')
       .where(`summonerRecord.summonerId =:summonerId`, { summonerId });
     return await queryBuilder.getRawOne();
+  }
+
+  private async findAllSummonerId() {
+    const queryBuilder = createQueryBuilder()
+      .select(['summoner_id'])
+      .from(SummonerRecord, 'summonerRecord');
+
+    return await queryBuilder.getRawMany();
   }
 }

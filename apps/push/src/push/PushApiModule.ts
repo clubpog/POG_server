@@ -1,3 +1,4 @@
+import { SummonerRecordApiModule } from './../../../api/src/summonerRecord/SummonerRecordApiModule';
 import { PushJobModule } from './../../../../libs/common-config/src/job/src/PushJobModule';
 import { Module } from '@nestjs/common';
 import { WinstonModule } from 'nest-winston';
@@ -17,6 +18,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     getBullQueue(),
     RedisModule.register(RedisModuleConfig),
     ScheduleModule.forRoot(),
+    SummonerRecordApiModule,
   ],
   controllers: [PushApiController],
   providers: [PushApiService, PushApiConsumer],
