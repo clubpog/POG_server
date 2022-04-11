@@ -1,17 +1,6 @@
 version: '3.7'
 
 services:
-  pog_redis:
-    image: redis:latest
-    restart: unless-stopped
-    user: root
-    labels:
-      - pog_redis
-    ports:
-      - 6379:6379
-    expose:
-      - 6379
-
   pog_server:
     container_name: pog_server
     restart: unless-stopped
@@ -25,7 +14,4 @@ services:
     ports:
       - 3000:3000
     working_dir: /app/pog_server
-    links:
-      - pog_redis
-    depends_on:
-      - pog_redis
+

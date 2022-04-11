@@ -1,8 +1,9 @@
-name: Deploy dev Docker
+name: Deploy prod Docker
 on:
   push:
     branches:
-      - develop
+      - master
+      - feature/deploy-prod
 
 jobs:
   build:
@@ -14,7 +15,7 @@ jobs:
       - name: Create env
         run: |
           touch .env
-          echo NODE_ENV=development >> .env
+          echo NODE_ENV=production >> .env
           echo PORT=3000 >> .env
           echo ADMIN_USER=${{ secrets.ADMIN_USER }} >> .env
           echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }} >> .env
@@ -44,10 +45,10 @@ jobs:
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v14
         with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_access_key: ${{ secrets.AWS_PROD_ACCESS_KEY }}
+          aws_secret_key: ${{ secrets.AWS_PROD_SECRET_KEY }}
           application_name: pog-server
-          environment_name: Pogserver-env
+          environment_name: Pogserver-env-1
           region: ap-northeast-2
           version_label: ${{ github.sha }}
           deployment_package: deploy.zip

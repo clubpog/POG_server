@@ -12,11 +12,11 @@ const [logging, synchronize] =
 
 const OrmConfig: TypeOrmModuleOptions = {
   type: 'postgres',
-  host: process.env.DB_TEST_HOST,
-  port: Number(process.env.DB_TEST_PORT),
-  username: process.env.DB_TEST_USERNAME,
-  password: process.env.DB_TEST_PASSWORD,
-  database: process.env.DB_TEST_NAME,
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT),
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   entities: [path.join(__dirname, 'src/domain/**/*.entity.{js,ts}')],
   migrations: [path.join(__dirname, 'migrations/*{.ts,.js}')],
   cli: { migrationsDir: 'libs/entity/migrations' },
