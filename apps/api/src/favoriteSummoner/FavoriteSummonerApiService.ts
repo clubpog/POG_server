@@ -16,8 +16,9 @@ import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
 import { FavoriteSummonerId } from '@app/entity/domain/favoriteSummoner/FavoriteSummonerId';
 import { User } from '@app/entity/domain/user/User.entity';
 import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
-import { RedisService } from 'nestjs-redis';
-import { Redis } from 'ioredis';
+import { RedisModuleConfig } from 'libs/entity/config/redisConfig';
+
+import Redis from 'ioredis';
 
 @Injectable()
 export class FavoriteSummonerApiService {
@@ -31,7 +32,6 @@ export class FavoriteSummonerApiService {
     private summonerRecordRepository?: Repository<SummonerRecord>,
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
     private readonly favoriteSummonerApiQueryRepository?: FavoriteSummonerApiQueryRepository,
-    private readonly redisService?: RedisService,
   ) {}
 
   async createFavoriteSummoner(
@@ -174,7 +174,7 @@ export class FavoriteSummonerApiService {
   }
 
   private async getRedisClient(): Promise<Redis> {
-    return this.redisService.getClient();
+    return new Redis(RedisModuleConfig);
   }
 
   private async saveSummonerRecord(

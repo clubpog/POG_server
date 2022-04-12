@@ -1,20 +1,20 @@
-import { Redis } from 'ioredis';
 import { PushRiotApi } from './dto/PushRiotApi';
 import { plainToInstance } from 'class-transformer';
 import { RiotApiJobs } from './../../../../libs/common-config/src/job/RiotApi';
-import { RedisService } from 'nestjs-redis';
 import { InjectQueue } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
 import { Queue } from 'bull';
 import { Interval } from '@nestjs/schedule';
 import { SummonerRecordApiQueryRepository } from '../../../api/src/summonerRecord/SummonerRecordApiQueryRepository';
+import { RedisModuleConfig } from 'libs/entity/config/redisConfig';
+
+import Redis from 'ioredis';
 
 @Injectable()
 export class PushApiService {
   constructor(
     @InjectQueue('PushQueue')
     private pushQueue: Queue,
-    private readonly redisService: RedisService,
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
   ) {}
   @Interval('pushCronTask', 180000)
@@ -55,7 +55,7 @@ export class PushApiService {
   }
 
   public async getRedisClient(): Promise<Redis> {
-    return this.redisService.getClient();
+    return new Redis(RedisModuleConfig);
   }
 
   private async compareRecord(
