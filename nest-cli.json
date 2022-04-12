@@ -1,6 +1,7 @@
 {
   "collection": "@nestjs/schematics",
   "sourceRoot": "apps/api/src",
+  "monorepo": true,
   "projects": {
     "entity": {
       "type": "library",
@@ -18,6 +19,15 @@
       "sourceRoot": "apps/api/src",
       "compilerOptions": {
         "tsConfigPath": "apps/api/tsconfig.app.json"
+      }
+    },
+    "push": {
+      "type": "application",
+      "root": "apps/push",
+      "entryFile": "main",
+      "sourceRoot": "apps/push/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/push/tsconfig.app.json"
       }
     },
     "common-config": {

@@ -83,7 +83,7 @@ export class FavoriteSummonerApiController {
   async createFollow(
     @CurrentUser() userDto: UserReq,
     @Body() favoriteSummonerDto: FavoriteSummonerReq,
-  ) {
+  ): Promise<ResponseEntity<string>> {
     try {
       await this.favoriteSummonerApiService.createFavoriteSummoner(
         userDto,
@@ -138,7 +138,7 @@ export class FavoriteSummonerApiController {
   async deleteFollow(
     @CurrentUser() userDto: UserReq,
     @Body() favoriteSummonerIdDto: FavoriteSummonerIdReq,
-  ) {
+  ): Promise<ResponseEntity<string>> {
     try {
       await this.favoriteSummonerApiService.deleteFavoriteSummoner(
         userDto,
@@ -180,7 +180,9 @@ export class FavoriteSummonerApiController {
   @ApiBearerAuth('Authorization')
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getFollow(@CurrentUser() userDto: UserReq) {
+  async getFollow(
+    @CurrentUser() userDto: UserReq,
+  ): Promise<ResponseEntity<FavoriteSummonerRes[] | string>> {
     try {
       const data: FavoriteSummonerRes[] =
         await this.favoriteSummonerApiService.getFavoriteSummoner(

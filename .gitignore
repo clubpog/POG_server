@@ -1,6 +1,7 @@
 *.env
 env_files/*
 db_data
+pog-adminsdk.json
 
 # compiled output
 /dist
