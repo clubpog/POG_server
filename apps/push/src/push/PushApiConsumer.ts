@@ -18,8 +18,13 @@ export class PushApiConsumer {
 
   @Process('summonerList')
   async getSummonerIdQueue(job: Job) {
-    await this.pushJobService.send(job.data['summonerId']);
-    this.logger.log(`${job.data['summonerId']} topic 푸시를 전송했습니다.`);
+    await this.pushJobService.send(
+      job.data['summonerId'],
+      job.data['summonerName'],
+    );
+    this.logger.log(
+      `${job.data['summonerName']}의 ${job.data['summonerId']} topic 푸시를 전송했습니다.`,
+    );
   }
 
   @Process('recoverList')

@@ -5,7 +5,6 @@ export class PushRiotApi {
   @Exclude() queueType: string;
   @Exclude() rank: string;
   @Exclude() summonerId: string;
-  @Exclude() summonerName: string;
   @Exclude() leaguePoints: number;
   @Exclude() veteran: boolean;
   @Exclude() freshBlood: boolean;
@@ -20,4 +19,7 @@ export class PushRiotApi {
 
   @Expose({ name: 'tier' })
   tier: string;
+
+  @Expose({ name: 'summonerName' })
+  summonerName: string;
 }
