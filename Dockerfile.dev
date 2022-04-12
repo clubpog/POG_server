@@ -4,10 +4,7 @@ FROM node:14-alpine AS build
 WORKDIR /app/pog_server
 
 COPY package*.json /app/pog_server/
-RUN npm uninstall nestjs-redis
 RUN npm ci
-# nestjs-redis dependency error 임시방편 처리
-RUN npm i nestjs-redis@git+https://github.com/GyanendroKh/nestjs-redis.git#nest8-fix --save
 COPY . /app/pog_server/
 RUN npm run build
 

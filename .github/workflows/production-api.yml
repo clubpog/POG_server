@@ -43,6 +43,7 @@ jobs:
           echo REDIS_PORT=${{ secrets.JWT_SECRET_KEY }} >> .env
           echo REDIS_ENDPOINT=${{ secrets.REDIS_ENDPOINT }} >> .env
           echo API_KEY=${{ secrets.API_KEY }} >> .env
+          echo POG_SDK=${{ secrets.POG_SDK }} >> .env
           cat .env
 
       - name: Generate deployment package
