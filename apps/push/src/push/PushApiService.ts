@@ -17,49 +17,30 @@ export class PushApiService {
     private readonly redisService: RedisService,
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
   ) {}
-
-  // @Interval('pushCronTask', 10000)
+  @Interval('pushCronTask', 180000)
   async addMessageQueue(): Promise<void> {
     const redisClient: Redis = await this.getRedisClient();
     const summonerIds = await redisClient.smembers('summonerId');
-    // summonerIds.map(async summonerId => {
-    // const riotApiResponse = plainToInstance(
-    //   PushRiotApi,
-    //   await RiotApiJobs(summonerId),
-    // );
-    // const redisResponse = await redisClient.mget(
-    //   `summonerId:${summonerId}:win`,
-    //   `summonerId:${summonerId}:lose`,
-    //   `summonerId:${summonerId}:tier`,
-    // );
-    // const isChangeRecord = await this.compareRecord(
-    //   riotApiResponse,
-    //   redisResponse,
-    // );
-    // if (isChangeRecord) {
-    // await this.addPushQueue(summonerId);
-    // await this.changeRecord(riotApiResponse, redisClient, summonerId);
-    // }
-    // });
-    const summonerId =
-      'sqyAJOaCU72G_FT6kahr0RVPCnv6ciDse-xq50DrjgrXpmkGtlwsdFgGkA';
-    const riotApiResponse = plainToInstance(
-      PushRiotApi,
-      await RiotApiJobs(summonerId),
-    );
-    // const redisResponse = await redisClient.mget(
-    //   `summonerId:${summonerId}:win`,
-    //   `summonerId:${summonerId}:lose`,
-    //   `summonerId:${summonerId}:tier`,
-    // );
-    // const isChangeRecord = await this.compareRecord(
-    //   riotApiResponse,
-    //   redisResponse,
-    // );
-    // if (isChangeRecord) {
-    await this.addPushQueue(summonerId);
-    // await this.changeRecord(riotApiResponse, redisClient, summonerId);
-    // }
+
+    summonerIds.map(async summonerId => {
+      const riotApiResponse = plainToInstance(
+        PushRiotApi,
+        await RiotApiJobs(summonerId),
+      );
+      const redisResponse = await redisClient.mget(
+        `summonerId:${summonerId}:win`,
+        `summonerId:${summonerId}:lose`,
+        `summonerId:${summonerId}:tier`,
+      );
+      const isChangeRecord = await this.compareRecord(
+        riotApiResponse,
+        redisResponse,
+      );
+      if (isChangeRecord) {
+        await this.addPushQueue(summonerId, riotApiResponse.summonerName);
+        await this.changeRecord(riotApiResponse, redisClient, summonerId);
+      }
+    });
   }
 
   async recoverRedis(): Promise<void> {
@@ -87,11 +68,12 @@ export class PushApiService {
     if (riotApiResponse.lose !== Number(lose)) return true;
   }
 
-  private async addPushQueue(summonerId: string) {
+  private async addPushQueue(summonerId: string, summonerName: string) {
     return await this.pushQueue.add(
       'summonerList',
       {
         summonerId,
+        summonerName,
       },
       { delay: 10000, removeOnComplete: true },
     );

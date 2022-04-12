@@ -12,11 +12,17 @@ export class PushJobService {
     });
   }
 
-  async send(summonerId: string) {
+  // Title
+  // {소환사 이름} 전적 갱신
+
+  // SubTitle
+  // {소환사 이름}의 전적이 갱신됐어요
+
+  async send(summonerId: string, summonerName: string) {
     const message = {
       notification: {
-        title: 'test',
-        body: 'test',
+        title: `${summonerName} 전적 갱신`,
+        body: `${summonerName}의 전적이 갱신됐어요.`,
       },
       topic: summonerId,
     };
