@@ -16,7 +16,7 @@ import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
 import { FavoriteSummonerId } from '@app/entity/domain/favoriteSummoner/FavoriteSummonerId';
 import { User } from '@app/entity/domain/user/User.entity';
 import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
-import { RedisModuleConfig } from 'libs/entity/config/redisConfig';
+import { RedisModuleConfig } from '../../../../libs/entity/config/redisConfig';
 
 import Redis from 'ioredis';
 
