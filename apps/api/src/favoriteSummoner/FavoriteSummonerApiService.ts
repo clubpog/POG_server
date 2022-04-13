@@ -3,6 +3,7 @@ import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRe
 import { FavoriteSummonerReq } from './dto/FavoriteSummonerReq.dto';
 import {
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -16,9 +17,9 @@ import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
 import { FavoriteSummonerId } from '@app/entity/domain/favoriteSummoner/FavoriteSummonerId';
 import { User } from '@app/entity/domain/user/User.entity';
 import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
-import { RedisModuleConfig } from '../../../../libs/entity/config/redisConfig';
 
 import Redis from 'ioredis';
+import { FavoriteSummonerApiInjectionToken } from './FavoriteSummonerApiInjectionToken';
 
 @Injectable()
 export class FavoriteSummonerApiService {
@@ -32,6 +33,8 @@ export class FavoriteSummonerApiService {
     private summonerRecordRepository?: Repository<SummonerRecord>,
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
     private readonly favoriteSummonerApiQueryRepository?: FavoriteSummonerApiQueryRepository,
+    @Inject(FavoriteSummonerApiInjectionToken.EVENT_STORE)
+    private readonly redisClient?: Redis,
   ) {}
 
   async createFavoriteSummoner(
@@ -146,11 +149,12 @@ export class FavoriteSummonerApiService {
     favoriteSummonerDto: FavoriteSummonerReq,
   ): Promise<void> {
     const redisClient = await this.getRedisClient();
-    const [win, lose, tier] = await redisClient.mget(
+
+    const [win, lose, tier] = await redisClient.mget([
       `summonerId:${favoriteSummonerDto.summonerId}:win`,
       `summonerId:${favoriteSummonerDto.summonerId}:lose`,
       `summonerId:${favoriteSummonerDto.summonerId}:tier`,
-    );
+    ]);
 
     if (!win)
       await redisClient.set(
@@ -174,7 +178,7 @@ export class FavoriteSummonerApiService {
   }
 
   private async getRedisClient(): Promise<Redis> {
-    return new Redis(RedisModuleConfig);
+    return this.redisClient['master'];
   }
 
   private async saveSummonerRecord(
