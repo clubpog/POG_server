@@ -39,8 +39,8 @@ jobs:
           echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
           echo REDIS_TEST_HOST=${{ secrets.REDIS_TEST_HOST }} >> .env
           echo REDIS_TEST_PORT=${{ secrets.REDIS_TEST_PORT }} >> .env
-          echo REDIS_HOST=${{ secrets.JWT_SECRET_KEY }} >> .env
-          echo REDIS_PORT=${{ secrets.JWT_SECRET_KEY }} >> .env
+          echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
+          echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env
           echo REDIS_ENDPOINT=${{ secrets.REDIS_ENDPOINT }} >> .env
           echo API_KEY=${{ secrets.API_KEY }} >> .env
           echo POG_SDK=${{ secrets.POG_SDK }} >> .env
