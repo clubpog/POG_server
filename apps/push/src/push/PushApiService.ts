@@ -26,6 +26,7 @@ export class PushApiService {
 
     summonerIds.map(async summonerId => {
       const soloRankResult = await RiotApiJobService.riotLeagueApi(summonerId);
+      console.log(soloRankResult);
       if (!soloRankResult) return;
 
       const riotApiResponse = plainToInstance(PushRiotApi, soloRankResult);
@@ -34,6 +35,8 @@ export class PushApiService {
         `summonerId:${summonerId}:lose`,
         `summonerId:${summonerId}:tier`,
       );
+
+      console.log(redisResponse);
       const isChangeRecord = await this.compareRecord(
         riotApiResponse,
         redisResponse,

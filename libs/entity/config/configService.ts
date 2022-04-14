@@ -45,6 +45,10 @@ export class ConfigService {
     return process.env.JWT_SECRET_KEY;
   }
 
+  static riotApiKey(): string {
+    return process.env.API_KEY;
+  }
+
   static redisClusterConfig(): RedisConfig {
     const [host, port] =
       process.env.NODE_ENV === 'production'
