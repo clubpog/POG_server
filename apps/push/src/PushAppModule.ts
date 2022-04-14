@@ -8,13 +8,12 @@ import { ConfigModule } from '@nestjs/config';
 import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
 
-import { AuthConfig, ValidationSchema } from '@app/common-config/config';
 import { BullMonitorModule } from '../../../libs/entity/queue/src/bull-monitor/BullMonitorModule';
+import { ValidationSchema } from '@app/common-config/config/validationSchema';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [AuthConfig],
       isGlobal: true,
       validationSchema: ValidationSchema,
     }),

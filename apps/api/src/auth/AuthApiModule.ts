@@ -8,6 +8,7 @@ import { WinstonModule } from 'nest-winston';
 import { getWinstonLogger } from '@app/common-config/getWinstonLogger';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '../../../../libs/entity/config/configService';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { JwtModule } from '@nestjs/jwt';
     PassportModule.register({ defaultStrategy: 'jwt', session: false }),
     JwtModule.registerAsync({
       useFactory: async () => ({
-        secret: process.env.JWT_SECRET_KEY,
+        secret: ConfigService.jwtSecretKey(),
         signOptions: { expiresIn: '1y' },
       }),
     }),
