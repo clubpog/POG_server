@@ -25,11 +25,10 @@ export class PushApiService {
     const summonerIds = await redisClient.smembers('summonerId');
 
     summonerIds.map(async summonerId => {
-      const riotApiResponse = plainToInstance(
-        PushRiotApi,
-        await RiotApiJobService.riotLeagueApi(summonerId),
-      );
+      const soloRankResult = await RiotApiJobService.riotLeagueApi(summonerId);
+      if (!soloRankResult) return;
 
+      const riotApiResponse = plainToInstance(PushRiotApi, soloRankResult);
       const redisResponse = await redisClient.mget(
         `summonerId:${summonerId}:win`,
         `summonerId:${summonerId}:lose`,
