@@ -1,4 +1,4 @@
-import { ConfigService } from './../entity/config/configService';
+import { ConfigService } from '../entity/config/configService';
 import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
 import { Event, EventStore } from './interface/integration';
@@ -17,16 +17,16 @@ export class EventStoreServiceImplement implements EventStore {
     await this.master.set(event.data.id, JSON.stringify(event.data));
   }
 
-  // async set(key: string, value: string): Promise<void> {
-  //   await this.master.set(key, value, 'EX', 1);
-  // }
+  async set(key: string, value: string): Promise<void> {
+    await this.master.set(key, value, 'EX', 1);
+  }
 
-  // async get(key: string): Promise<string | null> {
-  //   return this.master
-  //     .get(key)
-  //     .then(result => result)
-  //     .catch(() => null);
-  // }
+  async get(key: string): Promise<string | null> {
+    return this.master
+      .get(key)
+      .then(result => result)
+      .catch(() => null);
+  }
 
   private failToConnectRedis(error: Error): Promise<void> {
     console.error(error);
