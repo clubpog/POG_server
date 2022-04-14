@@ -34,6 +34,18 @@ export class PushApiConsumer {
       PushRiotApi,
       await RiotApiJobService.riotLeagueApi(job.data['summonerId']),
     );
+
+    if (!riotApiResponse) {
+      await redisClient.mset(
+        `summonerId:${job.data['summonerId']}:win`,
+        0,
+        `summonerId:${job.data['summonerId']}:lose`,
+        0,
+        `summonerId:${job.data['summonerId']}:tier`,
+        '언랭',
+      );
+      return;
+    }
     await this.pushApiService.changeRecord(
       riotApiResponse,
       redisClient,
