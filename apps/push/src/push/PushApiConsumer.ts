@@ -1,19 +1,19 @@
 import { PushApiService } from './PushApiService';
-import { PushJobService } from './../../../../libs/common-config/src/job/src/PushJobService';
+import { PushJobService } from '../../../../libs/common-config/src/job/push/PushJobService';
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
 import { plainToInstance } from 'class-transformer';
-import { RiotApiJobs } from '@app/common-config/job/RiotApi';
 import { PushRiotApi } from './dto/PushRiotApi';
+import { RiotApiJobService } from '@app/common-config/job/riot/RiotApiJobService';
 
 @Processor('PushQueue')
 export class PushApiConsumer {
   private readonly logger = new Logger(PushApiConsumer.name);
 
   constructor(
-    private readonly pushJobService: PushJobService,
-    private readonly pushApiService: PushApiService,
+    private readonly pushJobService?: PushJobService,
+    private readonly pushApiService?: PushApiService,
   ) {}
 
   @Process('summonerList')
@@ -32,7 +32,7 @@ export class PushApiConsumer {
     const redisClient = await this.pushApiService.getRedisClient();
     const riotApiResponse = plainToInstance(
       PushRiotApi,
-      await RiotApiJobs(job.data['summonerId']),
+      await RiotApiJobService.riotLeagueApi(job.data['summonerId']),
     );
     await this.pushApiService.changeRecord(
       riotApiResponse,
