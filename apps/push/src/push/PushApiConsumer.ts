@@ -41,6 +41,6 @@ export class PushApiConsumer {
     );
 
     await this.pushApiService.addRedisSet(redisClient, job.data['summonerId']);
-    this.logger.log(`${job.data}를 Redis에 추가했습니다.`);
+    this.logger.log(`${job.data['summonerId']}를 Redis에 추가했습니다.`);
   }
 }

@@ -1,4 +1,4 @@
-import { ConfigService } from './../../../libs/entity/config/configService';
+import { ConfigService } from '../../../libs/entity/config/configService';
 import { NestFactory } from '@nestjs/core';
 import * as winston from 'winston';
 import {
