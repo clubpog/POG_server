@@ -5,11 +5,13 @@ import { ServiceAccount } from 'firebase-admin';
 @Injectable()
 export class PushJobService {
   constructor() {
-    admin.initializeApp({
-      credential: admin.credential.cert(
-        JSON.parse(process.env.POG_SDK) as ServiceAccount,
-      ),
-    });
+    if (!admin.apps.length) {
+      admin.initializeApp({
+        credential: admin.credential.cert(
+          JSON.parse(process.env.POG_SDK) as ServiceAccount,
+        ),
+      });
+    }
   }
   // Title
   // {소환사 이름} 전적 갱신

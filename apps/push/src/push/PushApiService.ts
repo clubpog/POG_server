@@ -1,6 +1,6 @@
+import { RiotApiJobService } from './../../../../libs/common-config/src/job/riot/RiotApiJobService';
 import { PushRiotApi } from './dto/PushRiotApi';
 import { plainToInstance } from 'class-transformer';
-import { RiotApiJobs } from './../../../../libs/common-config/src/job/RiotApi';
 import { InjectQueue } from '@nestjs/bull';
 import { Inject, Injectable } from '@nestjs/common';
 import { Queue } from 'bull';
@@ -27,8 +27,9 @@ export class PushApiService {
     summonerIds.map(async summonerId => {
       const riotApiResponse = plainToInstance(
         PushRiotApi,
-        await RiotApiJobs(summonerId),
+        await RiotApiJobService.riotLeagueApi(summonerId),
       );
+
       const redisResponse = await redisClient.mget(
         `summonerId:${summonerId}:win`,
         `summonerId:${summonerId}:lose`,
