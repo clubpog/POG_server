@@ -1,6 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from './../entity/config/configService';
+import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
-import { RedisModuleConfig } from '../entity/config/redisConfig';
 import { Event, EventStore } from './interface/integration';
 
 @Injectable()
@@ -8,7 +8,7 @@ export class EventStoreServiceImplement implements EventStore {
   private readonly master: Redis;
 
   constructor() {
-    this.master = new Redis(RedisModuleConfig).on(
+    this.master = new Redis(ConfigService.redisClusterConfig()).on(
       'error',
       this.failToConnectRedis,
     );

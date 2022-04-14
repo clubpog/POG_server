@@ -1,3 +1,4 @@
+import { ConfigService } from './../../../libs/entity/config/configService';
 import { NestFactory } from '@nestjs/core';
 import * as winston from 'winston';
 import {
@@ -11,25 +12,25 @@ import { SetNestApp } from '@app/common-config/setNestApp';
 
 class Application {
   private logger = new Logger(Application.name);
-  private PORT: string;
   private DEV_MODE: boolean;
 
   constructor(private server: NestExpressApplication) {
     this.server = server;
-    this.PORT = process.env.PUSH_PORT;
     this.DEV_MODE = process.env.NODE_ENV === 'production' ? false : true;
   }
 
   async bootstrap() {
     SetNestApp(this.server);
-    await this.server.listen(this.PORT);
+    await this.server.listen(ConfigService.pushPort());
   }
 
   startLog() {
     if (this.DEV_MODE) {
-      this.logger.log(`✅ Server on http://localhost:${this.PORT}`);
+      this.logger.log(
+        `✅ Server on http://localhost:${ConfigService.pushPort()}`,
+      );
     } else {
-      this.logger.log(`✅ Server on port ${this.PORT}...`);
+      this.logger.log(`✅ Server on port ${ConfigService.pushPort()}...`);
     }
   }
 }
