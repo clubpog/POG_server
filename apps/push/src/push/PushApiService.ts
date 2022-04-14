@@ -87,9 +87,9 @@ export class PushApiService {
     redisResponse: string[],
   ): Promise<boolean> {
     const [win, lose, tier] = redisResponse;
-    if (riotApiResponse.tier !== tier) return true;
-    if (riotApiResponse.win !== Number(win)) return true;
-    if (riotApiResponse.lose !== Number(lose)) return true;
+    if (riotApiResponse[0].tier !== tier) return true;
+    if (riotApiResponse[0].win !== Number(win)) return true;
+    if (riotApiResponse[0].lose !== Number(lose)) return true;
   }
 
   private async addPushQueue(summonerId: string, summonerName: string) {
