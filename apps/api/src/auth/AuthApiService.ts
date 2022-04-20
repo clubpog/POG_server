@@ -4,8 +4,10 @@ import { UserApiQueryRepository } from './../user/UserApiQueryRepository';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { User } from '@app/entity/domain/user/User.entity';
 import { Repository } from 'typeorm';
@@ -24,7 +26,16 @@ export class AuthApiService {
   ) {}
 
   async signup(signupUser: User): Promise<User> {
-    return await this.userRepository.save(signupUser);
+    try {
+      return await this.userRepository.save(signupUser);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new UnprocessableEntityException(
+          '이미 DB에 있는 deviceId를 입력했습니다.',
+        );
+      }
+      throw new InternalServerErrorException();
+    }
   }
 
   async signin(signinUser: User): Promise<UserAccessToken> {

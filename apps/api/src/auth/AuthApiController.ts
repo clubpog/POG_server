@@ -1,3 +1,5 @@
+import { SignupUnprocessableEntityFail } from './../../../../libs/common-config/src/response/swagger/domain/auth/SignupUnprocessableEntityFail';
+import { InternalServerError } from '@app/common-config/response/swagger/common/error/InternalServerError';
 import { UserAccessToken } from '@app/entity/domain/user/UserAccessToken';
 import { SigninFail } from '@app/common-config/response/swagger/domain/auth/SigninFail';
 import { SigninSuccess } from '@app/common-config/response/swagger/domain/auth/SigninSuccess';
@@ -15,9 +17,9 @@ import {
   ApiTags,
   ApiOkResponse,
   ApiNotFoundResponse,
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { BadRequestError } from '@app/common-config/response/swagger/common/error/BadRequestError';
-import { SignupFail } from '@app/common-config/response/swagger/domain/auth/SignupFail';
 import { AuthSigninReq, AuthSignupReq } from './dto';
 import { SignupSuccess } from '@app/common-config/response/swagger/domain/auth/SignupSuccess';
 import { SigninNotFoundFail } from '@app/common-config/response/swagger/domain/auth/SigninNotFoundFail';
@@ -45,9 +47,13 @@ export class AuthApiController {
     description: '입력값을 누락한 경우 입니다.',
     type: BadRequestError,
   })
+  @ApiUnprocessableEntityResponse({
+    description: '이미 DB에 있는 deviceId를 입력했습니다.',
+    type: SignupUnprocessableEntityFail,
+  })
   @ApiInternalServerErrorResponse({
-    description: '회원 가입에 실패했습니다. 실제 응답 코드는 201을 받습니다.',
-    type: SignupFail,
+    description: '회원 가입에 실패했습니다.',
+    type: InternalServerError,
   })
   @Post('/signup')
   async signup(@Body() dto: AuthSignupReq): Promise<ResponseEntity<string>> {
@@ -56,7 +62,7 @@ export class AuthApiController {
       return ResponseEntity.CREATED_WITH('회원 가입에 성공했습니다.');
     } catch (error) {
       this.logger.error(`dto = ${JSON.stringify(dto)}`, error);
-      return ResponseEntity.ERROR_WITH('회원 가입에 실패했습니다.');
+      throw error;
     }
   }
 
