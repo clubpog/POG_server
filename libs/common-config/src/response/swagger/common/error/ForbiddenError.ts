@@ -13,8 +13,8 @@ export class ForbiddenError {
   @ApiProperty({
     type: 'array',
     title: 'Error 메시지',
-    example: '요청 값에 문제가 있습니다.',
-    description: '접근을 거부합니다.',
+    example: 'Forbidden',
+    description: 'Forbidden',
   })
   message: any;
 

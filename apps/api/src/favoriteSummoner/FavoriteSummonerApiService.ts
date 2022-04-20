@@ -41,11 +41,15 @@ export class FavoriteSummonerApiService {
     userDto: UserReq,
     favoriteSummonerDto: FavoriteSummonerReq,
   ): Promise<void> {
-    await this.checkLimitFavoriteSummoner(userDto.userId);
-    await this.saveRedisSummonerRecord(favoriteSummonerDto);
-    await this.saveSummonerRecord(favoriteSummonerDto);
-    await this.saveFavoriteSummoner(favoriteSummonerDto, userDto);
-    await this.restoreFavoriteSummoner(favoriteSummonerDto, userDto);
+    try {
+      await this.checkLimitFavoriteSummoner(userDto.userId);
+      await this.saveRedisSummonerRecord(favoriteSummonerDto);
+      await this.saveSummonerRecord(favoriteSummonerDto);
+      await this.saveFavoriteSummoner(favoriteSummonerDto, userDto);
+      await this.restoreFavoriteSummoner(favoriteSummonerDto, userDto);
+    } catch (error) {
+      throw error;
+    }
   }
 
   async deleteFavoriteSummoner(

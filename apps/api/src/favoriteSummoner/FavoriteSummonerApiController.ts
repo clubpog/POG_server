@@ -31,7 +31,6 @@ import { FavoriteSummonerCreateSuccess } from '@app/common-config/response/swagg
 import { UnauthorizedError } from '@app/common-config/response/swagger/common/error/UnauthorizedError';
 import { BadRequestError } from '@app/common-config/response/swagger/common/error/BadRequestError';
 import { FavoriteSummonerCreateLimitFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerCreateLimitFail';
-import { FavoriteSummonerCreateFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerCreateFail';
 import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
 import { FavoriteSummonerDeleteSuccess } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteSuccess';
 import { FavoriteSummonerDeleteFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteFail';
@@ -39,6 +38,7 @@ import { FavoriteSummonerDeleteNotFound } from '@app/common-config/response/swag
 import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
 import { FavoriteSummonerReadFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerReadFail';
 import { FavoriteSummonerReadSuccess } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerReadSuccess';
+import { InternalServerError } from '@app/common-config/response/swagger/common/error/InternalServerError';
 
 @Controller('favoriteSummoner')
 @ApiTags('소환사 즐겨찾기 API')
@@ -75,7 +75,7 @@ export class FavoriteSummonerApiController {
   })
   @ApiInternalServerErrorResponse({
     description: '소환사 즐겨찾기 추가에 실패했습니다.',
-    type: FavoriteSummonerCreateFail,
+    type: InternalServerError,
   })
   @ApiBearerAuth('Authorization')
   @UseGuards(JwtAuthGuard)
@@ -94,10 +94,7 @@ export class FavoriteSummonerApiController {
       );
     } catch (error) {
       this.logger.error(`dto = ${JSON.stringify(favoriteSummonerDto)}`, error);
-      if (error.status === ResponseStatus.FORBIDDEN) {
-        return ResponseEntity.FORBIDDEN_WITH(error.message);
-      }
-      return ResponseEntity.ERROR_WITH('소환사 즐겨찾기 추가에 실패했습니다.');
+      throw error;
     }
   }
 
