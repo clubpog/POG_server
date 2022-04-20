@@ -33,7 +33,6 @@ import { BadRequestError } from '@app/common-config/response/swagger/common/erro
 import { FavoriteSummonerCreateLimitFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerCreateLimitFail';
 import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
 import { FavoriteSummonerDeleteSuccess } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteSuccess';
-import { FavoriteSummonerDeleteFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteFail';
 import { FavoriteSummonerDeleteNotFound } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteNotFound';
 import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
 import { FavoriteSummonerReadFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerReadFail';
@@ -127,7 +126,7 @@ export class FavoriteSummonerApiController {
   })
   @ApiInternalServerErrorResponse({
     description: '소환사 즐겨찾기 취소에 실패했습니다.',
-    type: FavoriteSummonerDeleteFail,
+    type: InternalServerError,
   })
   @ApiBearerAuth('Authorization')
   @UseGuards(JwtAuthGuard)
@@ -147,10 +146,7 @@ export class FavoriteSummonerApiController {
         `dto = ${JSON.stringify(favoriteSummonerIdDto)}`,
         error,
       );
-      if (error.status === ResponseStatus.NOT_FOUND) {
-        return ResponseEntity.NOT_FOUND_WITH(error.message);
-      }
-      return ResponseEntity.ERROR_WITH('소환사 즐겨찾기 취소에 실패했습니다.');
+      throw error;
     }
   }
 

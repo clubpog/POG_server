@@ -4,7 +4,7 @@ import { ApiExtraModels, ApiProperty, PickType } from '@nestjs/swagger';
 @ApiExtraModels()
 export class FavoriteSummonerDeleteNotFound extends PickType(NotFoundError, [
   'statusCode',
-  'data',
+  'message',
 ] as const) {
   @ApiProperty({
     type: 'string',
@@ -13,5 +13,5 @@ export class FavoriteSummonerDeleteNotFound extends PickType(NotFoundError, [
     description:
       '소환사 즐겨찾기 취소 시 삭제할 즐겨찾기를 조회할 수 없습니다.',
   })
-  message: string;
+  data: string;
 }
