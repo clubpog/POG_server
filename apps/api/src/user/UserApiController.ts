@@ -1,7 +1,7 @@
+import { InternalServerError } from '@app/common-config/response/swagger/common/error/InternalServerError';
 import { JwtPayload } from '@app/common-config/jwt/JwtPayload';
 import { CurrentUser } from '@app/common-config/decorator/UserDecorator';
 import { JwtAuthGuard } from '@app/common-config/jwt/JwtGuard';
-import { FcmTokenUpdateFail } from '@app/common-config/response/swagger/domain/user/FcmTokenUpdateFail';
 import { UserUpdateFcmTokenReq } from './dto/UserUpdateFcmTokenReq.dto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { UserApiService } from './UserApiService';
@@ -54,7 +54,7 @@ export class UserApiController {
   })
   @ApiInternalServerErrorResponse({
     description: 'FCM 토큰 수정에 실패했습니다.',
-    type: FcmTokenUpdateFail,
+    type: InternalServerError,
   })
   @ApiBearerAuth('Authorization')
   @UseGuards(JwtAuthGuard)
@@ -75,7 +75,7 @@ export class UserApiController {
         )} `,
         error,
       );
-      return ResponseEntity.ERROR_WITH('FCM 토큰 수정에 실패했습니다.');
+      throw error;
     }
   }
 
