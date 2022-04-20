@@ -26,7 +26,6 @@ import {
 } from '@nestjs/swagger';
 import { FavoriteSummonerApiService } from './FavoriteSummonerApiService';
 import { UserReq } from '../user/dto/UserReq.dto';
-import { ResponseStatus } from '@app/common-config/response/ResponseStatus';
 import { FavoriteSummonerCreateSuccess } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerCreateSuccess';
 import { UnauthorizedError } from '@app/common-config/response/swagger/common/error/UnauthorizedError';
 import { BadRequestError } from '@app/common-config/response/swagger/common/error/BadRequestError';
@@ -35,7 +34,6 @@ import { FavoriteSummonerIdReq } from './dto/FavoriteSummonerIdReq.dto';
 import { FavoriteSummonerDeleteSuccess } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteSuccess';
 import { FavoriteSummonerDeleteNotFound } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteNotFound';
 import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
-import { FavoriteSummonerReadFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerReadFail';
 import { FavoriteSummonerReadSuccess } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerReadSuccess';
 import { InternalServerError } from '@app/common-config/response/swagger/common/error/InternalServerError';
 
@@ -168,7 +166,7 @@ export class FavoriteSummonerApiController {
   })
   @ApiInternalServerErrorResponse({
     description: '소환사 즐겨찾기 조회에 실패했습니다.',
-    type: FavoriteSummonerReadFail,
+    type: InternalServerError,
   })
   @ApiBearerAuth('Authorization')
   @UseGuards(JwtAuthGuard)
@@ -188,7 +186,7 @@ export class FavoriteSummonerApiController {
       );
     } catch (error) {
       this.logger.error(`dto = ${JSON.stringify(userDto)}`, error);
-      return ResponseEntity.ERROR_WITH('소환사 즐겨찾기 조회에 실패했습니다.');
+      throw error;
     }
   }
 }

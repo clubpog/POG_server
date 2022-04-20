@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
@@ -48,7 +49,7 @@ export class FavoriteSummonerApiService {
       await this.saveFavoriteSummoner(favoriteSummonerDto, userDto);
       await this.restoreFavoriteSummoner(favoriteSummonerDto, userDto);
     } catch (error) {
-      throw error;
+      throw new InternalServerErrorException();
     }
   }
 
@@ -56,13 +57,21 @@ export class FavoriteSummonerApiService {
     userDto: UserReq,
     favoriteSummonerIdDto: FavoriteSummonerIdReq,
   ): Promise<void> {
-    await this.checkNotFoundFavoriteSummoner(userDto, favoriteSummonerIdDto);
-    await this.softDeleteFavoriteSummoner(userDto, favoriteSummonerIdDto);
-    await this.deleteNoUseSummonerRecord(favoriteSummonerIdDto);
+    try {
+      await this.checkNotFoundFavoriteSummoner(userDto, favoriteSummonerIdDto);
+      await this.softDeleteFavoriteSummoner(userDto, favoriteSummonerIdDto);
+      await this.deleteNoUseSummonerRecord(favoriteSummonerIdDto);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   async getFavoriteSummoner(userDto: User): Promise<FavoriteSummonerRes[]> {
-    return await this.findAllFavoriteSummoners(userDto.id);
+    try {
+      return await this.findAllFavoriteSummoners(userDto.id);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   private async checkNotFoundFavoriteSummoner(
