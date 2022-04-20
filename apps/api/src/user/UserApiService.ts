@@ -18,9 +18,13 @@ export class UserApiService {
   }
 
   async updatePush(updatePushUser: User): Promise<void> {
-    await this.userApiRepository.updatePush(
-      updatePushUser.deviceId,
-      updatePushUser.isPush,
-    );
+    try {
+      await this.userApiRepository.updatePush(
+        updatePushUser.deviceId,
+        updatePushUser.isPush,
+      );
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 }

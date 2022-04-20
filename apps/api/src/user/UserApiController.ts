@@ -18,7 +18,6 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { UserUpdatePushReq } from './dto/UserUpdatePushReq.dto';
-import { PushUpdateFail } from '@app/common-config/response/swagger/domain/user/PushUpdateFail';
 import { UnauthorizedError } from '@app/common-config/response/swagger/common/error/UnauthorizedError';
 import { BadRequestError } from '@app/common-config/response/swagger/common/error/BadRequestError';
 import { FcmTokenUpdateSuccess } from '@app/common-config/response/swagger/domain/user/FcmTokenUpdateSuccess';
@@ -101,7 +100,7 @@ export class UserApiController {
   })
   @ApiInternalServerErrorResponse({
     description: '푸시알림 허용 여부 수정에 실패했습니다.',
-    type: PushUpdateFail,
+    type: InternalServerError,
   })
   @ApiBearerAuth('Authorization')
   @UseGuards(JwtAuthGuard)
@@ -117,9 +116,7 @@ export class UserApiController {
       return ResponseEntity.OK_WITH('푸시알림 허용 여부 수정에 성공했습니다.');
     } catch (error) {
       this.logger.error(`dto = ${JSON.stringify(userUpdatePushDto)}`, error);
-      return ResponseEntity.ERROR_WITH(
-        '푸시알림 허용 여부 수정에 실패했습니다.',
-      );
+      throw error;
     }
   }
 }
