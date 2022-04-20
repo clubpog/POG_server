@@ -4,16 +4,8 @@ import { ApiExtraModels, ApiProperty, PickType } from '@nestjs/swagger';
 @ApiExtraModels()
 export class SignupUnprocessableEntityFail extends PickType(
   UnprocessableEntityError,
-  ['statusCode'] as const,
+  ['statusCode', 'message'] as const,
 ) {
-  @ApiProperty({
-    type: 'string',
-    title: 'Error 메시지',
-    description: 'Unprocessable Entity',
-    example: 'Unprocessable Entity',
-  })
-  message: string;
-
   @ApiProperty({
     type: 'string',
     title: 'Error 메시지',

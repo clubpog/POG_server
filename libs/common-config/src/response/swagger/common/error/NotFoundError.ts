@@ -13,8 +13,8 @@ export class NotFoundError {
   @ApiProperty({
     type: 'string',
     title: 'Error 메시지',
-    example: '요청 값을 찾을 수 없습니다.',
-    description: '요청 값을 찾을 수 없습니다.',
+    example: 'Not Found',
+    description: 'Not Found',
   })
   message: string;
 

@@ -1,7 +1,6 @@
 import { SignupUnprocessableEntityFail } from './../../../../libs/common-config/src/response/swagger/domain/auth/SignupUnprocessableEntityFail';
 import { InternalServerError } from '@app/common-config/response/swagger/common/error/InternalServerError';
 import { UserAccessToken } from '@app/entity/domain/user/UserAccessToken';
-import { SigninFail } from '@app/common-config/response/swagger/domain/auth/SigninFail';
 import { SigninSuccess } from '@app/common-config/response/swagger/domain/auth/SigninSuccess';
 import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
 import { ResponseStatus } from '@app/common-config/response/ResponseStatus';
@@ -84,7 +83,7 @@ export class AuthApiController {
   })
   @ApiInternalServerErrorResponse({
     description: '로그인에 실패했습니다.',
-    type: SigninFail,
+    type: InternalServerError,
   })
   @HttpCode(ResponseStatus.OK)
   @Post('/signin')
@@ -99,9 +98,7 @@ export class AuthApiController {
       );
     } catch (error) {
       this.logger.error(`dto = ${JSON.stringify(dto)}`, error);
-      if (error.status === ResponseStatus.NOT_FOUND)
-        return ResponseEntity.NOT_FOUND_WITH(error.message);
-      return ResponseEntity.ERROR_WITH('로그인에 실패했습니다.');
+      throw error;
     }
   }
 }

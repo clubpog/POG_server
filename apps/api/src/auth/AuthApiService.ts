@@ -40,14 +40,18 @@ export class AuthApiService {
 
   async signin(signinUser: User): Promise<UserAccessToken> {
     const foundUserId = await this.findUserByDeviceId(signinUser.deviceId);
-    if (!foundUserId)
-      throw new NotFoundException('입력된 deviceId가 존재하지 않습니다.');
-    await this.updateLoggedAt(signinUser.loggedAt, signinUser.deviceId);
-    const payload: JwtPayload = {
-      userId: foundUserId.id,
-      deviceId: signinUser.deviceId,
-    };
-    return { accessToken: this.jwtService.sign(payload) };
+    try {
+      await this.updateLoggedAt(signinUser.loggedAt, signinUser.deviceId);
+      const payload: JwtPayload = {
+        userId: foundUserId.id,
+        deviceId: signinUser.deviceId,
+      };
+      return { accessToken: this.jwtService.sign(payload) };
+    } catch (error) {
+      if (!foundUserId)
+        throw new NotFoundException('입력된 deviceId가 존재하지 않습니다.');
+      throw new InternalServerErrorException();
+    }
   }
 
   async validateUser(payload: JwtPayload): Promise<JwtPayload> {

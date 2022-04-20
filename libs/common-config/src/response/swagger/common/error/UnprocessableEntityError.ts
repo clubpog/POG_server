@@ -13,10 +13,8 @@ export class UnprocessableEntityError {
   @ApiProperty({
     type: 'string',
     title: 'Error 메시지',
-    example:
-      '서버가 요청을 이해하고 요청 문법도 올바르지만 요청된 지시를 따를 수 없음을 나타냅니다.',
-    description:
-      '서버가 요청을 이해하고 요청 문법도 올바르지만 요청된 지시를 따를 수 없음을 나타냅니다.',
+    example: 'Unprocessable Entity',
+    description: 'Unprocessable Entity',
   })
   message: string;
 

@@ -4,7 +4,7 @@ import { ApiExtraModels, ApiProperty, PickType } from '@nestjs/swagger';
 @ApiExtraModels()
 export class SigninNotFoundFail extends PickType(NotFoundError, [
   'statusCode',
-  'data',
+  'message',
 ] as const) {
   @ApiProperty({
     type: 'string',
@@ -12,5 +12,5 @@ export class SigninNotFoundFail extends PickType(NotFoundError, [
     example: '입력된 deviceId가 존재하지 않습니다.',
     description: '입력된 deviceId가 존재하지 않습니다.',
   })
-  message: string;
+  data: string;
 }
