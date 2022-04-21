@@ -2,25 +2,28 @@ name: Integration Test
 on:
   pull_request:
     branches:
-      - develop
-      - master
+      - 'develop**'
+      - 'production**'
+
 
 jobs:
   build:
     runs-on: ubuntu-latest
     container: node:14
-    # 아래 defaults 의 run 설정은 node 루트 경로와 저장소 루트가 일치하지 않아 추가됨
-    # 일반 프로젝트에는 필요없음
     env:
       NODE_ENV: development
-      PORT: 3000
+      PORT: ${{ secrets.PORT }}
+      PUSH_PORT: ${{ secrets.PUSH_PORT }}
+      ADMIN_USER: ${{ secrets.ADMIN_USER }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
       DB_HOST: ${{ secrets.DB_HOST }}
       DB_PORT: ${{ secrets.DB_PORT }}
       DB_NAME: ${{ secrets.DB_NAME }}
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      LOGGING: false
-      SYNCHRONIZE: false
+      LOGGING: ${{ secrets.LOGGING }}
+      SYNCHRONIZE: ${{ secrets.SYNCHRONIZE }}
       DB_TEST_HOST: rdb
       DB_TEST_PORT: 5432
       DB_TEST_NAME: postgres
@@ -28,7 +31,12 @@ jobs:
       DB_TEST_PASSWORD: pogTest123
       TEST_LOGGING: false
       TEST_SYNCHRONIZE: true
+      DB_CONNECTION_TIMEOUT: ${{ secrets.DB_CONNECTION_TIMEOUT }}
       JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      REDIS_TEST_HOST: cache
+      REDIS_TEST_PORT: 6379
       REDIS_ENDPOINT: ${{ secrets.REDIS_ENDPOINT }}
       API_KEY: ${{ secrets.API_KEY }}
 
