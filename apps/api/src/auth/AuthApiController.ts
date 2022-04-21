@@ -1,3 +1,5 @@
+import { SigninNotFoundFailV1 } from './../../../../libs/common-config/src/response/swagger/domain/auth/SigninNotFoundFailV1';
+import { SigninFailV1 } from './../../../../libs/common-config/src/response/swagger/domain/auth/SigninFailV1';
 import { SignupFailV1 } from './../../../../libs/common-config/src/response/swagger/domain/auth/SignupFailV1';
 import { UserAccessToken } from '@app/entity/domain/user/UserAccessToken';
 import { SigninFail } from '@app/common-config/response/swagger/domain/auth/SigninFail';
@@ -77,7 +79,7 @@ export class AuthApiController {
     type: SignupUnprocessableEntityFail,
   })
   @ApiInternalServerErrorResponse({
-    description: '회원 가입에 실패했습니다. 실제 응답 코드는 201을 받습니다.',
+    description: '회원 가입에 실패했습니다.',
     type: SignupFailV1,
   })
   @Post('/signup/v1')
@@ -122,5 +124,37 @@ export class AuthApiController {
         return ResponseEntity.NOT_FOUND_WITH(error.message);
       return ResponseEntity.ERROR_WITH('로그인에 실패했습니다.');
     }
+  }
+
+  @ApiOperation({
+    summary: '로그인 V1',
+    description: `
+    로그인할 때 deviceId를 입력받습니다. \n
+    로그인할 때 입력값을 누락한 경우 400 에러를 출력합니다. \n
+    로그인할 때 deviceId가 DB에 저장되어 있지 않다면 404 에러를 출력합니다. \n
+    `,
+  })
+  @ApiOkResponse({
+    description: '로그인에 성공했습니다.',
+    type: SigninSuccess,
+  })
+  @ApiNotFoundResponse({
+    description: '입력한 deviceId는 DB에 저장되어 있지 않습니다.',
+    type: SigninNotFoundFailV1,
+  })
+  @ApiInternalServerErrorResponse({
+    description: '로그인에 실패했습니다.',
+    type: SigninFailV1,
+  })
+  @HttpCode(ResponseStatus.OK)
+  @Post('/signin/v1')
+  async signinV1(
+    @Body() dto: AuthSigninReq,
+  ): Promise<ResponseEntity<UserAccessToken | string>> {
+    const userId = await this.authApiService.signinV1(await dto.toEntity());
+    return ResponseEntity.OK_WITH_DATA<UserAccessToken>(
+      '로그인에 성공했습니다.',
+      userId,
+    );
   }
 }
