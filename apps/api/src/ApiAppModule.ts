@@ -6,16 +6,15 @@ import { ConfigModule } from '@nestjs/config';
 import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
 
-import { AuthConfig, ValidationSchema } from '@app/common-config/config';
 import { AuthApiModule } from './auth/AuthApiModule';
 import { UserApiModule } from './user/UserApiModule';
 import { FavoriteSummonerApiModule } from './favoriteSummoner/FavoriteSummonerApiModule';
 import { SummonerRecordApiModule } from './summonerRecord/SummonerRecordApiModule';
+import { ValidationSchema } from '@app/common-config/config/validationSchema';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [AuthConfig],
       isGlobal: true,
       validationSchema: ValidationSchema,
     }),

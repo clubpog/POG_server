@@ -1,20 +1,22 @@
+import { RiotApiJobService } from './../../../../libs/common-config/src/job/riot/RiotApiJobService';
 import { PushRiotApi } from './dto/PushRiotApi';
 import { plainToInstance } from 'class-transformer';
-import { RiotApiJobs } from './../../../../libs/common-config/src/job/RiotApi';
 import { InjectQueue } from '@nestjs/bull';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Queue } from 'bull';
-import { Interval } from '@nestjs/schedule';
+import { Interval, Timeout } from '@nestjs/schedule';
 import { SummonerRecordApiQueryRepository } from '../../../api/src/summonerRecord/SummonerRecordApiQueryRepository';
-import { RedisModuleConfig } from 'libs/entity/config/redisConfig';
 
 import Redis from 'ioredis';
+import { PushApiInjectionToken } from './PushApiInjectionToken';
 
 @Injectable()
 export class PushApiService {
   constructor(
     @InjectQueue('PushQueue')
     private pushQueue: Queue,
+    @Inject(PushApiInjectionToken.EVENT_STORE)
+    private readonly redisClient?: Redis,
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
   ) {}
   @Interval('pushCronTask', 180000)
@@ -23,10 +25,14 @@ export class PushApiService {
     const summonerIds = await redisClient.smembers('summonerId');
 
     summonerIds.map(async summonerId => {
-      const riotApiResponse = plainToInstance(
-        PushRiotApi,
-        await RiotApiJobs(summonerId),
-      );
+      const isKeyError = await this.redisKeyErrorCheck(summonerId, redisClient);
+      if (isKeyError) return;
+
+      const soloRankResult = await RiotApiJobService.riotLeagueApi(summonerId);
+      if (!soloRankResult) return;
+
+      const riotApiResponse = plainToInstance(PushRiotApi, soloRankResult);
+
       const redisResponse = await redisClient.mget(
         `summonerId:${summonerId}:win`,
         `summonerId:${summonerId}:lose`,
@@ -36,8 +42,9 @@ export class PushApiService {
         riotApiResponse,
         redisResponse,
       );
+
       if (isChangeRecord) {
-        await this.addPushQueue(summonerId, riotApiResponse.summonerName);
+        await this.addPushQueue(summonerId, riotApiResponse[0].summonerName);
         await this.changeRecord(riotApiResponse, redisClient, summonerId);
       }
     });
@@ -55,7 +62,24 @@ export class PushApiService {
   }
 
   public async getRedisClient(): Promise<Redis> {
-    return new Redis(RedisModuleConfig);
+    return this.redisClient['master'];
+  }
+
+  private async redisKeyErrorCheck(
+    summonerId: string,
+    redisClient: Redis,
+  ): Promise<boolean> {
+    if (summonerId === 'error') {
+      await redisClient.multi({ pipeline: false });
+
+      await redisClient.del(`summonerId:${summonerId}:lose`);
+      await redisClient.del(`summonerId:${summonerId}:tier`);
+      await redisClient.del(`summonerId:${summonerId}:win`);
+      await redisClient.srem('summonerId', 'error');
+
+      await redisClient.exec();
+      return true;
+    }
   }
 
   private async compareRecord(
@@ -63,9 +87,9 @@ export class PushApiService {
     redisResponse: string[],
   ): Promise<boolean> {
     const [win, lose, tier] = redisResponse;
-    if (riotApiResponse.tier !== tier) return true;
-    if (riotApiResponse.win !== Number(win)) return true;
-    if (riotApiResponse.lose !== Number(lose)) return true;
+    if (riotApiResponse[0].tier !== tier) return true;
+    if (riotApiResponse[0].win !== Number(win)) return true;
+    if (riotApiResponse[0].lose !== Number(lose)) return true;
   }
 
   private async addPushQueue(summonerId: string, summonerName: string) {
@@ -94,17 +118,24 @@ export class PushApiService {
     redisClient: Redis,
     summonerId: string,
   ) {
-    await redisClient.mset(
-      `summonerId:${summonerId}:win`,
-      riotApiResponse.win,
-      `summonerId:${summonerId}:lose`,
-      riotApiResponse.lose,
-      `summonerId:${summonerId}:tier`,
-      riotApiResponse.tier,
-    );
+    try {
+      await redisClient.mset(
+        `summonerId:${summonerId}:win`,
+        riotApiResponse[0].win,
+        `summonerId:${summonerId}:lose`,
+        riotApiResponse[0].lose,
+        `summonerId:${summonerId}:tier`,
+        riotApiResponse[0].tier,
+      );
+    } catch (error) {
+      console.error(error);
+    }
   }
 
-  public async addRedisSet(redisClient: Redis, summonerId: string) {
+  public async addRedisSet(
+    redisClient: Redis,
+    summonerId: string,
+  ): Promise<void> {
     await redisClient.sadd('summonerId', summonerId);
   }
 }

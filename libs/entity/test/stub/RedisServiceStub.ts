@@ -1,7 +1,9 @@
 import { RedisStub } from './RedisStub';
 
 export class RedisServiceStub {
-  getClient() {
-    return new RedisStub();
+  private readonly master;
+
+  constructor() {
+    this.master = new RedisStub();
   }
 }

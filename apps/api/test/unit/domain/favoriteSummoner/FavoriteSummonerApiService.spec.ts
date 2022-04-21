@@ -14,8 +14,7 @@ describe('FavoriteSummonerApiService', () => {
   let summonerRecordRepository;
   let summonerRecordApiQueryRepository: SummonerRecordApiQueryRepositoryStub;
   let favoriteSummonerApiQueryRepository: FavoriteSummonerApiQueryRepositoryStub;
-  let redisService;
-
+  let redisClient;
   it('즐겨찾기 추가에 성공했습니다.', async () => {
     // given
     favoriteSummonerRepository = new FavoriteSummonerRepositoryStub();
@@ -24,14 +23,14 @@ describe('FavoriteSummonerApiService', () => {
       new SummonerRecordApiQueryRepositoryStub();
     favoriteSummonerApiQueryRepository =
       new FavoriteSummonerApiQueryRepositoryStub();
-    redisService = new RedisServiceStub();
+    redisClient = new RedisServiceStub();
 
     const sut = new FavoriteSummonerApiService(
       favoriteSummonerRepository,
       summonerRecordRepository,
       summonerRecordApiQueryRepository,
       favoriteSummonerApiQueryRepository,
-      redisService,
+      redisClient,
     );
     // when
     const actual = await sut.createFavoriteSummoner(
@@ -98,14 +97,14 @@ describe('FavoriteSummonerApiService', () => {
       new SummonerRecordApiQueryRepositoryStub();
     favoriteSummonerApiQueryRepository =
       new FavoriteSummonerApiQueryRepositoryStub();
-    redisService = new RedisServiceStub();
+    redisClient = new RedisServiceStub();
 
     const sut = new FavoriteSummonerApiService(
       favoriteSummonerRepository,
       summonerRecordRepository,
       summonerRecordApiQueryRepository,
       favoriteSummonerApiQueryRepository,
-      redisService,
+      redisClient,
     );
     // when
     const actual = await sut.deleteFavoriteSummoner(

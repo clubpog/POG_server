@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Provider } from '@nestjs/common';
 import { WinstonModule } from 'nest-winston';
 import { getWinstonLogger } from '@app/common-config/getWinstonLogger';
 import { FavoriteSummonerApiService } from './FavoriteSummonerApiService';
@@ -8,6 +8,15 @@ import { FavoriteSummonerModule } from '@app/entity/domain/favoriteSummoner/Favo
 import { SummonerRecordApiModule } from '../summonerRecord/SummonerRecordApiModule';
 import { SummonerRecordModule } from '@app/entity/domain/summonerRecord/SummonerRecordModule';
 import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRepository';
+import { EventStoreServiceImplement } from '../../../../libs/cache/EventStoreService';
+import { FavoriteSummonerApiInjectionToken } from './FavoriteSummonerApiInjectionToken';
+
+const infrastructure: Provider[] = [
+  {
+    provide: FavoriteSummonerApiInjectionToken.EVENT_STORE,
+    useClass: EventStoreServiceImplement,
+  },
+];
 
 @Module({
   imports: [
@@ -21,6 +30,7 @@ import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRe
     FavoriteSummonerApiService,
     FavoriteSummonerApiRepository,
     FavoriteSummonerApiQueryRepository,
+    ...infrastructure,
   ],
 })
 export class FavoriteSummonerApiModule {}

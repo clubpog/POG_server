@@ -1,6 +1,6 @@
+import { ConfigService } from './config/configService';
 import { BullModule } from '@nestjs/bull';
-import { RedisConfig } from './config/redisConfig';
 
 export function getBullModule() {
-  return BullModule.forRoot(RedisConfig);
+  return BullModule.forRoot(ConfigService.bullConfig());
 }

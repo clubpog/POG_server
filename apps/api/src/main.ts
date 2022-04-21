@@ -1,3 +1,4 @@
+import { ConfigService } from './../../../libs/entity/config/configService';
 import { NestFactory } from '@nestjs/core';
 import * as winston from 'winston';
 import {
@@ -17,17 +18,11 @@ import expressBasicAuth from 'express-basic-auth';
 
 class Application {
   private logger = new Logger(Application.name);
-  private PORT: string;
   private DEV_MODE: boolean;
-  private ADMIN_USER: string;
-  private ADMIN_PASSWORD: string;
 
   constructor(private server: NestExpressApplication) {
     this.server = server;
-    this.PORT = process.env.PORT;
     this.DEV_MODE = process.env.NODE_ENV === 'production' ? false : true;
-    this.ADMIN_USER = process.env.ADMIN_USER;
-    this.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
   }
 
   private async swagger() {
@@ -41,7 +36,8 @@ class Application {
       expressBasicAuth({
         challenge: true,
         users: {
-          [this.ADMIN_USER]: this.ADMIN_PASSWORD,
+          [ConfigService.swaggerAdminAuth().ADMIN_USER]:
+            ConfigService.swaggerAdminAuth().ADMIN_PASSWORD,
         },
       }),
     );
@@ -82,14 +78,16 @@ class Application {
   async bootstrap() {
     SetNestApp(this.server);
     await this.swagger();
-    await this.server.listen(this.PORT);
+    await this.server.listen(ConfigService.appPort());
   }
 
   startLog() {
     if (this.DEV_MODE) {
-      this.logger.log(`✅ Server on http://localhost:${this.PORT}`);
+      this.logger.log(
+        `✅ Server on http://localhost:${ConfigService.appPort()}`,
+      );
     } else {
-      this.logger.log(`✅ Server on port ${this.PORT}...`);
+      this.logger.log(`✅ Server on port ${ConfigService.appPort()}...`);
     }
   }
 }
