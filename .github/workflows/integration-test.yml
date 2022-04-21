@@ -38,7 +38,7 @@ jobs:
       JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
       REDIS_HOST: ${{ secrets.REDIS_HOST }}
       REDIS_PORT: ${{ secrets.REDIS_PORT }}
-      REDIS_TEST_HOST: localhost
+      REDIS_TEST_HOST: cache
       REDIS_TEST_PORT: 6379
       REDIS_ENDPOINT: ${{ secrets.REDIS_ENDPOINT }}
       API_KEY: ${{ secrets.API_KEY }}
