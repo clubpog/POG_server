@@ -3,6 +3,7 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { instanceToPlain } from 'class-transformer';
@@ -16,9 +17,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost): any {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const status = exception.getStatus();
+    const status = (exception as HttpException).getStatus();
 
-    const responseBody = exception.getResponse();
+    if (!(exception instanceof HttpException)) {
+      exception = new InternalServerErrorException();
+    }
+
+    const responseBody = (exception as HttpException).getResponse();
     const ResponseStatusValue =
       Object.keys(ResponseStatus)[
         Object.values(ResponseStatus).indexOf(status as ResponseStatus)
@@ -26,7 +31,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const isValidationError = responseBody instanceof ValidationError;
 
     return response
-      .status(status)
+      .status((exception as HttpException).getStatus())
       .json(
         instanceToPlain(
           ResponseEntity.ERROR_WITH_DATA<CustomValidationError[]>(

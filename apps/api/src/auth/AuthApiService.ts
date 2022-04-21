@@ -3,15 +3,20 @@ import { UserAccessToken } from '@app/entity/domain/user/UserAccessToken';
 import { UserApiQueryRepository } from './../user/UserApiQueryRepository';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { User } from '@app/entity/domain/user/User.entity';
 import { Repository } from 'typeorm';
 import { UserApiRepository } from './../user/UserApiRepository';
 import { JwtService } from '@nestjs/jwt';
 import { UserId } from '@app/entity/domain/user/UserId';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Injectable()
 export class AuthApiService {
@@ -21,10 +26,25 @@ export class AuthApiService {
     private readonly userApiRepository?: UserApiRepository,
     private readonly userApiQueryRepository?: UserApiQueryRepository,
     private readonly jwtService?: JwtService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger?: Logger,
   ) {}
 
   async signup(signupUser: User): Promise<User> {
     return await this.userRepository.save(signupUser);
+  }
+
+  async signupV1(signupUser: User): Promise<User> {
+    try {
+      return await this.userRepository.save(signupUser);
+    } catch (error) {
+      this.logger.error(`dto = ${JSON.stringify(signupUser)}`, error);
+      if (error.code === '23505') {
+        throw new UnprocessableEntityException(
+          '이미 DB에 있는 deviceId를 입력했습니다.',
+        );
+      }
+      throw new InternalServerErrorException();
+    }
   }
 
   async signin(signinUser: User): Promise<UserAccessToken> {
