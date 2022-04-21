@@ -1,9 +1,13 @@
 name: Integration Test
 on:
-  pull_request:
+  push:
     branches:
-      - 'develop**'
-      - 'production**'
+      - feature/deploy-prod
+  # pull_request:
+  #   branches:
+  #     - 'develop**'
+  #     - 'production**'
+
 
 jobs:
   build:
