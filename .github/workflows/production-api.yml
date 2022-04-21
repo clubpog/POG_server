@@ -2,8 +2,7 @@ name: Deploy prod-api Docker
 on:
   push:
     branches:
-      - production-api
-      - feature/deploy-prod
+      - develop
 
 jobs:
   build:
