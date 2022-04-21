@@ -7,6 +7,7 @@ export const ResponseStatus = {
   FORBIDDEN: 403,
   NOT_FOUND: 404,
   UN_AUTHORIZED: 401,
+  UNPROCESSABLE: 422,
 } as const;
 
 export type ResponseStatus = typeof ResponseStatus[keyof typeof ResponseStatus];
