@@ -19,7 +19,7 @@ import { User } from '@app/entity/domain/user/User.entity';
 import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
 
 import Redis from 'ioredis';
-import { FavoriteSummonerApiInjectionToken } from './FavoriteSummonerApiInjectionToken';
+import { EInfrastructureInjectionToken } from '@app/common-config/enum/InfrastructureInjectionToken';
 
 @Injectable()
 export class FavoriteSummonerApiService {
@@ -33,7 +33,7 @@ export class FavoriteSummonerApiService {
     private summonerRecordRepository?: Repository<SummonerRecord>,
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
     private readonly favoriteSummonerApiQueryRepository?: FavoriteSummonerApiQueryRepository,
-    @Inject(FavoriteSummonerApiInjectionToken.EVENT_STORE)
+    @Inject(EInfrastructureInjectionToken.EVENT_STORE.name)
     private readonly redisClient?: Redis,
   ) {}
 
