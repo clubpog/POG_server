@@ -54,6 +54,9 @@ export class FavoriteSummonerApiQueryRepositoryStub extends FavoriteSummonerApiQ
   override async findAllFavoriteSummoners(
     userId: number,
   ): Promise<FavoriteSummonerRes[]> {
+    if (userId === this.throwErrorFavoriteSummonerId) {
+      throw Error;
+    }
     const dto = [];
     dto.push(
       FavoriteSummonerJoinSummonerRecord.of(

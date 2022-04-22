@@ -274,7 +274,7 @@ describe('FavoriteSummonerApiService', () => {
       favoriteSummonerApiQueryRepository,
     );
     // when
-    const actual = await sut.getFavoriteSummoner(
+    const actual = await sut.getFavoriteSummonerV1(
       await User.jwtUserReq('test', 1),
     );
     // then
@@ -288,5 +288,32 @@ describe('FavoriteSummonerApiService', () => {
     expect(actual[0].profileIconId).toBe(1);
     expect(actual[0].summonerId).toBe('test');
     expect(actual[0].leaguePoint).toBe(1);
+  });
+
+  it('원인 모를 문제 때문에 즐겨찾기 조회에 실패했습니다.', async () => {
+    // given
+    favoriteSummonerRepository = new FavoriteSummonerRepositoryStub();
+    summonerRecordRepository = new SummonerRecordRepositoryStub();
+    summonerRecordApiQueryRepository =
+      new SummonerRecordApiQueryRepositoryStub();
+    favoriteSummonerApiQueryRepository =
+      new FavoriteSummonerApiQueryRepositoryStub();
+    redisClient = new RedisServiceStub();
+    logger = new Logger();
+
+    const sut = new FavoriteSummonerApiService(
+      favoriteSummonerRepository,
+      summonerRecordRepository,
+      summonerRecordApiQueryRepository,
+      favoriteSummonerApiQueryRepository,
+      redisClient,
+      logger,
+    );
+
+    await expect(async () => {
+      // when
+      await sut.getFavoriteSummonerV1(await User.jwtUserReq('test', 3));
+      // then
+    }).rejects.toThrowError(new InternalServerErrorException());
   });
 });

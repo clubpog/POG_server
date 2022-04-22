@@ -111,6 +111,15 @@ export class FavoriteSummonerApiService {
     return await this.findAllFavoriteSummoners(userDto.id);
   }
 
+  async getFavoriteSummonerV1(userDto: User): Promise<FavoriteSummonerRes[]> {
+    try {
+      return await this.findAllFavoriteSummoners(userDto.id);
+    } catch (error) {
+      this.logger.error(`userDto = ${JSON.stringify(userDto)}`, error);
+      throw new InternalServerErrorException();
+    }
+  }
+
   private async checkNotFoundFavoriteSummoner(
     userDto: UserReq,
     favoriteSummonerIdDto: FavoriteSummonerIdReq,
