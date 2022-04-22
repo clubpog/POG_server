@@ -16,6 +16,10 @@ export class UserApiRepositoryStub extends UserApiRepository {
   }
 
   override async updatePush(deviceId: string, isPush: boolean) {
+    if (deviceId === 'test1') {
+      throw Error;
+    }
+
     await UpdateResult.Result();
     return;
   }

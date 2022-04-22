@@ -23,6 +23,7 @@ import { UnauthorizedError } from '@app/common-config/response/swagger/common/er
 import { BadRequestError } from '@app/common-config/response/swagger/common/error/BadRequestError';
 import { FcmTokenUpdateSuccess } from '@app/common-config/response/swagger/domain/user/FcmTokenUpdateSuccess';
 import { PushUpdateSuccess } from '@app/common-config/response/swagger/domain/user/PushUpdateSuccess';
+import { PushUpdateFailV1 } from '@app/common-config/response/swagger/domain/user/PushUpdateFailV1';
 
 @Controller('user')
 @ApiTags('유저 API')
@@ -121,5 +122,42 @@ export class UserApiController {
         '푸시알림 허용 여부 수정에 실패했습니다.',
       );
     }
+  }
+
+  @ApiOperation({
+    summary: '푸시알림 허용 여부 수정 V1',
+    description: `
+    푸시알림 허용 여부 수정 시 deviceId, isPush를 입력받습니다. \n
+    푸시알림 허용 여부 수정 시 입력값을 누락한 경우 400 에러를 출력합니다. \n
+    헤더에 토큰 값을 제대로 설정하지 않으면 401 에러를 출력합니다. \n
+    `,
+  })
+  @ApiOkResponse({
+    description: '푸시알림 허용 여부 수정에 성공했습니다.',
+    type: PushUpdateSuccess,
+  })
+  @ApiUnauthorizedResponse({
+    description: '잘못된 Authorization입니다.',
+    type: UnauthorizedError,
+  })
+  @ApiBadRequestResponse({
+    description: '입력 값을 누락했습니다.',
+    type: BadRequestError,
+  })
+  @ApiInternalServerErrorResponse({
+    description: '푸시알림 허용 여부 수정에 실패했습니다.',
+    type: PushUpdateFailV1,
+  })
+  @ApiBearerAuth('Authorization')
+  @UseGuards(JwtAuthGuard)
+  @Put('/push/v1')
+  async updatePushV1(
+    @CurrentUser() userDto: JwtPayload,
+    @Body() userUpdatePushDto: UserUpdatePushReq,
+  ): Promise<ResponseEntity<string>> {
+    await this.userApiService.updatePushV1(
+      await userUpdatePushDto.toEntity(userDto.deviceId),
+    );
+    return ResponseEntity.OK_WITH('푸시알림 허용 여부 수정에 성공했습니다.');
   }
 }
