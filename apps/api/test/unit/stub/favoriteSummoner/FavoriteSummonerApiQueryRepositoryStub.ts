@@ -7,6 +7,7 @@ export class FavoriteSummonerApiQueryRepositoryStub extends FavoriteSummonerApiQ
   private readonly favoriteSummonerLimitCount: number = 5;
   private readonly favoriteSummonerNonLimitCount: number = 1;
   private readonly notFindFavoriteSummonerId: number = 2;
+  private readonly throwErrorFavoriteSummonerId: number = 3;
   private readonly nonUsedSummonerIdCount: number = 0;
   private readonly usedSummonerIdCount: number = 1;
 
@@ -42,6 +43,9 @@ export class FavoriteSummonerApiQueryRepositoryStub extends FavoriteSummonerApiQ
     userId: number,
     summonerId: string,
   ): Promise<FavoriteSummonerId> {
+    if (userId === this.throwErrorFavoriteSummonerId) {
+      throw Error;
+    }
     if (userId === this.notFindFavoriteSummonerId) return;
     const dto = FavoriteSummonerId.from(1);
     return dto;

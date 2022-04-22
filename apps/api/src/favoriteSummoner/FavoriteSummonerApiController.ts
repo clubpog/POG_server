@@ -41,6 +41,8 @@ import { FavoriteSummonerReadFail } from '@app/common-config/response/swagger/do
 import { FavoriteSummonerReadSuccess } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerReadSuccess';
 import { FavoriteSummonerCreateLimitFailV1 } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerCreateLimitFailV1';
 import { FavoriteSummonerCreateFailV1 } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerCreateFailV1';
+import { FavoriteSummonerDeleteNotFoundV1 } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteNotFoundV1';
+import { FavoriteSummonerDeleteFailV1 } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteFailV1';
 
 @Controller('favoriteSummoner')
 @ApiTags('소환사 즐겨찾기 API')
@@ -200,6 +202,51 @@ export class FavoriteSummonerApiController {
       }
       return ResponseEntity.ERROR_WITH('소환사 즐겨찾기 취소에 실패했습니다.');
     }
+  }
+
+  @ApiOperation({
+    summary: '소환사 즐겨찾기 취소 V1',
+    description: `
+    소환사 즐겨찾기 취소 시 summonerId를 입력받습니다. \n
+    소환사 즐겨찾기 취소 시 입력값을 누락한 경우 400 에러를 출력합니다. \n
+    소환사 즐겨찾기 취소 시 즐겨찾기 한도가 초과된 경우 403 에러를 출력합니다. \n
+    헤더에 토큰 값을 제대로 설정하지 않으면 401 에러를 출력합니다. \n
+    소환사 즐겨찾기 취소 시 삭제할 즐겨찾기를 조회할 수 없다면 404 에러를 출력합니다. \n
+    `,
+  })
+  @ApiOkResponse({
+    description: '소환사 즐겨찾기 취소에 성공했습니다.',
+    type: FavoriteSummonerDeleteSuccess,
+  })
+  @ApiUnauthorizedResponse({
+    description: '잘못된 Authorization입니다.',
+    type: UnauthorizedError,
+  })
+  @ApiBadRequestResponse({
+    description: '입력 값을 누락했습니다.',
+    type: BadRequestError,
+  })
+  @ApiNotFoundResponse({
+    description:
+      '소환사 즐겨찾기 취소 시 삭제할 즐겨찾기를 조회할 수 없습니다.',
+    type: FavoriteSummonerDeleteNotFoundV1,
+  })
+  @ApiInternalServerErrorResponse({
+    description: '소환사 즐겨찾기 취소에 실패했습니다.',
+    type: FavoriteSummonerDeleteFailV1,
+  })
+  @ApiBearerAuth('Authorization')
+  @UseGuards(JwtAuthGuard)
+  @Delete('/v1')
+  async deleteFollowV1(
+    @CurrentUser() userDto: UserReq,
+    @Body() favoriteSummonerIdDto: FavoriteSummonerIdReq,
+  ): Promise<ResponseEntity<string>> {
+    await this.favoriteSummonerApiService.deleteFavoriteSummonerV1(
+      userDto,
+      favoriteSummonerIdDto,
+    );
+    return ResponseEntity.OK_WITH('소환사 즐겨찾기 취소에 성공했습니다.');
   }
 
   @ApiOperation({

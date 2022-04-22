@@ -158,7 +158,7 @@ describe('FavoriteSummonerApiService', () => {
       redisClient,
     );
     // when
-    const actual = await sut.deleteFavoriteSummoner(
+    const actual = await sut.deleteFavoriteSummonerV1(
       UserReq.of('test', 1),
       FavoriteSummonerReq.of(
         'test',
@@ -184,17 +184,21 @@ describe('FavoriteSummonerApiService', () => {
       new SummonerRecordApiQueryRepositoryStub();
     favoriteSummonerApiQueryRepository =
       new FavoriteSummonerApiQueryRepositoryStub();
+    redisClient = new RedisServiceStub();
+    logger = new Logger();
 
     const sut = new FavoriteSummonerApiService(
       favoriteSummonerRepository,
       summonerRecordRepository,
       summonerRecordApiQueryRepository,
       favoriteSummonerApiQueryRepository,
+      redisClient,
+      logger,
     );
 
     await expect(async () => {
       // when
-      await sut.deleteFavoriteSummoner(
+      await sut.deleteFavoriteSummonerV1(
         UserReq.of('test2', 2),
         FavoriteSummonerReq.of(
           'test',
@@ -212,6 +216,46 @@ describe('FavoriteSummonerApiService', () => {
     }).rejects.toThrowError(
       new NotFoundException('삭제할 즐겨찾기를 조회할 수 없습니다.'),
     );
+  });
+
+  it('원인 모를 문제 때문에 즐겨찾기 삭제에 실패했습니다.', async () => {
+    // given
+    favoriteSummonerRepository = new FavoriteSummonerRepositoryStub();
+    summonerRecordRepository = new SummonerRecordRepositoryStub();
+    summonerRecordApiQueryRepository =
+      new SummonerRecordApiQueryRepositoryStub();
+    favoriteSummonerApiQueryRepository =
+      new FavoriteSummonerApiQueryRepositoryStub();
+    redisClient = new RedisServiceStub();
+    logger = new Logger();
+
+    const sut = new FavoriteSummonerApiService(
+      favoriteSummonerRepository,
+      summonerRecordRepository,
+      summonerRecordApiQueryRepository,
+      favoriteSummonerApiQueryRepository,
+      redisClient,
+      logger,
+    );
+
+    await expect(async () => {
+      // when
+      await sut.deleteFavoriteSummonerV1(
+        UserReq.of('test2', 3),
+        FavoriteSummonerReq.of(
+          'test',
+          'test',
+          1,
+          1,
+          6,
+          'test',
+          'test',
+          1,
+          'test',
+        ),
+      );
+      // then
+    }).rejects.toThrowError(new InternalServerErrorException());
   });
 
   it('즐겨찾기 조회에 성공했습니다.', async () => {
