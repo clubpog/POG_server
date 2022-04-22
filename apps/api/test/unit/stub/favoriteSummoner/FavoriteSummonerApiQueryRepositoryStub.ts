@@ -15,6 +15,10 @@ export class FavoriteSummonerApiQueryRepositoryStub extends FavoriteSummonerApiQ
   }
 
   override async countId(userId: number): Promise<number> {
+    if (userId === 3) {
+      throw Error;
+    }
+
     return userId === 1
       ? this.favoriteSummonerNonLimitCount
       : this.favoriteSummonerLimitCount;
