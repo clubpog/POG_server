@@ -85,6 +85,28 @@ export class FavoriteSummonerApiService {
     await this.deleteNoUseSummonerRecord(favoriteSummonerIdDto);
   }
 
+  async deleteFavoriteSummonerV1(
+    userDto: UserReq,
+    favoriteSummonerIdDto: FavoriteSummonerIdReq,
+  ): Promise<void> {
+    try {
+      await this.checkNotFoundFavoriteSummoner(userDto, favoriteSummonerIdDto);
+      await this.softDeleteFavoriteSummoner(userDto, favoriteSummonerIdDto);
+      await this.deleteNoUseSummonerRecord(favoriteSummonerIdDto);
+    } catch (error) {
+      this.logger.error(
+        `userDto = ${JSON.stringify(
+          userDto,
+        )}, favoriteSummonerIdDto = ${JSON.stringify(favoriteSummonerIdDto)}`,
+        error,
+      );
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('삭제할 즐겨찾기를 조회할 수 없습니다.');
+      }
+      throw new InternalServerErrorException();
+    }
+  }
+
   async getFavoriteSummoner(userDto: User): Promise<FavoriteSummonerRes[]> {
     return await this.findAllFavoriteSummoners(userDto.id);
   }
