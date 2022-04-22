@@ -1,5 +1,5 @@
 import { UserApiRepository } from './UserApiRepository';
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { User } from '@app/entity/domain/user/User.entity';
 
 @Injectable()
@@ -18,5 +18,16 @@ export class UserApiService {
       updatePushUser.deviceId,
       updatePushUser.isPush,
     );
+  }
+
+  async updatePushV1(updatePushUser: User): Promise<void> {
+    try {
+      await this.userApiRepository.updatePush(
+        updatePushUser.deviceId,
+        updatePushUser.isPush,
+      );
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 }
