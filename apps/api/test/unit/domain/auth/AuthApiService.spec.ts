@@ -104,7 +104,7 @@ describe('AuthApiService', () => {
       jwtService,
     );
     // when
-    const actual = await sut.signin(await User.signin('test'));
+    const actual = await sut.signinV1(await User.signin('test'));
     // then
     expect(Object.keys(actual)).toContain('accessToken');
   });
@@ -118,20 +118,50 @@ describe('AuthApiService', () => {
       { secret: 'test', signOptions: { expiresIn: '1y' } },
       new Logger('JwtService', {}),
     );
+    logger = new Logger();
+
     const sut = new AuthApiService(
       userRepository,
       userApiRepository,
       userApiQueryRepository,
       jwtService,
+      logger,
     );
 
     await expect(async () => {
       // when
-      await sut.signin(await User.signinTest());
+      await sut.signinV1(await User.signinTest());
 
       // then
     }).rejects.toThrowError(
       new NotFoundException('입력된 deviceId가 존재하지 않습니다.'),
     );
+  });
+
+  it('이유 모를 문제 때문에 로그인에 실패합니다.', async () => {
+    // given
+    userRepository = new UserRepositoryStub();
+    userApiRepository = new UserApiRepositoryStub();
+    userApiQueryRepository = new UserApiQueryRepositoryStub();
+    jwtService = new JwtServiceStub(
+      { secret: 'test', signOptions: { expiresIn: '1y' } },
+      new Logger('JwtService', {}),
+    );
+    logger = new Logger();
+
+    const sut = new AuthApiService(
+      userRepository,
+      userApiRepository,
+      userApiQueryRepository,
+      jwtService,
+      logger,
+    );
+
+    await expect(async () => {
+      // when
+      await sut.signinV1(await User.signin('test1'));
+
+      // then
+    }).rejects.toThrowError(new InternalServerErrorException());
   });
 });
