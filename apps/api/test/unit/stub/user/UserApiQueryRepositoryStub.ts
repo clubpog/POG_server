@@ -8,6 +8,10 @@ export class UserApiQueryRepositoryStub extends UserApiQueryRepository {
   }
 
   override async findUserIdByDeviceId(deviceId): Promise<UserId> {
+    if (deviceId === 'test1') {
+      throw Error;
+    }
+
     if (!deviceId) return;
     const row = await User.createId(deviceId);
     return new UserId(row.id);
