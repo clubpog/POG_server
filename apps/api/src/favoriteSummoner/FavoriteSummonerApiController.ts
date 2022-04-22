@@ -39,6 +39,8 @@ import { FavoriteSummonerDeleteNotFound } from '@app/common-config/response/swag
 import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
 import { FavoriteSummonerReadFail } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerReadFail';
 import { FavoriteSummonerReadSuccess } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerReadSuccess';
+import { FavoriteSummonerCreateLimitFailV1 } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerCreateLimitFailV1';
+import { FavoriteSummonerCreateFailV1 } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerCreateFailV1';
 
 @Controller('favoriteSummoner')
 @ApiTags('소환사 즐겨찾기 API')
@@ -99,6 +101,49 @@ export class FavoriteSummonerApiController {
       }
       return ResponseEntity.ERROR_WITH('소환사 즐겨찾기 추가에 실패했습니다.');
     }
+  }
+
+  @ApiOperation({
+    summary: '소환사 즐겨찾기 추가 V1',
+    description: `
+    소환사 즐겨찾기 추가 시 name, tier, win, lose, profileIconId, puuid, summonerId, leaguePoint, rank를 입력받습니다. \n
+    소환사 즐겨찾기 추가 시 입력값을 누락한 경우 400 에러를 출력합니다. \n
+    소환사 즐겨찾기 추가 시 즐겨찾기 한도가 초과된 경우 403 에러를 출력합니다. \n
+    헤더에 토큰 값을 제대로 설정하지 않으면 401 에러를 출력합니다. \n
+    `,
+  })
+  @ApiOkResponse({
+    description: '소환사 즐겨찾기 추가에 성공했습니다.',
+    type: FavoriteSummonerCreateSuccess,
+  })
+  @ApiUnauthorizedResponse({
+    description: '잘못된 Authorization입니다.',
+    type: UnauthorizedError,
+  })
+  @ApiBadRequestResponse({
+    description: '입력 값을 누락했습니다.',
+    type: BadRequestError,
+  })
+  @ApiForbiddenResponse({
+    description: '즐겨찾기 한도가 초과되었습니다.',
+    type: FavoriteSummonerCreateLimitFailV1,
+  })
+  @ApiInternalServerErrorResponse({
+    description: '소환사 즐겨찾기 추가에 실패했습니다.',
+    type: FavoriteSummonerCreateFailV1,
+  })
+  @ApiBearerAuth('Authorization')
+  @UseGuards(JwtAuthGuard)
+  @Post('/v1')
+  async createFollowV1(
+    @CurrentUser() userDto: UserReq,
+    @Body() favoriteSummonerDto: FavoriteSummonerReq,
+  ): Promise<ResponseEntity<string>> {
+    await this.favoriteSummonerApiService.createFavoriteSummonerV1(
+      userDto,
+      favoriteSummonerDto,
+    );
+    return ResponseEntity.CREATED_WITH('소환사 즐겨찾기 추가에 성공했습니다.');
   }
 
   @ApiOperation({

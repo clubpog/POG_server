@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
@@ -20,6 +21,8 @@ import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
 
 import Redis from 'ioredis';
 import { EInfrastructureInjectionToken } from '@app/common-config/enum/InfrastructureInjectionToken';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Injectable()
 export class FavoriteSummonerApiService {
@@ -35,6 +38,7 @@ export class FavoriteSummonerApiService {
     private readonly favoriteSummonerApiQueryRepository?: FavoriteSummonerApiQueryRepository,
     @Inject(EInfrastructureInjectionToken.EVENT_STORE.name)
     private readonly redisClient?: Redis,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger?: Logger,
   ) {}
 
   async createFavoriteSummoner(
@@ -46,6 +50,30 @@ export class FavoriteSummonerApiService {
     await this.saveSummonerRecord(favoriteSummonerDto);
     await this.saveFavoriteSummoner(favoriteSummonerDto, userDto);
     await this.restoreFavoriteSummoner(favoriteSummonerDto, userDto);
+  }
+
+  async createFavoriteSummonerV1(
+    userDto: UserReq,
+    favoriteSummonerDto: FavoriteSummonerReq,
+  ): Promise<void> {
+    try {
+      await this.checkLimitFavoriteSummoner(userDto.userId);
+      await this.saveRedisSummonerRecord(favoriteSummonerDto);
+      await this.saveSummonerRecord(favoriteSummonerDto);
+      await this.saveFavoriteSummoner(favoriteSummonerDto, userDto);
+      await this.restoreFavoriteSummoner(favoriteSummonerDto, userDto);
+    } catch (error) {
+      this.logger.error(
+        `userDto = ${JSON.stringify(
+          userDto,
+        )}, favoriteSummonerDto = ${JSON.stringify(favoriteSummonerDto)}`,
+        error,
+      );
+      if (error instanceof ForbiddenException) {
+        throw new ForbiddenException('즐겨찾기 한도가 초과되었습니다.');
+      }
+      throw new InternalServerErrorException();
+    }
   }
 
   async deleteFavoriteSummoner(

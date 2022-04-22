@@ -6,8 +6,13 @@ import { SummonerRecordApiQueryRepositoryStub } from '../../stub/summonerRecord/
 import { FavoriteSummonerApiQueryRepositoryStub } from '../../stub/favoriteSummoner/FavoriteSummonerApiQueryRepositoryStub';
 import { FavoriteSummonerReq } from '../../../../../../apps/api/src/favoriteSummoner/dto/FavoriteSummonerReq.dto';
 import { UserReq } from '../../../../../../apps/api/src/user/dto/UserReq.dto';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { User } from '@app/entity/domain/user/User.entity';
+import { Logger } from '../../../../../../libs/common-config/test/stub/LoggerStub';
 
 describe('FavoriteSummonerApiService', () => {
   let favoriteSummonerRepository;
@@ -15,6 +20,8 @@ describe('FavoriteSummonerApiService', () => {
   let summonerRecordApiQueryRepository: SummonerRecordApiQueryRepositoryStub;
   let favoriteSummonerApiQueryRepository: FavoriteSummonerApiQueryRepositoryStub;
   let redisClient;
+  let logger;
+
   it('즐겨찾기 추가에 성공했습니다.', async () => {
     // given
     favoriteSummonerRepository = new FavoriteSummonerRepositoryStub();
@@ -33,7 +40,7 @@ describe('FavoriteSummonerApiService', () => {
       redisClient,
     );
     // when
-    const actual = await sut.createFavoriteSummoner(
+    const actual = await sut.createFavoriteSummonerV1(
       UserReq.of('test', 1),
       FavoriteSummonerReq.of(
         'test',
@@ -59,17 +66,21 @@ describe('FavoriteSummonerApiService', () => {
       new SummonerRecordApiQueryRepositoryStub();
     favoriteSummonerApiQueryRepository =
       new FavoriteSummonerApiQueryRepositoryStub();
+    redisClient = new RedisServiceStub();
+    logger = new Logger();
 
     const sut = new FavoriteSummonerApiService(
       favoriteSummonerRepository,
       summonerRecordRepository,
       summonerRecordApiQueryRepository,
       favoriteSummonerApiQueryRepository,
+      redisClient,
+      logger,
     );
 
     await expect(async () => {
       // when
-      await sut.createFavoriteSummoner(
+      await sut.createFavoriteSummonerV1(
         UserReq.of('test2', 2),
         FavoriteSummonerReq.of(
           'test',
@@ -87,6 +98,46 @@ describe('FavoriteSummonerApiService', () => {
     }).rejects.toThrowError(
       new ForbiddenException('즐겨찾기 한도가 초과되었습니다.'),
     );
+  });
+
+  it('원인 모를 문제 때문에 즐겨찾기 추가에 실패했습니다.', async () => {
+    // given
+    favoriteSummonerRepository = new FavoriteSummonerRepositoryStub();
+    summonerRecordRepository = new SummonerRecordRepositoryStub();
+    summonerRecordApiQueryRepository =
+      new SummonerRecordApiQueryRepositoryStub();
+    favoriteSummonerApiQueryRepository =
+      new FavoriteSummonerApiQueryRepositoryStub();
+    redisClient = new RedisServiceStub();
+    logger = new Logger();
+
+    const sut = new FavoriteSummonerApiService(
+      favoriteSummonerRepository,
+      summonerRecordRepository,
+      summonerRecordApiQueryRepository,
+      favoriteSummonerApiQueryRepository,
+      redisClient,
+      logger,
+    );
+
+    await expect(async () => {
+      // when
+      await sut.createFavoriteSummonerV1(
+        UserReq.of('test3', 3),
+        FavoriteSummonerReq.of(
+          'test',
+          'test',
+          1,
+          1,
+          6,
+          'test',
+          'test',
+          1,
+          'test',
+        ),
+      );
+      // then
+    }).rejects.toThrowError(new InternalServerErrorException());
   });
 
   it('즐겨찾기 삭제에 성공했습니다.', async () => {
