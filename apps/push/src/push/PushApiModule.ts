@@ -9,20 +9,21 @@ import { PushApiService } from './PushApiService';
 import { getBullQueue } from '../../../../libs/entity/queue/getBullQueue';
 import { PushApiConsumer } from './PushApiConsumer';
 import { ScheduleModule } from '@nestjs/schedule';
-import { PushApiInjectionToken } from './PushApiInjectionToken';
 import { EventStoreServiceImplement } from '../../../../libs/cache/EventStoreService';
 import { PushJobService } from '@app/common-config/job/push/PushJobService';
+import { EInfrastructureInjectionToken } from '@app/common-config/enum/InfrastructureInjectionToken';
+import { EApplicationInjectionToken } from '@app/common-config/enum/ApplicationInjectionToken';
 
 const infrastructure: Provider[] = [
   {
-    provide: PushApiInjectionToken.EVENT_STORE,
+    provide: EInfrastructureInjectionToken.EVENT_STORE.name,
     useClass: EventStoreServiceImplement,
   },
 ];
 
 const application: Provider[] = [
   {
-    provide: PushApiInjectionToken.PUSH_JOB,
+    provide: EApplicationInjectionToken.PUSH_JOB.name,
     useClass: PushJobService,
   },
 ];

@@ -8,14 +8,14 @@ import { Interval, Timeout } from '@nestjs/schedule';
 import { SummonerRecordApiQueryRepository } from '../../../api/src/summonerRecord/SummonerRecordApiQueryRepository';
 
 import Redis from 'ioredis';
-import { PushApiInjectionToken } from './PushApiInjectionToken';
+import { EInfrastructureInjectionToken } from '@app/common-config/enum/InfrastructureInjectionToken';
 
 @Injectable()
 export class PushApiService {
   constructor(
     @InjectQueue('PushQueue')
     private pushQueue: Queue,
-    @Inject(PushApiInjectionToken.EVENT_STORE)
+    @Inject(EInfrastructureInjectionToken.EVENT_STORE.name)
     private readonly redisClient?: Redis,
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
   ) {}

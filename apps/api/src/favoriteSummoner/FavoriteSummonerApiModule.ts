@@ -9,11 +9,11 @@ import { SummonerRecordApiModule } from '../summonerRecord/SummonerRecordApiModu
 import { SummonerRecordModule } from '@app/entity/domain/summonerRecord/SummonerRecordModule';
 import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRepository';
 import { EventStoreServiceImplement } from '../../../../libs/cache/EventStoreService';
-import { FavoriteSummonerApiInjectionToken } from './FavoriteSummonerApiInjectionToken';
+import { EInfrastructureInjectionToken } from '@app/common-config/enum/InfrastructureInjectionToken';
 
 const infrastructure: Provider[] = [
   {
-    provide: FavoriteSummonerApiInjectionToken.EVENT_STORE,
+    provide: EInfrastructureInjectionToken.EVENT_STORE.name,
     useClass: EventStoreServiceImplement,
   },
 ];
