@@ -10,11 +10,17 @@ export class UserRepositoryStub {
 
   save(user: User): User | object {
     UserRepositoryStub.database.set(user.id, user);
+    if (user.deviceId === 'test214') {
+      throw Error;
+    }
+
     if (!this._user) {
       this._user = user;
       return this._user;
-    } else {
-      return { severity: 'ERROR', code: '23505' };
+    }
+
+    if (this._user) {
+      throw { severity: 'ERROR', code: '23505' };
     }
   }
 }
