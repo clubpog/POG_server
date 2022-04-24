@@ -2,7 +2,7 @@ import request from 'supertest';
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { ApiTestAppModule } from '../../src/ApiTestAppModule';
+import { ApiTestAppModule } from '../ApiTestAppModule';
 import { getConnection, Repository } from 'typeorm';
 import { SetNestApp } from '@app/common-config/setNestApp';
 import { User } from '@app/entity/domain/user/User.entity';

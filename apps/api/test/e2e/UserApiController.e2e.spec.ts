@@ -1,8 +1,9 @@
+import { TestUtils } from './../testUtils';
 import request from 'supertest';
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { ApiTestAppModule } from '../../src/ApiTestAppModule';
+import { ApiTestAppModule } from '../ApiTestAppModule';
 import { getConnection, Repository } from 'typeorm';
 import { SetNestApp } from '@app/common-config/setNestApp';
 import { User } from '@app/entity/domain/user/User.entity';
@@ -17,39 +18,26 @@ describe('UserApiController (e2e)', () => {
   let userRepository: Repository<User>;
   let favoriteRepository: Repository<FavoriteSummoner>;
   let summonerRecordRepository: Repository<SummonerRecord>;
+  let testUtils: TestUtils;
   let userToken: string;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ApiTestAppModule],
+      imports: [ApiTestAppModule, TestUtils],
     }).compile();
 
     app = module.createNestApplication();
     userRepository = module.get(getRepositoryToken(User));
     favoriteRepository = module.get(getRepositoryToken(FavoriteSummoner));
     summonerRecordRepository = module.get(getRepositoryToken(SummonerRecord));
+    testUtils = module.get<TestUtils>(TestUtils);
 
     SetNestApp(app); // ClassSerializerInterceptor 적용
     await app.init();
     await userRepository.delete({});
     await favoriteRepository.delete({});
     await summonerRecordRepository.delete({});
-
-    const deviceId = 'test';
-    const firebaseToken = 'test';
-
-    await request(app.getHttpServer()).post('/auth/signup/v1').send({
-      deviceId,
-      firebaseToken,
-    });
-
-    const res = await request(app.getHttpServer())
-      .post('/auth/signin/v1')
-      .send({
-        deviceId,
-      });
-
-    userToken = res.body.data['accessToken'];
+    userToken = await testUtils.getDefaultUserToken();
   });
 
   afterAll(async () => {
@@ -60,22 +48,7 @@ describe('UserApiController (e2e)', () => {
     await userRepository.delete({});
     await favoriteRepository.delete({});
     await summonerRecordRepository.delete({});
-
-    const deviceId = 'test';
-    const firebaseToken = 'test';
-
-    await request(app.getHttpServer()).post('/auth/signup/v1').send({
-      deviceId,
-      firebaseToken,
-    });
-
-    const res = await request(app.getHttpServer())
-      .post('/auth/signin/v1')
-      .send({
-        deviceId,
-      });
-
-    userToken = res.body.data['accessToken'];
+    userToken = await testUtils.getDefaultUserToken();
   });
 
   it('/fcmToken (PUT)', async () => {
