@@ -88,7 +88,10 @@ export class AuthApiService {
     return payload;
   }
 
-  async updateLoggedAt(loggedAt: Date, deviceId: string): Promise<void> {
+  private async updateLoggedAt(
+    loggedAt: Date,
+    deviceId: string,
+  ): Promise<void> {
     return await this.userApiRepository.updateLoggedAtByDeviceId(
       loggedAt,
       deviceId,
