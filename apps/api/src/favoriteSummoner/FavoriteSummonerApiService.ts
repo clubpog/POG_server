@@ -19,10 +19,10 @@ import { FavoriteSummonerId } from '@app/entity/domain/favoriteSummoner/Favorite
 import { User } from '@app/entity/domain/user/User.entity';
 import { FavoriteSummonerRes } from './dto/FavoriteSummonerRes.dto';
 
-import Redis from 'ioredis';
 import { EInfrastructureInjectionToken } from '@app/common-config/enum/InfrastructureInjectionToken';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import { IEventStoreService } from '../../../../libs/cache/interface/integration';
 
 @Injectable()
 export class FavoriteSummonerApiService {
@@ -36,8 +36,9 @@ export class FavoriteSummonerApiService {
     private summonerRecordRepository?: Repository<SummonerRecord>,
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
     private readonly favoriteSummonerApiQueryRepository?: FavoriteSummonerApiQueryRepository,
+
     @Inject(EInfrastructureInjectionToken.EVENT_STORE.name)
-    private readonly redisClient?: Redis,
+    private readonly redisClient?: IEventStoreService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger?: Logger,
   ) {}
 
@@ -46,7 +47,7 @@ export class FavoriteSummonerApiService {
     favoriteSummonerDto: FavoriteSummonerReq,
   ): Promise<void> {
     await this.checkLimitFavoriteSummoner(userDto.userId);
-    await this.saveRedisSummonerRecord(favoriteSummonerDto);
+    await this.redisClient.saveRedisSummonerRecord(favoriteSummonerDto);
     await this.saveSummonerRecord(favoriteSummonerDto);
     await this.saveFavoriteSummoner(favoriteSummonerDto, userDto);
     await this.restoreFavoriteSummoner(favoriteSummonerDto, userDto);
@@ -58,7 +59,7 @@ export class FavoriteSummonerApiService {
   ): Promise<void> {
     try {
       await this.checkLimitFavoriteSummoner(userDto.userId);
-      await this.saveRedisSummonerRecord(favoriteSummonerDto);
+      await this.redisClient.saveRedisSummonerRecord(favoriteSummonerDto);
       await this.saveSummonerRecord(favoriteSummonerDto);
       await this.saveFavoriteSummoner(favoriteSummonerDto, userDto);
       await this.restoreFavoriteSummoner(favoriteSummonerDto, userDto);
@@ -185,59 +186,11 @@ export class FavoriteSummonerApiService {
     }
   }
 
-  private async removeTransactionRedis(
-    redisClient: Redis,
-    summonerId: string,
-  ): Promise<void> {
-    await redisClient.multi({ pipeline: false });
-    await redisClient.del(`summonerId:${summonerId}:win`);
-    await redisClient.del(`summonerId:${summonerId}:lose`);
-    await redisClient.del(`summonerId:${summonerId}:tier`);
-    await redisClient.srem('summonerId', summonerId);
-    await redisClient.exec();
-  }
-
   private async deleteSummonerRecord(summonerId: string): Promise<void> {
     await this.summonerRecordRepository.delete(
       await this.findSummonerRecordBySummonerId(summonerId),
     );
-    await this.removeTransactionRedis(await this.getRedisClient(), summonerId);
-  }
-
-  private async saveRedisSummonerRecord(
-    favoriteSummonerDto: FavoriteSummonerReq,
-  ): Promise<void> {
-    const redisClient = await this.getRedisClient();
-
-    const [win, lose, tier] = await redisClient.mget([
-      `summonerId:${favoriteSummonerDto.summonerId}:win`,
-      `summonerId:${favoriteSummonerDto.summonerId}:lose`,
-      `summonerId:${favoriteSummonerDto.summonerId}:tier`,
-    ]);
-
-    if (!win)
-      await redisClient.set(
-        `summonerId:${favoriteSummonerDto.summonerId}:win`,
-        favoriteSummonerDto.win,
-      );
-
-    if (!lose)
-      await redisClient.set(
-        `summonerId:${favoriteSummonerDto.summonerId}:lose`,
-        favoriteSummonerDto.lose,
-      );
-
-    if (!tier)
-      await redisClient.set(
-        `summonerId:${favoriteSummonerDto.summonerId}:tier`,
-        favoriteSummonerDto.tier,
-      );
-
-    await redisClient.sadd('summonerId', favoriteSummonerDto.summonerId);
-  }
-
-  private async getRedisClient(): Promise<Redis> {
-    return this.redisClient['master'];
+    await this.redisClient.removeTransactionRedis(summonerId);
   }
 
   private async saveSummonerRecord(

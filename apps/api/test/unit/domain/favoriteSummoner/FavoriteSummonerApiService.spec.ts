@@ -13,13 +13,14 @@ import {
 } from '@nestjs/common';
 import { User } from '@app/entity/domain/user/User.entity';
 import { Logger } from '../../../../../../libs/common-config/test/stub/LoggerStub';
+import { IEventStoreService } from '../../../../../../libs/cache/interface/integration';
 
 describe('FavoriteSummonerApiService', () => {
   let favoriteSummonerRepository;
   let summonerRecordRepository;
   let summonerRecordApiQueryRepository: SummonerRecordApiQueryRepositoryStub;
   let favoriteSummonerApiQueryRepository: FavoriteSummonerApiQueryRepositoryStub;
-  let redisClient;
+  let redisClient: IEventStoreService;
   let logger;
 
   it('즐겨찾기 추가에 성공했습니다.', async () => {
@@ -31,6 +32,7 @@ describe('FavoriteSummonerApiService', () => {
     favoriteSummonerApiQueryRepository =
       new FavoriteSummonerApiQueryRepositoryStub();
     redisClient = new RedisServiceStub();
+    logger = new Logger();
 
     const sut = new FavoriteSummonerApiService(
       favoriteSummonerRepository,

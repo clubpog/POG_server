@@ -6,15 +6,16 @@ import { FavoriteSummonerReq } from '../../apps/api/src/favoriteSummoner/dto/Fav
 import { PushRiotApi } from '../../apps/push/src/push/dto/PushRiotApi';
 
 @Injectable()
-export class EventStoreServiceImplement implements IEventStoreService {
+export class EventStoreTestServiceImplement implements IEventStoreService {
   private readonly master: Redis;
 
   constructor() {
-    this.master = new Redis(ConfigService.redisClusterConfig()).on(
+    this.master = new Redis(ConfigService.redisTestConfig()).on(
       'error',
       this.failToConnectRedis,
     );
   }
+
   async save(event: Event): Promise<void> {
     await this.master.set(event.data.id, JSON.stringify(event.data));
   }
@@ -27,7 +28,7 @@ export class EventStoreServiceImplement implements IEventStoreService {
     await this.master.sadd(key, value);
   }
 
-  async smembers(key: string): Promise<string[]> {
+  async smembers(key: string) {
     return await this.master.smembers(key);
   }
 
