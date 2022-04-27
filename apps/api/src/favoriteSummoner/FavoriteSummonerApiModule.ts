@@ -1,3 +1,4 @@
+import { EventStoreModule } from './../../../../libs/cache/EventStoreModule';
 import { Module, Provider } from '@nestjs/common';
 import { WinstonModule } from 'nest-winston';
 import { getWinstonLogger } from '@app/common-config/getWinstonLogger';
@@ -8,15 +9,6 @@ import { FavoriteSummonerModule } from '@app/entity/domain/favoriteSummoner/Favo
 import { SummonerRecordApiModule } from '../summonerRecord/SummonerRecordApiModule';
 import { SummonerRecordModule } from '@app/entity/domain/summonerRecord/SummonerRecordModule';
 import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRepository';
-import { EventStoreServiceImplement } from '../../../../libs/cache/EventStoreService';
-import { EInfrastructureInjectionToken } from '@app/common-config/enum/InfrastructureInjectionToken';
-
-const infrastructure: Provider[] = [
-  {
-    provide: EInfrastructureInjectionToken.EVENT_STORE.name,
-    useClass: EventStoreServiceImplement,
-  },
-];
 
 @Module({
   imports: [
@@ -24,13 +16,13 @@ const infrastructure: Provider[] = [
     SummonerRecordModule,
     WinstonModule.forRoot(getWinstonLogger(process.env.NODE_ENV, 'api')),
     SummonerRecordApiModule,
+    EventStoreModule,
   ],
   controllers: [FavoriteSummonerApiController],
   providers: [
     FavoriteSummonerApiService,
     FavoriteSummonerApiRepository,
     FavoriteSummonerApiQueryRepository,
-    ...infrastructure,
   ],
 })
 export class FavoriteSummonerApiModule {}

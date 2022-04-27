@@ -5,25 +5,26 @@ import { Event, IEventStoreService } from './interface/integration';
 import { FavoriteSummonerReq } from '../../apps/api/src/favoriteSummoner/dto/FavoriteSummonerReq.dto';
 
 @Injectable()
-export class EventStoreServiceImplement implements IEventStoreService {
+export class EventStoreTestServiceImplement implements IEventStoreService {
   private readonly master: Redis;
 
   constructor() {
-    this.master = new Redis(ConfigService.redisClusterConfig()).on(
+    this.master = new Redis(ConfigService.redisTestConfig()).on(
       'error',
       this.failToConnectRedis,
     );
   }
+
   async save(event: Event): Promise<void> {
     await this.master.set(event.data.id, JSON.stringify(event.data));
   }
 
   async set(key: string, value: string): Promise<void> {
-    await this.master.set(key, value);
+    await this.master.set(key, value, 'EX', 1);
   }
 
   async sadd(key: string, value: string): Promise<void> {
-    await this.master.sadd(key, value);
+    throw new Error('Method not implemented.');
   }
 
   async get(key: string): Promise<string | null> {
@@ -76,7 +77,7 @@ export class EventStoreServiceImplement implements IEventStoreService {
     await redisClient.exec();
   }
 
-  failToConnectRedis(error: Error): Promise<void> {
+  private failToConnectRedis(error: Error): Promise<void> {
     console.error(error);
     process.exit(1);
   }
