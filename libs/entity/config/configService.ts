@@ -94,6 +94,24 @@ export class ConfigService {
     };
   }
 
+  static testOrmConfig(): TypeOrmModuleOptions {
+    return {
+      ...this.loadTestDBConfig(),
+      type: 'postgres',
+      entities: [path.join(__dirname, '..', 'src/domain/**/*.entity.{js,ts}')],
+      migrations: [path.join(__dirname, '..', 'migrations/*{.ts,.js}')],
+      cli: { migrationsDir: 'libs/entity/migrations' },
+      migrationsTableName: 'migrations',
+      autoLoadEntities: true,
+      keepConnectionAlive: true,
+      namingStrategy: new SnakeNamingStrategy(),
+      maxQueryExecutionTime: Number(process.env.DB_CONNECTION_TIMEOUT),
+      extra: {
+        statement_timeout: Number(process.env.DB_CONNECTION_TIMEOUT),
+      },
+    };
+  }
+
   static loadDBConfig(): DBConfig {
     const [host, port, username, password, database, logging, synchronize] =
       process.env.NODE_ENV === 'production'
@@ -107,13 +125,13 @@ export class ConfigService {
             process.env.SYNCHRONIZE,
           ]
         : [
-            process.env.DB_TEST_HOST,
-            process.env.DB_TEST_PORT,
-            process.env.DB_TEST_USERNAME,
-            process.env.DB_TEST_PASSWORD,
-            process.env.DB_TEST_NAME,
-            process.env.TEST_LOGGING,
-            process.env.TEST_SYNCHRONIZE,
+            process.env.DB_DEV_HOST,
+            process.env.DB_DEV_PORT,
+            process.env.DB_DEV_USERNAME,
+            process.env.DB_DEV_PASSWORD,
+            process.env.DB_DEV_NAME,
+            process.env.DEV_LOGGING,
+            process.env.DEV_SYNCHRONIZE,
           ];
 
     return {
@@ -124,6 +142,24 @@ export class ConfigService {
       password,
       synchronize: synchronize === 'false' ? false : Boolean(synchronize),
       logging: logging === 'false' ? false : Boolean(logging),
+    };
+  }
+
+  static loadTestDBConfig(): DBConfig {
+    return {
+      host: process.env.DB_TEST_HOST,
+      port: Number(process.env.DB_TEST_PORT),
+      database: process.env.DB_TEST_NAME,
+      username: process.env.DB_TEST_USERNAME,
+      password: process.env.DB_TEST_PASSWORD,
+      synchronize:
+        process.env.TEST_SYNCHRONIZE === 'false'
+          ? false
+          : Boolean(process.env.TEST_SYNCHRONIZE),
+      logging:
+        process.env.TEST_LOGGING === 'false'
+          ? false
+          : Boolean(process.env.TEST_LOGGING),
     };
   }
 }

@@ -41,6 +41,14 @@ export class ResponseEntity<T> {
     return new ResponseEntity<string>(ResponseStatus.NOT_FOUND, '', '');
   }
 
+  static UNAUTHORIZED(): ResponseEntity<string> {
+    return new ResponseEntity<string>(
+      ResponseStatus.UN_AUTHORIZED,
+      'Unauthorized',
+      'Unauthorized',
+    );
+  }
+
   static NOT_FOUND_WITH(message: string): ResponseEntity<string> {
     return new ResponseEntity(ResponseStatus.NOT_FOUND, message, '');
   }
@@ -59,6 +67,14 @@ export class ResponseEntity<T> {
 
   static FORBIDDEN_WITH(message: string): ResponseEntity<string> {
     return new ResponseEntity(ResponseStatus.FORBIDDEN, message, '');
+  }
+
+  static UNPROCESSABLE_WITH(data: string): ResponseEntity<string> {
+    return new ResponseEntity(
+      ResponseStatus.UNPROCESSABLE,
+      'Unprocessable Entity',
+      data,
+    );
   }
 
   static ERROR(): ResponseEntity<string> {
