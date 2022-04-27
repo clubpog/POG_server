@@ -1,5 +1,5 @@
 import { EventStoreModule } from './../../../../libs/cache/EventStoreModule';
-import { Module, Provider } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { WinstonModule } from 'nest-winston';
 import { getWinstonLogger } from '@app/common-config/getWinstonLogger';
 import { FavoriteSummonerApiService } from './FavoriteSummonerApiService';
