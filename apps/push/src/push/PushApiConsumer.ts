@@ -1,11 +1,12 @@
-import { PushApiService } from './PushApiService';
 import { PushJobService } from '../../../../libs/common-config/src/job/push/PushJobService';
 import { Process, Processor } from '@nestjs/bull';
-import { Logger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { Job } from 'bull';
 import { plainToInstance } from 'class-transformer';
 import { PushRiotApi } from './dto/PushRiotApi';
 import { RiotApiJobService } from '@app/common-config/job/riot/RiotApiJobService';
+import { IEventStoreService } from '../../../../libs/cache/interface/integration';
+import { EInfrastructureInjectionToken } from '@app/common-config/enum/InfrastructureInjectionToken';
 
 @Processor('PushQueue')
 export class PushApiConsumer {
@@ -13,7 +14,8 @@ export class PushApiConsumer {
 
   constructor(
     private readonly pushJobService?: PushJobService,
-    private readonly pushApiService?: PushApiService,
+    @Inject(EInfrastructureInjectionToken.EVENT_STORE.name)
+    private readonly redisClient?: IEventStoreService,
   ) {}
 
   @Process('summonerList')
@@ -29,30 +31,22 @@ export class PushApiConsumer {
 
   @Process('recoverList')
   async getRecoverQueue(job: Job) {
-    const redisClient = await this.pushApiService.getRedisClient();
     const riotApiResponse = plainToInstance(
       PushRiotApi,
       await RiotApiJobService.riotLeagueApi(job.data['summonerId']),
     );
 
     if (!riotApiResponse) {
-      await redisClient.mset(
-        `summonerId:${job.data['summonerId']}:win`,
-        0,
-        `summonerId:${job.data['summonerId']}:lose`,
-        0,
-        `summonerId:${job.data['summonerId']}:tier`,
-        '언랭',
-      );
+      await this.redisClient.unRankMset(job.data['summonerId']);
       return;
     }
-    await this.pushApiService.changeRecord(
+
+    await this.redisClient.pushChangeRecord(
       riotApiResponse,
-      redisClient,
       job.data['summonerId'],
     );
 
-    await this.pushApiService.addRedisSet(redisClient, job.data['summonerId']);
+    await this.redisClient.sadd('summonerId', job.data['summonerId']);
     this.logger.log(`${job.data['summonerId']}를 Redis에 추가했습니다.`);
   }
 }
