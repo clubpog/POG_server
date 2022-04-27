@@ -1,3 +1,4 @@
+import { SentryModule } from './../../../libs/common-config/src/sentry/SentryModule';
 import { HealthCheckController } from './health-check/HealthCheckController';
 import { getTypeOrmModule } from '../../../libs/entity/getTypeOrmModule';
 import { LoggingModule } from '@app/common-config/logging/logging.module';
@@ -26,6 +27,7 @@ import { ValidationSchema } from '@app/common-config/config/validationSchema';
     SummonerRecordApiModule,
     TerminusModule,
     HttpModule,
+    SentryModule,
   ],
   controllers: [HealthCheckController],
 })

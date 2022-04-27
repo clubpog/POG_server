@@ -15,6 +15,7 @@ import {
   SwaggerCustomOptions,
 } from '@nestjs/swagger';
 import expressBasicAuth from 'express-basic-auth';
+import * as Sentry from '@sentry/node';
 
 class Application {
   private logger = new Logger(Application.name);
@@ -75,8 +76,15 @@ class Application {
     SwaggerModule.setup('docs', this.server, document, swaggerCustomOptions);
   }
 
+  private sentry() {
+    Sentry.init({
+      dsn: ConfigService.sentryDsn(),
+    });
+  }
+
   async bootstrap() {
     SetNestApp(this.server);
+    this.sentry();
     await this.swagger();
     await this.server.listen(ConfigService.appPort());
   }

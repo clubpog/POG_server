@@ -11,12 +11,16 @@ import { ValidationError } from 'class-validator';
 import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
 import { CustomValidationError } from '@app/common-config/filter/CustomValidationError';
 import { ResponseStatus } from '@app/common-config/response/ResponseStatus';
+import { SlackService } from '../job/slack/slackService';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  constructor(private slackService: SlackService) {}
+
   catch(exception: HttpException, host: ArgumentsHost): any {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
     const status = (exception as HttpException).getStatus();
 
     if (!(exception instanceof HttpException)) {
@@ -29,6 +33,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
         Object.values(ResponseStatus).indexOf(status as ResponseStatus)
       ];
     const isValidationError = responseBody instanceof ValidationError;
+
+    // Slack 전송
+    this.slackService.sentryWebhook(request, exception);
 
     return response
       .status((exception as HttpException).getStatus())

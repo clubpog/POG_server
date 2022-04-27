@@ -9,6 +9,7 @@ import { PushAppModule } from './PushAppModule';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
 import { SetNestApp } from '@app/common-config/setNestApp';
+import * as Sentry from '@sentry/node';
 
 class Application {
   private logger = new Logger(Application.name);
@@ -19,8 +20,15 @@ class Application {
     this.DEV_MODE = process.env.NODE_ENV === 'production' ? false : true;
   }
 
+  private sentry() {
+    Sentry.init({
+      dsn: ConfigService.sentryDsn(),
+    });
+  }
+
   async bootstrap() {
     SetNestApp(this.server);
+    this.sentry();
     await this.server.listen(ConfigService.pushPort());
   }
 

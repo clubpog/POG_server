@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { HttpExceptionFilter } from './filter/HttpExceptionFilter';
+import { SlackService } from './job/slack/slackService';
 
 export function SetNestApp<T extends INestApplication>(app: T): void {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
@@ -25,5 +26,5 @@ export function SetNestApp<T extends INestApplication>(app: T): void {
       validateCustomDecorators: true,
     }),
   );
-  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalFilters(new HttpExceptionFilter(new SlackService()));
 }
