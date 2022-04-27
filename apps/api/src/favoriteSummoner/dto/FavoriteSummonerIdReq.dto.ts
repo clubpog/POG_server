@@ -12,4 +12,10 @@ export class FavoriteSummonerIdReq {
   @IsNotEmpty()
   @IsString()
   summonerId: string;
+
+  static from(summonerId: string): FavoriteSummonerIdReq {
+    const dto = new FavoriteSummonerIdReq();
+    dto.summonerId = summonerId;
+    return dto;
+  }
 }

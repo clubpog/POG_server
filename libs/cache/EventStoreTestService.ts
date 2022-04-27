@@ -39,6 +39,10 @@ export class EventStoreTestServiceImplement implements IEventStoreService {
       .catch(() => null);
   }
 
+  async flushall(): Promise<void> {
+    await this.master.flushall();
+  }
+
   async saveRedisSummonerRecord(
     favoriteSummonerDto: FavoriteSummonerReq,
   ): Promise<void> {

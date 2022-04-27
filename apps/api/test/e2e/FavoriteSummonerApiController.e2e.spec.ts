@@ -2,7 +2,7 @@ import { TestUtils } from '../testUtils';
 import request from 'supertest';
 
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus, INestApplication, Post } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import { ApiTestAppModule } from '../ApiTestAppModule';
 import { getConnection, Repository } from 'typeorm';
 import { SetNestApp } from '@app/common-config/setNestApp';
@@ -12,6 +12,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
 import { FavoriteSummoner } from '@app/entity/domain/favoriteSummoner/FavoriteSummoner.entity';
 import { SummonerRecord } from '@app/entity/domain/summonerRecord/SummonerRecord.entity';
+import { EventStoreTestServiceImplement } from '../../../../libs/cache/EventStoreTestService';
+import { EInfrastructureInjectionToken } from '@app/common-config/enum/InfrastructureInjectionToken';
 
 describe('FavoriteSummonerApiController (e2e)', () => {
   let app: INestApplication;
@@ -19,6 +21,7 @@ describe('FavoriteSummonerApiController (e2e)', () => {
   let favoriteRepository: Repository<FavoriteSummoner>;
   let summonerRecordRepository: Repository<SummonerRecord>;
   let testUtils: TestUtils;
+  let redisClient: EventStoreTestServiceImplement;
   let userToken: string;
 
   beforeAll(async () => {
@@ -31,12 +34,16 @@ describe('FavoriteSummonerApiController (e2e)', () => {
     favoriteRepository = module.get(getRepositoryToken(FavoriteSummoner));
     summonerRecordRepository = module.get(getRepositoryToken(SummonerRecord));
     testUtils = module.get<TestUtils>(TestUtils);
+    redisClient = module.get<EventStoreTestServiceImplement>(
+      EInfrastructureInjectionToken.EVENT_STORE.name,
+    );
 
     SetNestApp(app); // ClassSerializerInterceptor 적용
     await app.init();
     await userRepository.delete({});
     await favoriteRepository.delete({});
     await summonerRecordRepository.delete({});
+    await redisClient.flushall();
     userToken = await testUtils.getDefaultUserToken();
   });
 
@@ -48,6 +55,7 @@ describe('FavoriteSummonerApiController (e2e)', () => {
     await userRepository.delete({});
     await favoriteRepository.delete({});
     await summonerRecordRepository.delete({});
+    await redisClient.flushall();
     userToken = await testUtils.getDefaultUserToken();
   });
 
@@ -87,14 +95,6 @@ describe('FavoriteSummonerApiController (e2e)', () => {
     );
     expect(summonerRecord.leaguePoint).toBe(564);
     expect(summonerRecord.rank).toBe('I');
-
-    await request(app.getHttpServer())
-      .delete('/favoriteSummoner/v1')
-      .set('Authorization', `Bearer ${userToken}`)
-      .send({
-        summonerId: 'Yr6IbOSrmcKdZ2EVfFW5RpeAS57WF8t6dFz_A2NncjVGrA',
-      })
-      .expect(HttpStatus.OK);
   });
 
   it('/favoriteSummoner/v1 (POST) 시 userToken이 없으면 Unauthorized 에러가 발생한다', async () => {
@@ -228,42 +228,6 @@ describe('FavoriteSummonerApiController (e2e)', () => {
     expect(body.statusCode).toBe(ResponseEntity.FORBIDDEN().statusCode);
     expect(body.message).toBe('Forbidden');
     expect(body.data).toBe('즐겨찾기 한도가 초과되었습니다.');
-
-    await request(app.getHttpServer())
-      .delete('/favoriteSummoner/v1')
-      .set('Authorization', `Bearer ${userToken}`)
-      .send({
-        summonerId: 'test1',
-      })
-      .expect(HttpStatus.OK);
-    await request(app.getHttpServer())
-      .delete('/favoriteSummoner/v1')
-      .set('Authorization', `Bearer ${userToken}`)
-      .send({
-        summonerId: 'test2',
-      })
-      .expect(HttpStatus.OK);
-    await request(app.getHttpServer())
-      .delete('/favoriteSummoner/v1')
-      .set('Authorization', `Bearer ${userToken}`)
-      .send({
-        summonerId: 'test3',
-      })
-      .expect(HttpStatus.OK);
-    await request(app.getHttpServer())
-      .delete('/favoriteSummoner/v1')
-      .set('Authorization', `Bearer ${userToken}`)
-      .send({
-        summonerId: 'test4',
-      })
-      .expect(HttpStatus.OK);
-    await request(app.getHttpServer())
-      .delete('/favoriteSummoner/v1')
-      .set('Authorization', `Bearer ${userToken}`)
-      .send({
-        summonerId: 'test5',
-      })
-      .expect(HttpStatus.OK);
   });
 
   it('/favoriteSummoner (DELETE)', async () => {
@@ -414,14 +378,6 @@ describe('FavoriteSummonerApiController (e2e)', () => {
     );
     expect(body.data[0]['leaguePoint']).toBe(564);
     expect(body.data[0]['rank']).toBe('I');
-
-    await request(app.getHttpServer())
-      .delete('/favoriteSummoner/v1')
-      .set('Authorization', `Bearer ${userToken}`)
-      .send({
-        summonerId: 'Yr6IbOSrmcKdZ2EVfFW5RpeAS57WF8t6dFz_A2NncjVGrA',
-      })
-      .expect(HttpStatus.OK);
   });
 
   it('/favoriteSummoner/v1 (GET) 시 userToken이 없으면 Unauthorized 에러가 발생한다', async () => {

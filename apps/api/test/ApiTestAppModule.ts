@@ -8,9 +8,9 @@ import { HttpModule } from '@nestjs/axios';
 
 import { AuthApiModule } from '../src/auth/AuthApiModule';
 import { UserApiModule } from '../src/user/UserApiModule';
-import { FavoriteSummonerApiModule } from '../src/favoriteSummoner/FavoriteSummonerApiModule';
 import { SummonerRecordApiModule } from '../src/summonerRecord/SummonerRecordApiModule';
 import { ValidationSchema } from '@app/common-config/config/validationSchema';
+import { FavoriteSummonerTestApiModule } from './FavoriteSummonerApiModule';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import { ValidationSchema } from '@app/common-config/config/validationSchema';
     LoggingModule,
     AuthApiModule,
     UserApiModule,
-    FavoriteSummonerApiModule,
+    FavoriteSummonerTestApiModule,
     SummonerRecordApiModule,
     TerminusModule,
     HttpModule,
