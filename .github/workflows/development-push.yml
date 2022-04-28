@@ -1,0 +1,100 @@
+name: Deploy dev-push CodeDeploy
+on:
+  push:
+    branches: 
+      - development-push-not-available
+      - feature/split-deploy-env
+ 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    
+    #액션의 실행 수행내용, 단계별로 실행된다.
+    steps:
+      - name: Get current date
+        id: current-time
+        run: echo "::set-output name=date::$(date +KST%Y%m%d-T%H%M%S.%3N)"
+        env:
+          TZ: Asia/Seoul
+
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Create env
+        run: |
+          touch .env
+          echo NODE_ENV=development >> .env
+          echo PORT=${{ secrets.PORT }} >> .env
+          echo PUSH_PORT=${{ secrets.PUSH_PORT }} >> .env
+          echo ADMIN_USER=${{ secrets.ADMIN_USER }} >> .env
+          echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }} >> .env
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+          echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+          echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+          echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+          echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+          echo LOGGING=${{ secrets.LOGGING }} >> .env
+          echo SYNCHRONIZE=${{ secrets.SYNCHRONIZE }} >> .env
+          echo DB_TEST_HOST=${{ secrets.DB_TEST_HOST }} >> .env
+          echo DB_TEST_PORT=${{ secrets.DB_TEST_PORT }} >> .env
+          echo DB_TEST_NAME=${{ secrets.DB_TEST_NAME }} >> .env
+          echo DB_TEST_USERNAME=${{ secrets.DB_TEST_USERNAME }} >> .env
+          echo DB_TEST_PASSWORD=${{ secrets.DB_TEST_PASSWORD }} >> .env
+          echo TEST_LOGGING=${{ secrets.TEST_LOGGING }} >> .env
+          echo TEST_SYNCHRONIZE=${{ secrets.TEST_SYNCHRONIZE }} >> .env
+          echo DB_CONNECTION_TIMEOUT=${{ secrets.DB_CONNECTION_TIMEOUT }} >> .env
+          echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
+          echo REDIS_TEST_HOST=${{ secrets.REDIS_TEST_HOST }} >> .env
+          echo REDIS_TEST_PORT=${{ secrets.REDIS_TEST_PORT }} >> .env
+          echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
+          echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env
+          echo REDIS_ENDPOINT=${{ secrets.REDIS_ENDPOINT }} >> .env
+          echo API_KEY=${{ secrets.API_KEY }} >> .env
+          echo POG_SDK=${{ secrets.POG_SDK }} >> .env
+          echo DB_DEV_HOST=${{ secrets.DB_DEV_HOST }} >> .env
+          echo DB_DEV_PORT=${{ secrets.DB_DEV_PORT }} >> .env
+          echo DB_DEV_NAME=${{ secrets.DB_DEV_NAME }} >> .env
+          echo DB_DEV_USERNAME=${{ secrets.DB_DEV_USERNAME }} >> .env
+          echo DB_DEV_PASSWORD=${{ secrets.DB_DEV_PASSWORD }} >> .env
+          echo DEV_LOGGING=${{ secrets.DEV_LOGGING }} >> .env
+          echo DEV_SYNCHRONIZE=true >> .env
+          echo SENTRY_DSN=${{ secrets.SENTRY_DSN }} >> .env
+          echo SLACK_SENTRY_WEBHOOK=${{ secrets.SLACK_SENTRY_WEBHOOK }} >> .env
+          cat .env
+
+      # - name: Install dependencies
+      #   run: npm ci
+
+      # - name: build file
+      #   run: npm run build
+          
+      - name: Generate deployment package
+        run: zip -r deploy-${{ steps.current-time.outputs.date }}.zip . -x '*.git*'
+
+      - name: AWS configure credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_DEV_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+          
+      - name: upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./deploy-${{ steps.current-time.outputs.date }}.zip s3://pog-dev-code-deploy/pog-deploy/
+
+      - name: deploy with AWS codeDeploy
+        run: aws deploy create-deployment
+          --application-name pog-dev-deploy
+          --deployment-config-name CodeDeployDefault.AllAtATime
+          --deployment-group-name pog-dev-deploy-pipe
+          --s3-location bucket=pog-dev-code-deploy,bundleType=zip,key=pog-deploy/deploy-${{ steps.current-time.outputs.date }}.zip

@@ -2,7 +2,7 @@ name: Deploy prod-api Docker
 on:
   push:
     branches:
-      - production-api-not-available
+      - development-api-not-available
 
 jobs:
   build:
