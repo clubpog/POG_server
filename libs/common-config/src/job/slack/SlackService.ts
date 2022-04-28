@@ -22,7 +22,7 @@ export class SlackService implements ISlackService {
             'https://user-images.githubusercontent.com/59385491/165659528-1b289595-352b-40c0-95ee-19b8d9b438d1.png',
           title: '🚨 Server Error 🚨',
           title_link:
-            'https://sentry.io/organizations/pog_server/issues/?project=6365859',
+            'https://sentry.io/organizations/pog-qq/issues/?project=6367205',
           fields: [
             {
               title: `Request URL: ${method} ${url}`,
