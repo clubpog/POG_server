@@ -15,7 +15,7 @@ import { SlackService } from '../job/slack/slackService';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  constructor(private slackService: SlackService) {}
+  constructor(private slackService?: SlackService) {}
 
   catch(exception: HttpException, host: ArgumentsHost): any {
     const ctx = host.switchToHttp();
@@ -34,8 +34,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       ];
     const isValidationError = responseBody instanceof ValidationError;
 
-    // Slack 전송
-    this.slackService.sentryWebhook(request, exception);
+    if (process.env.NODE_ENV === 'production' && this.slackService) {
+      // Slack 전송
+      this.slackService.sentryWebhook(request, exception);
+    }
 
     return response
       .status((exception as HttpException).getStatus())

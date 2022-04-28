@@ -10,6 +10,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
 import { SetNestApp } from '@app/common-config/setNestApp';
 import * as Sentry from '@sentry/node';
+import { SlackService } from '@app/common-config/job/slack/slackService';
 
 class Application {
   private logger = new Logger(Application.name);
@@ -27,7 +28,7 @@ class Application {
   }
 
   async bootstrap() {
-    SetNestApp(this.server);
+    SetNestApp(this.server, new SlackService());
     this.sentry();
     await this.server.listen(ConfigService.pushPort());
   }

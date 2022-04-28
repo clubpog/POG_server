@@ -44,7 +44,7 @@
     "@nestjs/terminus": "^8.0.4",
     "@nestjs/typeorm": "^8.0.3",
     "@sentry/node": "^6.19.7",
-    "@slack/client": "^5.0.2",
+    "@slack/webhook": "^6.1.0",
     "@types/cron": "^1.7.3",
     "axios": "^0.26.1",
     "bull": "^4.8.1",
