@@ -95,6 +95,6 @@ jobs:
       - name: deploy with AWS codeDeploy
         run: aws deploy create-deployment
           --application-name pog-dev-deploy
-          --deployment-config-name CodeDeployDefault.AllAtATime
+          --deployment-config-name CodeDeployDefault.AllAtOnce
           --deployment-group-name pog-dev-deploy-pipe
           --s3-location bucket=pog-dev-code-deploy,bundleType=zip,key=pog-deploy/deploy-${{ steps.current-time.outputs.date }}.zip
