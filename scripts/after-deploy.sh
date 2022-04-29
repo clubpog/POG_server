@@ -5,4 +5,4 @@ cd $REPOSITORY
 rm -rf node_modules
 sudo npm install
 sudo npm run build
-sudo pm2 start dist/apps/api/src/main.js --name "pog-push"
+pm2 start dist/apps/api/src/main.js --name "pog-push"
