@@ -5,8 +5,11 @@ cd $REPOSITORY
 rm -rf node_modules
 
 sudo n 12
-sudo npm install
-sudo npm run build
+sudo npm ci
 
 sudo n 16
-sudo pm2 restart pog-api
+sudo npm i graphql
+sudo rimraf dist
+sudo npm run build
+
+sudo pm2 restart pog-push
