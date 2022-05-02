@@ -2,8 +2,7 @@ name: Deploy dev-api CodeDeploy
 on:
   push:
     branches: 
-      - development-api-not-available
-      - feature/split-deploy-env
+      - development-api
  
 jobs:
   build:
