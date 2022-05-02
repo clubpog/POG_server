@@ -2,7 +2,7 @@ name: Deploy dev-api CodeDeploy
 on:
   push:
     branches: 
-      - development-api
+      - development/api
  
 jobs:
   build:
