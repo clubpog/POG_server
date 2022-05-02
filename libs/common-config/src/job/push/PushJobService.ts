@@ -18,7 +18,6 @@ export class PushJobService {
 
   // SubTitle
   // {소환사 이름}의 전적이 갱신됐어요
-
   async send(summonerId: string, summonerName: string) {
     const message = {
       notification: {
@@ -30,13 +29,25 @@ export class PushJobService {
     return Promise.all([await admin.messaging().send(message)]);
   }
 
+  // AB 테스트 진행
+  async defaultSummonerListSend(summonerId: string, summonerName: string) {
+    const message = {
+      notification: {
+        title: `${summonerName} 전적 갱신`,
+        body: `${summonerName}의 전적이 갱신됐어요.`,
+      },
+      topic: `A_${summonerId}`,
+    };
+    return Promise.all([await admin.messaging().send(message)]);
+  }
+
   async winSummonerListSend(summonerId: string, summonerName: string) {
     const message = {
       notification: {
         title: `${summonerName} 전적 갱신`,
         body: `${summonerName} 소환사가 승리했어요.`,
       },
-      topic: summonerId,
+      topic: `B_${summonerId}`,
     };
     return Promise.all([await admin.messaging().send(message)]);
   }
@@ -47,7 +58,7 @@ export class PushJobService {
         title: `${summonerName} 전적 갱신`,
         body: `${summonerName} 소환사가 패배했어요.`,
       },
-      topic: summonerId,
+      topic: `B_${summonerId}`,
     };
     return Promise.all([await admin.messaging().send(message)]);
   }
