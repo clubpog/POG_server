@@ -29,4 +29,26 @@ export class PushJobService {
     };
     return Promise.all([await admin.messaging().send(message)]);
   }
+
+  async winSummonerListSend(summonerId: string, summonerName: string) {
+    const message = {
+      notification: {
+        title: `${summonerName} 전적 갱신`,
+        body: `${summonerName} 소환사가 승리했어요.`,
+      },
+      topic: summonerId,
+    };
+    return Promise.all([await admin.messaging().send(message)]);
+  }
+
+  async loseSummonerListSend(summonerId: string, summonerName: string) {
+    const message = {
+      notification: {
+        title: `${summonerName} 전적 갱신`,
+        body: `${summonerName} 소환사가 패배했어요.`,
+      },
+      topic: summonerId,
+    };
+    return Promise.all([await admin.messaging().send(message)]);
+  }
 }

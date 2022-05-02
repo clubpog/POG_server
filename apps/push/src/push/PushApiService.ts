@@ -1,20 +1,21 @@
+import { PushApiTask } from './PushApiTask';
 import { IEventStoreService } from '../../../../libs/cache/interface/integration';
 import { RiotApiJobService } from './../../../../libs/common-config/src/job/riot/RiotApiJobService';
 import { PushRiotApi } from './dto/PushRiotApi';
 import { plainToInstance } from 'class-transformer';
-import { InjectQueue } from '@nestjs/bull';
 import { Inject, Injectable } from '@nestjs/common';
-import { Queue } from 'bull';
+import Bull from 'bull';
 import { Interval, Timeout } from '@nestjs/schedule';
-import { SummonerRecordApiQueryRepository } from '../../../api/src/summonerRecord/SummonerRecordApiQueryRepository';
 
 import { EInfrastructureInjectionToken } from '@app/common-config/enum/InfrastructureInjectionToken';
+import { SummonerRecordApiQueryRepository } from '../summonerRecord/SummonerRecordApiQueryRepository';
+import { BullService } from '../../../../libs/entity/queue/src/lib/index';
 
 @Injectable()
 export class PushApiService {
   constructor(
-    @InjectQueue('PushQueue')
-    private pushQueue: Queue,
+    private readonly bullService: BullService,
+    private readonly tasks: PushApiTask,
     @Inject(EInfrastructureInjectionToken.EVENT_STORE.name)
     private readonly redisClient?: IEventStoreService,
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
@@ -41,6 +42,11 @@ export class PushApiService {
       );
 
       if (isChangeRecord) {
+        await this.addWinOrLoseQueue(
+          await this.checkWinOrLose(riotApiResponse, redisResponse),
+          summonerId,
+          riotApiResponse[0].summonerName,
+        );
         await this.addPushQueue(summonerId, riotApiResponse[0].summonerName);
         await this.redisClient.pushChangeRecord(riotApiResponse, summonerId);
       }
@@ -58,6 +64,33 @@ export class PushApiService {
     );
   }
 
+  private async addWinOrLoseQueue(
+    checkWinOrLose: string,
+    summonerId: string,
+    summonerName: string,
+  ): Promise<Bull.Job<any>> {
+    if (checkWinOrLose === 'win') {
+      return await this.addWinPushQueue(summonerId, summonerName);
+    }
+    if (checkWinOrLose === 'lose') {
+      return await this.addLosePushQueue(summonerId, summonerName);
+    }
+    return;
+  }
+
+  private async checkWinOrLose(
+    riotApiResponse: PushRiotApi,
+    redisResponse: string[],
+  ): Promise<string> {
+    const [win, lose, tier] = redisResponse;
+    if (riotApiResponse[0].win !== win) {
+      return 'win';
+    }
+    if (riotApiResponse[0].lose !== lose) {
+      return 'lose';
+    }
+  }
+
   private async compareRecord(
     riotApiResponse: PushRiotApi,
     redisResponse: string[],
@@ -69,8 +102,29 @@ export class PushApiService {
   }
 
   private async addPushQueue(summonerId: string, summonerName: string) {
-    return await this.pushQueue.add(
-      'summonerList',
+    return await this.bullService.createJob(
+      this.tasks.addPushQueue,
+      {
+        summonerId,
+        summonerName,
+      },
+      { delay: 10000, removeOnComplete: true },
+    );
+  }
+
+  private async addWinPushQueue(summonerId: string, summonerName: string) {
+    return await this.bullService.createJob(
+      this.tasks.addWinPushQueue,
+      {
+        summonerId,
+        summonerName,
+      },
+      { delay: 10000, removeOnComplete: true },
+    );
+  }
+  private async addLosePushQueue(summonerId: string, summonerName: string) {
+    return await this.bullService.createJob(
+      this.tasks.addLosePushQueue,
       {
         summonerId,
         summonerName,
@@ -80,8 +134,8 @@ export class PushApiService {
   }
 
   private async recoverRedisQueue(summonerId: string) {
-    return await this.pushQueue.add(
-      'recoverList',
+    return await this.bullService.createJob(
+      this.tasks.recoverPushQueue,
       {
         summonerId,
       },
