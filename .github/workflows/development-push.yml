@@ -3,7 +3,6 @@ on:
   push:
     branches: 
       - development-push-not-available
-      - feature/split-deploy-env
  
 jobs:
   build:
