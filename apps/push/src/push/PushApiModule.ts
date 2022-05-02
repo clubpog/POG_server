@@ -1,3 +1,4 @@
+import { RiotApiJobService } from '@app/common-config/job/riot/RiotApiJobService';
 import { PushApiTask } from './PushApiTask';
 import {
   BullService,
@@ -23,6 +24,18 @@ const application: Provider[] = [
     provide: EApplicationInjectionToken.PUSH_JOB.name,
     useClass: PushJobService,
   },
+  {
+    provide: EApplicationInjectionToken.RIOT_API_JOB.name,
+    useClass: RiotApiJobService,
+  },
+  {
+    provide: EApplicationInjectionToken.BULL_JOB.name,
+    useClass: BullService,
+  },
+  {
+    provide: EApplicationInjectionToken.PUSH_API_TASK.name,
+    useClass: PushApiTask,
+  },
 ];
 
 @Module({
@@ -36,7 +49,7 @@ const application: Provider[] = [
     EventStoreModule,
   ],
   controllers: [PushApiController],
-  providers: [PushApiService, PushApiTask, ...application],
+  providers: [...application, PushApiService, PushApiTask],
 })
 export class PushApiModule implements OnModuleInit {
   constructor(

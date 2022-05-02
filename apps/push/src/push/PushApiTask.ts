@@ -1,3 +1,4 @@
+import { IPushApiTask } from './interface/IPushApiTask';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Task } from '../../../../libs/entity/queue/src/lib/index';
 import Bull from 'bull';
@@ -7,20 +8,38 @@ import { IEventStoreService } from '../../../../libs/cache/interface/integration
 import { plainToInstance } from 'class-transformer';
 import { PushRiotApi } from './dto/PushRiotApi';
 import { RiotApiJobService } from '@app/common-config/job/riot/RiotApiJobService';
+import { EApplicationInjectionToken } from '@app/common-config/enum/ApplicationInjectionToken';
 
 @Injectable()
-export class PushApiTask {
+export class PushApiTask implements IPushApiTask {
   private readonly logger = new Logger(PushApiTask.name);
 
   constructor(
-    private readonly pushJobService?: PushJobService,
     @Inject(EInfrastructureInjectionToken.EVENT_STORE.name)
     private readonly redisClient?: IEventStoreService,
+    private readonly pushJobService?: PushJobService,
+    @Inject(EApplicationInjectionToken.RIOT_API_JOB.name)
+    private readonly riotApiJobService?: RiotApiJobService,
   ) {}
 
   @Task({ name: 'addPushQueue' })
   async addPushQueue(job: Bull.Job, done: Bull.DoneCallback): Promise<void> {
     await this.pushJobService.send(
+      job.data['summonerId'],
+      job.data['summonerName'],
+    );
+    this.logger.log(
+      `${job.data['summonerName']}의 ${job.data['summonerId']} topic 푸시를 전송했습니다.`,
+    );
+    done(null);
+  }
+
+  @Task({ name: 'addDefaultPushQueue' })
+  async addDefaultPushQueue(
+    job: Bull.Job,
+    done: Bull.DoneCallback,
+  ): Promise<void> {
+    await this.pushJobService.defaultSummonerListSend(
       job.data['summonerId'],
       job.data['summonerName'],
     );
@@ -64,7 +83,7 @@ export class PushApiTask {
   ): Promise<void> {
     const riotApiResponse = plainToInstance(
       PushRiotApi,
-      await RiotApiJobService.riotLeagueApi(job.data['summonerId']),
+      await this.riotApiJobService.riotLeagueApi(job.data['summonerId']),
     );
 
     if (!riotApiResponse) {

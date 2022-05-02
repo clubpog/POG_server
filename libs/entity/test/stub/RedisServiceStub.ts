@@ -36,7 +36,7 @@ export class RedisServiceStub implements IEventStoreService {
 
   async removeTransactionRedis(summonerId: string): Promise<void> {}
   async redisKeyErrorCheck(summonerId: string): Promise<boolean> {
-    return true;
+    return false;
   }
   async pushChangeRecord(
     riotApiResponse: PushRiotApi,

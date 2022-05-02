@@ -3,9 +3,10 @@ import { TaskMetadata } from './BullUtils';
 import { Controller } from '@nestjs/common/interfaces';
 import Bull from 'bull';
 import * as Bluebird from 'bluebird';
+import { IBullService } from './interface/IBullService';
 
 @Injectable()
-export class BullService {
+export class BullService implements IBullService {
   private static readonly DEFAULT_CONCURRENCY: number = 3;
   private static readonly DEFAULT_QUEUE_NAME: string = 'default';
   private static readonly DEBUG_EVENTS: Array<string> = [

@@ -1,6 +1,6 @@
-import { PushApiTask } from './PushApiTask';
+import { EApplicationInjectionToken } from '@app/common-config/enum/ApplicationInjectionToken';
+import { IRiotApiJobService } from './../../../../libs/common-config/src/job/riot/interface/IRiotApiJobService';
 import { IEventStoreService } from '../../../../libs/cache/interface/integration';
-import { RiotApiJobService } from './../../../../libs/common-config/src/job/riot/RiotApiJobService';
 import { PushRiotApi } from './dto/PushRiotApi';
 import { plainToInstance } from 'class-transformer';
 import { Inject, Injectable } from '@nestjs/common';
@@ -9,16 +9,21 @@ import { Interval, Timeout } from '@nestjs/schedule';
 
 import { EInfrastructureInjectionToken } from '@app/common-config/enum/InfrastructureInjectionToken';
 import { SummonerRecordApiQueryRepository } from '../summonerRecord/SummonerRecordApiQueryRepository';
-import { BullService } from '../../../../libs/entity/queue/src/lib/index';
+import { IBullService } from '../../../../libs/entity/queue/src/lib/interface/IBullService';
+import { IPushApiTask } from './interface/IPushApiTask';
 
 @Injectable()
 export class PushApiService {
   constructor(
-    private readonly bullService: BullService,
-    private readonly tasks: PushApiTask,
     @Inject(EInfrastructureInjectionToken.EVENT_STORE.name)
     private readonly redisClient?: IEventStoreService,
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
+    @Inject(EApplicationInjectionToken.RIOT_API_JOB.name)
+    private readonly riotApiJobService?: IRiotApiJobService,
+    @Inject(EApplicationInjectionToken.BULL_JOB.name)
+    private readonly bullService?: IBullService,
+    @Inject(EApplicationInjectionToken.PUSH_API_TASK.name)
+    private readonly tasks?: IPushApiTask,
   ) {}
   @Interval('pushCronTask', 180000)
   async addMessageQueue(): Promise<void> {
@@ -28,7 +33,9 @@ export class PushApiService {
       const isKeyError = await this.redisClient.redisKeyErrorCheck(summonerId);
       if (isKeyError) return;
 
-      const soloRankResult = await RiotApiJobService.riotLeagueApi(summonerId);
+      const soloRankResult = await this.riotApiJobService.riotLeagueApi(
+        summonerId,
+      );
       if (!soloRankResult) return;
 
       const riotApiResponse = plainToInstance(PushRiotApi, soloRankResult);
@@ -44,6 +51,10 @@ export class PushApiService {
       if (isChangeRecord) {
         await this.addWinOrLoseQueue(
           await this.checkWinOrLose(riotApiResponse, redisResponse),
+          summonerId,
+          riotApiResponse[0].summonerName,
+        );
+        await this.addDefaultPushQueue(
           summonerId,
           riotApiResponse[0].summonerName,
         );
@@ -104,6 +115,17 @@ export class PushApiService {
   private async addPushQueue(summonerId: string, summonerName: string) {
     return await this.bullService.createJob(
       this.tasks.addPushQueue,
+      {
+        summonerId,
+        summonerName,
+      },
+      { delay: 10000, removeOnComplete: true },
+    );
+  }
+
+  private async addDefaultPushQueue(summonerId: string, summonerName: string) {
+    return await this.bullService.createJob(
+      this.tasks.addDefaultPushQueue,
       {
         summonerId,
         summonerName,

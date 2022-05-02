@@ -1,10 +1,11 @@
+import { IRiotApiJobService } from './interface/IRiotApiJobService';
 import { ConfigService } from '../../../../entity/config/configService';
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 
 @Injectable()
-export class RiotApiJobService {
-  static async riotLeagueApi(summonerId: string): Promise<any> {
+export class RiotApiJobService implements IRiotApiJobService {
+  public async riotLeagueApi(summonerId: string): Promise<any> {
     const url = `https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}?api_key=${ConfigService.riotApiKey()}`;
     try {
       const res = await axios.get(url);
