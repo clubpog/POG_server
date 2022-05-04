@@ -1,19 +1,34 @@
-import { Job, DoneCallback } from 'bull';
+import { PushJobServiceStub } from '@app/common-config/job/push/test/stub/PushJobServiceStub';
+import { IEventStoreService } from '../../../../../../libs/cache/interface/integration';
 import { IPushApiTask } from './../../../../src/push/interface/IPushApiTask';
 export class PushApiTaskStub implements IPushApiTask {
-  addPushQueue(job: Job<any>, done: DoneCallback) {
-    throw new Error('Method not implemented.');
+  constructor(
+    private readonly redisClient?: IEventStoreService,
+    private readonly pushJobService?: PushJobServiceStub,
+  ) {}
+
+  addPushQueue(task?, data?, opts?) {
+    return this.pushJobService.send(data['summonerId'], data['summonerName']);
   }
-  addDefaultPushQueue(job: Job<any>, done: DoneCallback) {
-    throw new Error('Method not implemented.');
+  addDefaultPushQueue(task, data, opts?) {
+    return this.pushJobService.defaultSummonerListSend(
+      data['summonerId'],
+      data['summonerName'],
+    );
   }
-  addWinPushQueue(job: Job<any>, done: DoneCallback) {
-    throw new Error('Method not implemented.');
+  addWinPushQueue(task, data, opts?) {
+    return this.pushJobService.winSummonerListSend(
+      data['summonerId'],
+      data['summonerName'],
+    );
   }
-  addLosePushQueue(job: Job<any>, done: DoneCallback) {
-    throw new Error('Method not implemented.');
+  addLosePushQueue(task, data, opts?) {
+    return this.pushJobService.loseSummonerListSend(
+      data['summonerId'],
+      data['summonerName'],
+    );
   }
-  recoverPushQueue(job: Job<any>, done: DoneCallback) {
-    throw new Error('Method not implemented.');
+  recoverPushQueue(task, data, opts?): Promise<void> {
+    return;
   }
 }

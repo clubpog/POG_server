@@ -1,3 +1,5 @@
+import { PushRiotApi } from '../../../../../../apps/push/src/push/dto/PushRiotApi';
+
 export interface IRiotApiJobService {
-  riotLeagueApi(summonerId: string);
+  soloRankResult(summonerId: string);
 }

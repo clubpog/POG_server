@@ -1,7 +1,6 @@
+import { PushJobServiceStub } from './../../../../../../libs/common-config/src/job/push/test/stub/PushJobServiceStub';
 import { PushApiTaskStub } from './../../stub/push/PushApiTaskStub';
-import { IPushApiTask } from './../../../../src/push/interface/IPushApiTask';
 import { BullServiceStub } from './../../../../../../libs/entity/queue/test/stub/BullServiceStub';
-import { IBullService } from './../../../../../../libs/entity/queue/src/lib/interface/IBullService';
 import { IRiotApiJobService } from './../../../../../../libs/common-config/src/job/riot/interface/IRiotApiJobService';
 import { RiotApiJobServiceStub } from './../../../../../../libs/common-config/src/job/riot/test/stub/RiotApiJobServiceStub';
 import { PushApiService } from './../../../../src/push/PushApiService';
@@ -13,17 +12,19 @@ describe('PushApiService', () => {
   let summonerRecordApiQueryRepository: SummonerRecordApiQueryRepositoryStub;
   let redisClient: IEventStoreService;
   let riotApiJobService: IRiotApiJobService;
-  let bullService: IBullService;
-  let tasks: IPushApiTask;
+  let bullService;
+  let tasks: PushApiTaskStub;
+  let spy: PushJobServiceStub;
 
-  it('Push Queue 검증', async () => {
+  it('Push Queue 검증 (메시지 템플릿 테스트 구현 예정)', async () => {
     // given
     redisClient = new RedisServiceStub();
     summonerRecordApiQueryRepository =
       new SummonerRecordApiQueryRepositoryStub();
     riotApiJobService = new RiotApiJobServiceStub();
-    bullService = new BullServiceStub();
-    tasks = new PushApiTaskStub();
+    spy = new PushJobServiceStub();
+    tasks = new PushApiTaskStub(redisClient, spy);
+    bullService = new BullServiceStub(tasks);
 
     const sut = new PushApiService(
       redisClient,

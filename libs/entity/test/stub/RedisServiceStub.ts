@@ -41,11 +41,13 @@ export class RedisServiceStub implements IEventStoreService {
   async pushChangeRecord(
     riotApiResponse: PushRiotApi,
     summonerId: string,
-  ): Promise<void> {}
+  ): Promise<void> {
+    return;
+  }
 
   async unRankMset(summonerId: string): Promise<void> {}
 
   async summonerRecordMget(summonerId: string): Promise<string[]> {
-    return ['test'];
+    return ['33', '17', 'PLATINUM'];
   }
 }

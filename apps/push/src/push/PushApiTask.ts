@@ -17,6 +17,7 @@ export class PushApiTask implements IPushApiTask {
   constructor(
     @Inject(EInfrastructureInjectionToken.EVENT_STORE.name)
     private readonly redisClient?: IEventStoreService,
+    @Inject(EApplicationInjectionToken.PUSH_JOB.name)
     private readonly pushJobService?: PushJobService,
     @Inject(EApplicationInjectionToken.RIOT_API_JOB.name)
     private readonly riotApiJobService?: RiotApiJobService,
@@ -83,7 +84,7 @@ export class PushApiTask implements IPushApiTask {
   ): Promise<void> {
     const riotApiResponse = plainToInstance(
       PushRiotApi,
-      await this.riotApiJobService.riotLeagueApi(job.data['summonerId']),
+      await this.riotApiJobService.soloRankResult(job.data['summonerId']),
     );
 
     if (!riotApiResponse) {

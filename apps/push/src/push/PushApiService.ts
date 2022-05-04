@@ -2,14 +2,14 @@ import { EApplicationInjectionToken } from '@app/common-config/enum/ApplicationI
 import { IRiotApiJobService } from './../../../../libs/common-config/src/job/riot/interface/IRiotApiJobService';
 import { IEventStoreService } from '../../../../libs/cache/interface/integration';
 import { PushRiotApi } from './dto/PushRiotApi';
-import { plainToInstance } from 'class-transformer';
 import { Inject, Injectable } from '@nestjs/common';
 import Bull from 'bull';
 import { Interval, Timeout } from '@nestjs/schedule';
 
 import { EInfrastructureInjectionToken } from '@app/common-config/enum/InfrastructureInjectionToken';
 import { SummonerRecordApiQueryRepository } from '../summonerRecord/SummonerRecordApiQueryRepository';
-import { IBullService } from '../../../../libs/entity/queue/src/lib/interface/IBullService';
+import { BullService } from '../../../../libs/entity/queue/src/lib/BullService';
+
 import { IPushApiTask } from './interface/IPushApiTask';
 
 @Injectable()
@@ -20,8 +20,7 @@ export class PushApiService {
     private readonly summonerRecordApiQueryRepository?: SummonerRecordApiQueryRepository,
     @Inject(EApplicationInjectionToken.RIOT_API_JOB.name)
     private readonly riotApiJobService?: IRiotApiJobService,
-    @Inject(EApplicationInjectionToken.BULL_JOB.name)
-    private readonly bullService?: IBullService,
+    private readonly bullService?: BullService,
     @Inject(EApplicationInjectionToken.PUSH_API_TASK.name)
     private readonly tasks?: IPushApiTask,
   ) {}
@@ -33,32 +32,33 @@ export class PushApiService {
       const isKeyError = await this.redisClient.redisKeyErrorCheck(summonerId);
       if (isKeyError) return;
 
-      const soloRankResult = await this.riotApiJobService.riotLeagueApi(
+      const riotApiResponse = await this.riotApiJobService.soloRankResult(
         summonerId,
       );
-      if (!soloRankResult) return;
-
-      const riotApiResponse = plainToInstance(PushRiotApi, soloRankResult);
+      if (!riotApiResponse) return;
 
       const redisResponse = await this.redisClient.summonerRecordMget(
         summonerId,
       );
+
       const isChangeRecord = await this.compareRecord(
         riotApiResponse,
         redisResponse,
       );
 
       if (isChangeRecord) {
-        await this.addWinOrLoseQueue(
-          await this.checkWinOrLose(riotApiResponse, redisResponse),
-          summonerId,
-          riotApiResponse[0].summonerName,
-        );
-        await this.addDefaultPushQueue(
-          summonerId,
-          riotApiResponse[0].summonerName,
-        );
+        // AB 테스트 완료되면 주석 제거
+        // await this.addWinOrLoseQueue(
+        //   await this.checkWinOrLose(riotApiResponse, redisResponse),
+        //   summonerId,
+        //   riotApiResponse[0].summonerName,
+        // );
+        // await this.addDefaultPushQueue(
+        //   summonerId,
+        //   riotApiResponse[0].summonerName,
+        // );
         await this.addPushQueue(summonerId, riotApiResponse[0].summonerName);
+
         await this.redisClient.pushChangeRecord(riotApiResponse, summonerId);
       }
     });
