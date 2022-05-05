@@ -1,18 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import * as admin from 'firebase-admin';
-import { ServiceAccount } from 'firebase-admin';
+export class PushJobServiceStub {
+  addPushQueue;
 
-@Injectable()
-export class PushJobService {
-  constructor() {
-    if (!admin.apps.length) {
-      admin.initializeApp({
-        credential: admin.credential.cert(
-          JSON.parse(process.env.POG_SDK) as ServiceAccount,
-        ),
-      });
-    }
-  }
   // Title
   // {소환사 이름} 전적 갱신
 
@@ -26,7 +14,8 @@ export class PushJobService {
       },
       topic: summonerId,
     };
-    return Promise.all([await admin.messaging().send(message)]);
+    this.addPushQueue = message;
+    return this.addPushQueue;
   }
 
   // AB 테스트 진행
@@ -38,7 +27,7 @@ export class PushJobService {
       },
       topic: `A_${summonerId}`,
     };
-    return Promise.all([await admin.messaging().send(message)]);
+    return message;
   }
 
   async winSummonerListSend(summonerId: string, summonerName: string) {
@@ -49,7 +38,7 @@ export class PushJobService {
       },
       topic: `B_${summonerId}`,
     };
-    return Promise.all([await admin.messaging().send(message)]);
+    return message;
   }
 
   async loseSummonerListSend(summonerId: string, summonerName: string) {
@@ -60,6 +49,6 @@ export class PushJobService {
       },
       topic: `B_${summonerId}`,
     };
-    return Promise.all([await admin.messaging().send(message)]);
+    return message;
   }
 }
