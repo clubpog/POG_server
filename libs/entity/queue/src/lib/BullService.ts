@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { TaskMetadata } from './BullUtils';
 import { Controller } from '@nestjs/common/interfaces';
 import Bull from 'bull';
-import * as Bluebird from 'bluebird';
 import { IBullService } from './interface/IBullService';
 
 @Injectable()
@@ -57,7 +56,7 @@ export class BullService implements IBullService {
     // eslint-disable-next-line @typescript-eslint/ban-types
     data: Object,
     opts?: Bull.JobOptions,
-  ): Bluebird<Bull.Job<any>> {
+  ): Promise<Bull.Job<any>> {
     const metadata: TaskMetadata = this.tasks[task.name];
     const queue: Bull.Queue = this.getQueue(metadata.queue);
     return queue.add(metadata.name, data, opts);
