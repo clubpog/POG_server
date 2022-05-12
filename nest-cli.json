@@ -14,7 +14,6 @@
     },
     "api": {
       "type": "application",
-      "root": "apps/api",
       "entryFile": "main",
       "sourceRoot": "apps/api/src",
       "compilerOptions": {
@@ -23,7 +22,6 @@
     },
     "push": {
       "type": "application",
-      "root": "apps/push",
       "entryFile": "main",
       "sourceRoot": "apps/push/src",
       "compilerOptions": {
