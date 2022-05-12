@@ -9,6 +9,8 @@
     "prebuild": "rimraf dist",
     "rimraf": "./node_modules/rimraf/bin.js",
     "build": "nest build && tsc-alias",
+    "build:api": "nest build api && tsc-alias",
+    "build:push": "nest build push && tsc-alias",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

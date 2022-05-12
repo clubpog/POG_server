@@ -1,8 +1,8 @@
-name: Deploy dev-api CodeDeploy
+name: Deploy development CodeDeploy
 on:
   push:
     branches: 
-      - development/api
+      - development/push
  
 jobs:
   build:
@@ -79,7 +79,7 @@ jobs:
       #   run: npm run build
           
       - name: Generate deployment package
-        run: zip -r deploy-api-${{ steps.current-time.outputs.date }}.zip . -x '*.git*'
+        run: zip -r deploy-${{ steps.current-time.outputs.date }}.zip . -x '*.git*'
 
       - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -89,11 +89,11 @@ jobs:
           aws-region: ap-northeast-2
           
       - name: upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./deploy-api-${{ steps.current-time.outputs.date }}.zip s3://pog-dev-code-deploy/pog-deploy/
+        run: aws s3 cp --region ap-northeast-2 ./deploy-${{ steps.current-time.outputs.date }}.zip s3://pog-dev-code-deploy/pog-deploy/
 
       - name: deploy with AWS codeDeploy
         run: aws deploy create-deployment
           --application-name pog-dev-deploy
           --deployment-config-name CodeDeployDefault.AllAtOnce
           --deployment-group-name pog-dev-deploy-pipe
-          --s3-location bucket=pog-dev-code-deploy,bundleType=zip,key=pog-deploy/deploy-api-${{ steps.current-time.outputs.date }}.zip
+          --s3-location bucket=pog-dev-code-deploy,bundleType=zip,key=pog-deploy/deploy-${{ steps.current-time.outputs.date }}.zip
