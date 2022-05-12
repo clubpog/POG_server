@@ -11,6 +11,21 @@ export class EApplicationInjectionToken extends EnumType<EApplicationInjectionTo
     'PushJob',
   );
 
+  static readonly RIOT_API_JOB = new EApplicationInjectionToken(
+    'RIOT_API_JOB',
+    'RiotApiJob',
+  );
+
+  static readonly BULL_JOB = new EApplicationInjectionToken(
+    'BULL_JOB',
+    'BullJob',
+  );
+
+  static readonly PUSH_API_TASK = new EApplicationInjectionToken(
+    'PUSH_API_TASK',
+    'PushApiTask',
+  );
+
   private constructor(code: string, name: string) {
     super();
     this._code = code;
