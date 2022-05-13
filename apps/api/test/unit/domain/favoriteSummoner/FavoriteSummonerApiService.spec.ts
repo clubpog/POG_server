@@ -14,6 +14,7 @@ import {
 import { User } from '@app/entity/domain/user/User.entity';
 import { Logger } from '../../../../../../libs/common-config/test/stub/LoggerStub';
 import { IEventStoreService } from '../../../../../../libs/cache/interface/integration';
+import { ConnectionStub } from '../../../../../../libs/entity/test/stub/ConnectionStub';
 
 describe('FavoriteSummonerApiService', () => {
   let favoriteSummonerRepository;
@@ -22,6 +23,7 @@ describe('FavoriteSummonerApiService', () => {
   let favoriteSummonerApiQueryRepository: FavoriteSummonerApiQueryRepositoryStub;
   let redisClient: IEventStoreService;
   let logger;
+  let connection;
 
   it('즐겨찾기 추가에 성공했습니다.', async () => {
     // given
@@ -33,6 +35,7 @@ describe('FavoriteSummonerApiService', () => {
       new FavoriteSummonerApiQueryRepositoryStub();
     redisClient = new RedisServiceStub();
     logger = new Logger();
+    connection = new ConnectionStub();
 
     const sut = new FavoriteSummonerApiService(
       favoriteSummonerRepository,
@@ -40,6 +43,8 @@ describe('FavoriteSummonerApiService', () => {
       summonerRecordApiQueryRepository,
       favoriteSummonerApiQueryRepository,
       redisClient,
+      logger,
+      connection,
     );
     // when
     const actual = await sut.createFavoriteSummonerV1(
