@@ -53,10 +53,6 @@ export class PushApiService {
         //   summonerId,
         //   riotApiResponse[0].summonerName,
         // );
-        // await this.addDefaultPushQueue(
-        //   summonerId,
-        //   riotApiResponse[0].summonerName,
-        // );
         await this.addPushQueue(summonerId, riotApiResponse[0].summonerName);
 
         await this.redisClient.pushChangeRecord(riotApiResponse, summonerId);
@@ -115,17 +111,6 @@ export class PushApiService {
   private async addPushQueue(summonerId: string, summonerName: string) {
     return await this.bullService.createJob(
       this.tasks.addPushQueue,
-      {
-        summonerId,
-        summonerName,
-      },
-      { delay: 10000, removeOnComplete: true },
-    );
-  }
-
-  private async addDefaultPushQueue(summonerId: string, summonerName: string) {
-    return await this.bullService.createJob(
-      this.tasks.addDefaultPushQueue,
       {
         summonerId,
         summonerName,

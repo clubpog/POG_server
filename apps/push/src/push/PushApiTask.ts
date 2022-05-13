@@ -35,21 +35,6 @@ export class PushApiTask implements IPushApiTask {
     done(null);
   }
 
-  @Task({ name: 'addDefaultPushQueue' })
-  async addDefaultPushQueue(
-    job: Bull.Job,
-    done: Bull.DoneCallback,
-  ): Promise<void> {
-    await this.pushJobService.defaultSummonerListSend(
-      job.data['summonerId'],
-      job.data['summonerName'],
-    );
-    this.logger.log(
-      `${job.data['summonerName']}의 ${job.data['summonerId']} topic 푸시를 전송했습니다.`,
-    );
-    done(null);
-  }
-
   @Task({ name: 'addWinPushQueue' })
   async addWinPushQueue(job: Bull.Job, done: Bull.DoneCallback): Promise<void> {
     await this.pushJobService.winSummonerListSend(
