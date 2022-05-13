@@ -48,12 +48,12 @@ export class PushApiService {
 
       if (isChangeRecord) {
         // AB 테스트 완료되면 주석 제거
-        // await this.addWinOrLoseQueue(
-        //   await this.checkWinOrLose(riotApiResponse, redisResponse),
-        //   summonerId,
-        //   riotApiResponse[0].summonerName,
-        // );
-        await this.addPushQueue(summonerId, riotApiResponse[0].summonerName);
+        await this.addWinOrLoseQueue(
+          await this.checkWinOrLose(riotApiResponse, redisResponse),
+          summonerId,
+          riotApiResponse[0].summonerName,
+        );
+        // await this.addPushQueue(summonerId, riotApiResponse[0].summonerName);
 
         await this.redisClient.pushChangeRecord(riotApiResponse, summonerId);
       }
