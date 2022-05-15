@@ -1,9 +1,9 @@
 name: Deploy development CodeDeploy
 on:
   push:
-    branches: 
+    branches:
       - development/push
- 
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,7 +12,7 @@ jobs:
       matrix:
         node-version: [16.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-    
+
     #액션의 실행 수행내용, 단계별로 실행된다.
     steps:
       - name: Get current date
@@ -67,7 +67,7 @@ jobs:
           echo DB_DEV_USERNAME=${{ secrets.DB_DEV_USERNAME }} >> .env
           echo DB_DEV_PASSWORD=${{ secrets.DB_DEV_PASSWORD }} >> .env
           echo DEV_LOGGING=${{ secrets.DEV_LOGGING }} >> .env
-          echo DEV_SYNCHRONIZE=true >> .env
+          echo DEV_SYNCHRONIZE=false >> .env
           echo SENTRY_DSN=${{ secrets.SENTRY_DSN }} >> .env
           echo SLACK_SENTRY_WEBHOOK=${{ secrets.SLACK_SENTRY_WEBHOOK }} >> .env
           cat .env
@@ -77,7 +77,7 @@ jobs:
 
       # - name: build file
       #   run: npm run build
-          
+
       - name: Generate deployment package
         run: zip -r deploy-${{ steps.current-time.outputs.date }}.zip . -x '*.git*'
 
@@ -87,7 +87,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_DEV_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
-          
+
       - name: upload to S3
         run: aws s3 cp --region ap-northeast-2 ./deploy-${{ steps.current-time.outputs.date }}.zip s3://pog-dev-code-deploy/pog-deploy/
 
