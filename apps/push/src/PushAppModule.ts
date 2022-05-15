@@ -10,6 +10,7 @@ import { HttpModule } from '@nestjs/axios';
 
 import { BullMonitorModule } from '../../../libs/entity/queue/src/bull-monitor/BullMonitorModule';
 import { ValidationSchema } from '@app/common-config/config/validationSchema';
+import { SentryModule } from '@app/common-config/sentry/SentryModule';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ValidationSchema } from '@app/common-config/config/validationSchema';
     TerminusModule,
     HttpModule,
     PushApiModule,
+    SentryModule,
   ],
   controllers: [HealthCheckController],
 })
