@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { HttpExceptionFilter } from './filter/HttpExceptionFilter';
-import { SlackService } from './job/slack/slackService';
+import { SlackService } from './job/slack/SlackService';
 
 export function SetNestApp<T extends INestApplication>(
   app: T,

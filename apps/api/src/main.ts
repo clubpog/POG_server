@@ -16,7 +16,7 @@ import {
 } from '@nestjs/swagger';
 import expressBasicAuth from 'express-basic-auth';
 import * as Sentry from '@sentry/node';
-import { SlackService } from '@app/common-config/job/slack/slackService';
+import { SlackService } from '@app/common-config/job/slack/SlackService';
 
 class Application {
   private logger = new Logger(Application.name);

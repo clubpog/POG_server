@@ -11,7 +11,7 @@ import { ValidationError } from 'class-validator';
 import { ResponseEntity } from '@app/common-config/response/ResponseEntity';
 import { CustomValidationError } from '@app/common-config/filter/CustomValidationError';
 import { ResponseStatus } from '@app/common-config/response/ResponseStatus';
-import { SlackService } from '../job/slack/slackService';
+import { SlackService } from '../job/slack/SlackService';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {

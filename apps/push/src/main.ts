@@ -10,7 +10,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
 import { SetNestApp } from '@app/common-config/setNestApp';
 import * as Sentry from '@sentry/node';
-import { SlackService } from '@app/common-config/job/slack/slackService';
+import { SlackService } from '@app/common-config/job/slack/SlackService';
 
 class Application {
   private logger = new Logger(Application.name);
