@@ -1,0 +1,72 @@
+name: Deploy prod-api Docker
+on:
+  push:
+    branches:
+      - production-api
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Create env
+        run: |
+          touch .env
+          echo NODE_ENV=development >> .env
+          echo PORT=${{ secrets.PORT }} >> .env
+          echo PUSH_PORT=${{ secrets.PUSH_PORT }} >> .env
+          echo ADMIN_USER=${{ secrets.ADMIN_USER }} >> .env
+          echo ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }} >> .env
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+          echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+          echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+          echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+          echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+          echo LOGGING=${{ secrets.LOGGING }} >> .env
+          echo SYNCHRONIZE=${{ secrets.SYNCHRONIZE }} >> .env
+          echo DB_TEST_HOST=${{ secrets.DB_TEST_HOST }} >> .env
+          echo DB_TEST_PORT=${{ secrets.DB_TEST_PORT }} >> .env
+          echo DB_TEST_NAME=${{ secrets.DB_TEST_NAME }} >> .env
+          echo DB_TEST_USERNAME=${{ secrets.DB_TEST_USERNAME }} >> .env
+          echo DB_TEST_PASSWORD=${{ secrets.DB_TEST_PASSWORD }} >> .env
+          echo TEST_LOGGING=${{ secrets.TEST_LOGGING }} >> .env
+          echo TEST_SYNCHRONIZE=${{ secrets.TEST_SYNCHRONIZE }} >> .env
+          echo DB_CONNECTION_TIMEOUT=${{ secrets.DB_CONNECTION_TIMEOUT }} >> .env
+          echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
+          echo REDIS_TEST_HOST=${{ secrets.REDIS_TEST_HOST }} >> .env
+          echo REDIS_TEST_PORT=${{ secrets.REDIS_TEST_PORT }} >> .env
+          echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
+          echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env
+          echo REDIS_ENDPOINT=${{ secrets.REDIS_ENDPOINT }} >> .env
+          echo API_KEY=${{ secrets.API_KEY }} >> .env
+          echo POG_SDK=${{ secrets.POG_SDK }} >> .env
+          echo DB_DEV_HOST=${{ secrets.DB_DEV_HOST }} >> .env
+          echo DB_DEV_PORT=${{ secrets.DB_DEV_PORT }} >> .env
+          echo DB_DEV_NAME=${{ secrets.DB_DEV_NAME }} >> .env
+          echo DB_DEV_USERNAME=${{ secrets.DB_DEV_USERNAME }} >> .env
+          echo DB_DEV_PASSWORD=${{ secrets.DB_DEV_PASSWORD }} >> .env
+          echo DEV_LOGGING=${{ secrets.DEV_LOGGING }} >> .env
+          echo DEV_SYNCHRONIZE=false >> .env
+          echo SENTRY_DSN=${{ secrets.SENTRY_DSN }} >> .env
+          echo SLACK_SENTRY_WEBHOOK=${{ secrets.SLACK_SENTRY_WEBHOOK }} >> .env
+          cat .env
+
+      - name: Generate deployment package
+        run: zip -r deploy.zip . -x '*.git*' -x node_modules/\*
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v14
+        with:
+          aws_access_key: ${{ secrets.AWS_PROD_ACCESS_KEY }}
+          aws_secret_key: ${{ secrets.AWS_PROD_SECRET_KEY }}
+          application_name: ${{ secrets.AWS_PROD_APPLICATION_NAME }}
+          environment_name: ${{ secrets.AWS_PROD_ENV_NAME }}
+          region: ${{ secrets.AWS_REGION }}
+          version_label: pog-production-api-${{ github.sha }}
+          deployment_package: deploy.zip
+
+      - name: Success
+        run: echo deployed successfully.
