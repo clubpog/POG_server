@@ -17,6 +17,6 @@ hooks:
     - location: scripts/before-deploy.sh
       runas: ubuntu
   AfterInstall:
-    - location: scripts/{{github.ref}}.sh
+    - location: scripts/${{github.ref}}.sh
       timeout: 200
       runas: ubuntu
