@@ -11,24 +11,6 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v2
 
-      - name: Create Code Deploy Script
-        run: |
-          touch scripts/after-deploy.sh
-          echo #!/bin/bash >> scripts/after-deploy.sh
-          echo REPOSITORY=/home/ubuntu/build >> scripts/after-deploy.sh
-          echo cd $REPOSITORY >> scripts/after-deploy.sh
-          echo rm -rf node_modules >> scripts/after-deploy.sh
-          echo sudo n 12 >> scripts/after-deploy.sh
-          echo sudo npm ci >> scripts/after-deploy.sh
-          echo sudo n 16 >> scripts/after-deploy.sh
-          echo sudo npm i graphql >> scripts/after-deploy.sh
-          echo sudo rimraf dist >> scripts/after-deploy.sh
-          echo sudo npm run build:push >> scripts/after-deploy.sh
-          echo sudo npm run build:api >> scripts/after-deploy.sh
-          echo sudo pm2 restart pog-api >> scripts/after-deploy.sh
-          echo sudo pm2 restart pog-push >> scripts/after-deploy.sh
-          cat scripts/after-deploy.sh
-
       - name: Create env
         run: |
           touch .env
