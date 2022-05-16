@@ -91,18 +91,18 @@ jobs:
       - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_PROD_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_PROD_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_PROD_SECRET_KEY }}
-          aws-region: ap-northeast-2
+          aws-region: ${{ secrets.AWS_PROD_ENV_NAME }}
 
       - name: upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./deploy-push-${{ steps.current-time.outputs.date }}.zip s3://pog-push-codedeploy/
+        run: aws s3 cp --region ap-northeast-2 ./deploy-push-${{ steps.current-time.outputs.date }}.zip ${{ secrets.AWS_S3_PUSH_DEPLOY_BUCKET }}
 
       - name: deploy with AWS codeDeploy
         run: aws deploy create-deployment
-          --application-name pog-push-deploy
+          --application-name ${{ secrets.AWS_PUSH_DEPLOY_APPLICATION }}
           --deployment-config-name CodeDeployDefault.AllAtOnce
-          --deployment-group-name pog-push-deploy-pipe
+          --deployment-group-name ${{ secrets.AWS_PUSH_DEPLOY_GROUP }}
           --s3-location bucket=pog-push-codedeploy,bundleType=zip,key=deploy-${{ steps.current-time.outputs.date }}.zip
 
       - name: Success
