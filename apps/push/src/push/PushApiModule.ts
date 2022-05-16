@@ -61,6 +61,11 @@ export class PushApiModule implements OnModuleInit {
     this.taskRegister.setModuleRef(this.moduleRef);
     this.taskRegister.register(PushApiTask, {
       queue: 'PushQueue',
+      options: {
+        redis: {
+          tls: { rejectUnauthorized: false },
+        },
+      },
     });
 
     // const limiter: RateLimiter = {
