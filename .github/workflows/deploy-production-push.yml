@@ -86,7 +86,7 @@ jobs:
 
       
       - name: Generate deployment package
-        run: zip -r deploy-${{ steps.current-time.outputs.date }}.zip . -x '*.git*'
+        run: zip -r deploy-push-${{ steps.current-time.outputs.date }}.zip . -x '*.git*'
 
       - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -96,14 +96,14 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./deploy-push-${{ steps.current-time.outputs.date }}.zip ${{ secrets.AWS_S3_PUSH_DEPLOY_BUCKET }}
+        run: aws s3 cp --region ${{ secrets.AWS_REGION }} ./deploy-push-${{ steps.current-time.outputs.date }}.zip ${{ secrets.AWS_S3_PUSH_DEPLOY_BUCKET }}
 
       - name: deploy with AWS codeDeploy
         run: aws deploy create-deployment
           --application-name ${{ secrets.AWS_PUSH_DEPLOY_APPLICATION }}
           --deployment-config-name CodeDeployDefault.AllAtOnce
           --deployment-group-name ${{ secrets.AWS_PUSH_DEPLOY_GROUP }}
-          --s3-location bucket=pog-push-codedeploy,bundleType=zip,key=deploy-${{ steps.current-time.outputs.date }}.zip
+          --s3-location bucket=pog-push-codedeploy,bundleType=zip,key=deploy-push-${{ steps.current-time.outputs.date }}.zip
 
       - name: Success
         run: echo deployed successfully.
