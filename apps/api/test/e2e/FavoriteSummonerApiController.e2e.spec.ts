@@ -59,7 +59,7 @@ describe('FavoriteSummonerApiController (e2e)', () => {
     userToken = await testUtils.getDefaultUserToken();
   });
 
-  it('/favoriteSummoner (POST)', async () => {
+  it('/favoriteSummoner/v1 (POST)', async () => {
     const res = await request(app.getHttpServer())
       .post('/favoriteSummoner/v1')
       .set('Authorization', `Bearer ${userToken}`)
@@ -95,6 +95,112 @@ describe('FavoriteSummonerApiController (e2e)', () => {
     );
     expect(summonerRecord.leaguePoint).toBe(564);
     expect(summonerRecord.rank).toBe('I');
+  });
+
+  it('/favoriteSummoner/v1 (POST) 시 softDelete된 컬럼이 restore 된다.', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/favoriteSummoner/v1')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({
+        name: 'Hide on bush',
+        tier: 'CHALLENGER',
+        win: 100,
+        lose: 100,
+        profileIconId: 6,
+        puuid:
+          'abHOdi3PiSiMUH48LtAhMl-V1uxthjVEvPRTw8quWhsg70HuF6vT5UAfUsf3nLBvPgF90CLOV3NIow',
+        summonerId: 'Yr6IbOSrmcKdZ2EVfFW5RpeAS57WF8t6dFz_A2NncjVGrA',
+        leaguePoint: 564,
+        rank: 'I',
+      })
+      .expect(HttpStatus.CREATED);
+
+    const body: ResponseEntity<string> = res.body;
+    expect(body.statusCode).toBe(ResponseEntity.CREATED().statusCode);
+    expect(body.message).toBe('소환사 즐겨찾기 추가에 성공했습니다.');
+
+    const summonerRecord = await summonerRecordRepository.findOne();
+    expect(summonerRecord.name).toBe('Hide on bush');
+    expect(summonerRecord.tier).toBe('CHALLENGER');
+    expect(summonerRecord.win).toBe(100);
+    expect(summonerRecord.lose).toBe(100);
+    expect(summonerRecord.profileIconId).toBe(6);
+    expect(summonerRecord.puuid).toBe(
+      'abHOdi3PiSiMUH48LtAhMl-V1uxthjVEvPRTw8quWhsg70HuF6vT5UAfUsf3nLBvPgF90CLOV3NIow',
+    );
+    expect(summonerRecord.summonerId).toBe(
+      'Yr6IbOSrmcKdZ2EVfFW5RpeAS57WF8t6dFz_A2NncjVGrA',
+    );
+    expect(summonerRecord.leaguePoint).toBe(564);
+    expect(summonerRecord.rank).toBe('I');
+
+    const testRes = await request(app.getHttpServer())
+      .post('/favoriteSummoner/v1')
+      .set('Authorization', `Bearer ${await testUtils.getAnotherUserToken()}`)
+      .send({
+        name: 'Hide on bush',
+        tier: 'CHALLENGER',
+        win: 100,
+        lose: 100,
+        profileIconId: 6,
+        puuid:
+          'abHOdi3PiSiMUH48LtAhMl-V1uxthjVEvPRTw8quWhsg70HuF6vT5UAfUsf3nLBvPgF90CLOV3NIow',
+        summonerId: 'Yr6IbOSrmcKdZ2EVfFW5RpeAS57WF8t6dFz_A2NncjVGrA',
+        leaguePoint: 564,
+        rank: 'I',
+      })
+      .expect(HttpStatus.CREATED);
+
+    const testBody: ResponseEntity<string> = testRes.body;
+    expect(testBody.statusCode).toBe(ResponseEntity.CREATED().statusCode);
+    expect(testBody.message).toBe('소환사 즐겨찾기 추가에 성공했습니다.');
+
+    const deleteRes = await request(app.getHttpServer())
+      .delete('/favoriteSummoner/v1')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({
+        summonerId: 'Yr6IbOSrmcKdZ2EVfFW5RpeAS57WF8t6dFz_A2NncjVGrA',
+      })
+      .expect(HttpStatus.OK);
+
+    const deleteBody: ResponseEntity<string> = deleteRes.body;
+    expect(deleteBody.statusCode).toBe(ResponseEntity.OK().statusCode);
+    expect(deleteBody.message).toBe('소환사 즐겨찾기 취소에 성공했습니다.');
+
+    const deletedFavoriteSummoner = favoriteRepository
+      .createQueryBuilder('favoriteSummoner')
+      .withDeleted()
+      .where('favoriteSummoner.deleted_at IS NOT NULL');
+
+    const sut = await deletedFavoriteSummoner.getRawOne();
+
+    expect(sut.deleted_at).not.toBeNull();
+
+    const restoreRes = await request(app.getHttpServer())
+      .post('/favoriteSummoner/v1')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({
+        name: 'Hide on bush',
+        tier: 'CHALLENGER',
+        win: 100,
+        lose: 100,
+        profileIconId: 6,
+        puuid:
+          'abHOdi3PiSiMUH48LtAhMl-V1uxthjVEvPRTw8quWhsg70HuF6vT5UAfUsf3nLBvPgF90CLOV3NIow',
+        summonerId: 'Yr6IbOSrmcKdZ2EVfFW5RpeAS57WF8t6dFz_A2NncjVGrA',
+        leaguePoint: 564,
+        rank: 'I',
+      })
+      .expect(HttpStatus.CREATED);
+
+    const restoreBody: ResponseEntity<string> = restoreRes.body;
+    expect(restoreBody.statusCode).toBe(ResponseEntity.CREATED().statusCode);
+    expect(restoreBody.message).toBe('소환사 즐겨찾기 추가에 성공했습니다.');
+
+    expect(sut.id).not.toBeNull();
+
+    const restoreFavoriteSummoner = await favoriteRepository.findOne(sut.id);
+    expect(restoreFavoriteSummoner.deletedAt).toBeNull();
   });
 
   it('/favoriteSummoner/v1 (POST) 시 userToken이 없으면 Unauthorized 에러가 발생한다', async () => {

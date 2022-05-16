@@ -37,4 +37,9 @@ export const ValidationSchema = Joi.object({
   REDIS_PORT: Joi.string().required(),
 
   API_KEY: Joi.string().required(),
+
+  SENTRY_DSN: Joi.string().required(),
+  SLACK_SENTRY_WEBHOOK: Joi.string().required(),
+
+  POG_SDK: Joi.string().required(),
 });

@@ -2,7 +2,7 @@ name: Deploy prod-api Docker
 on:
   push:
     branches:
-      - develop
+      - production-api
 
 jobs:
   build:
@@ -43,6 +43,15 @@ jobs:
           echo REDIS_ENDPOINT=${{ secrets.REDIS_ENDPOINT }} >> .env
           echo API_KEY=${{ secrets.API_KEY }} >> .env
           echo POG_SDK=${{ secrets.POG_SDK }} >> .env
+          echo DB_DEV_HOST=${{ secrets.DB_DEV_HOST }} >> .env
+          echo DB_DEV_PORT=${{ secrets.DB_DEV_PORT }} >> .env
+          echo DB_DEV_NAME=${{ secrets.DB_DEV_NAME }} >> .env
+          echo DB_DEV_USERNAME=${{ secrets.DB_DEV_USERNAME }} >> .env
+          echo DB_DEV_PASSWORD=${{ secrets.DB_DEV_PASSWORD }} >> .env
+          echo DEV_LOGGING=${{ secrets.DEV_LOGGING }} >> .env
+          echo DEV_SYNCHRONIZE=false >> .env
+          echo SENTRY_DSN=${{ secrets.SENTRY_DSN }} >> .env
+          echo SLACK_SENTRY_WEBHOOK=${{ secrets.SLACK_SENTRY_WEBHOOK }} >> .env
           cat .env
 
       - name: Generate deployment package

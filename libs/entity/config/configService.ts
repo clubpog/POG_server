@@ -45,6 +45,14 @@ export class ConfigService {
     return process.env.JWT_SECRET_KEY;
   }
 
+  static sentryDsn(): string {
+    return process.env.SENTRY_DSN;
+  }
+
+  static slackSentryHook(): string {
+    return process.env.SLACK_SENTRY_WEBHOOK;
+  }
+
   static riotApiKey(): string {
     return process.env.API_KEY;
   }
