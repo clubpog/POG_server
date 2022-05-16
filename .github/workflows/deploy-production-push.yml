@@ -42,6 +42,7 @@ jobs:
           echo sudo npm i graphql >> scripts/after-deploy.sh
           echo sudo rm -rf dist >> scripts/after-deploy.sh
           echo sudo npm run build:push >> scripts/after-deploy.sh
+          echo sudo pm2 restart pog-push >> scripts/after-deploy.sh
           cat scripts/after-deploy.sh
 
       - name: Create env
