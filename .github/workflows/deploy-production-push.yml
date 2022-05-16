@@ -36,7 +36,7 @@ jobs:
           echo $str >> scripts/after-deploy.sh
           echo cd /home/ubuntu/build >> scripts/after-deploy.sh
           echo rm -rf node_modules >> scripts/after-deploy.sh
-          echo npm ci >> scripts/after-deploy.sh
+          echo sudo npm ci >> scripts/after-deploy.sh
           echo rm -rf dist >> scripts/after-deploy.sh
           echo npm run build:push >> scripts/after-deploy.sh
           cat scripts/after-deploy.sh
@@ -44,7 +44,7 @@ jobs:
       - name: Create env
         run: |
           touch .env
-          echo NODE_ENV=development >> .env
+          echo NODE_ENV=production >> .env
           echo PORT=${{ secrets.PORT }} >> .env
           echo PUSH_PORT=${{ secrets.PUSH_PORT }} >> .env
           echo ADMIN_USER=${{ secrets.ADMIN_USER }} >> .env
