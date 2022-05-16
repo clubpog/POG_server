@@ -2,7 +2,7 @@ name: Deploy development CodeDeploy
 on:
   push:
     branches:
-      - development
+      - develop
 
 jobs:
   build:
@@ -32,9 +32,9 @@ jobs:
       - name: Create Code Deploy Script
         run: |
           touch scripts/after-deploy.sh
-          echo #!/bin/bash >> scripts/after-deploy.sh
-          echo REPOSITORY=/home/ubuntu/build >> scripts/after-deploy.sh
-          echo cd $REPOSITORY >> scripts/after-deploy.sh
+          str="#!/bin/bash"
+          echo $str >> scripts/after-deploy.sh
+          echo cd /home/ubuntu/build >> scripts/after-deploy.sh
           echo rm -rf node_modules >> scripts/after-deploy.sh
           echo sudo n 12 >> scripts/after-deploy.sh
           echo sudo npm ci >> scripts/after-deploy.sh

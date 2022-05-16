@@ -2,8 +2,7 @@ name: Deploy prod-push EC2
 on:
   push:
     branches:
-      - development/push
-      # - production-push
+      - production-push
 
 jobs:
   build:
@@ -32,19 +31,23 @@ jobs:
       - name: Create Code Deploy Script
         run: |
           touch scripts/after-deploy.sh
-          echo #!/bin/bash >> scripts/after-deploy.sh
-          echo REPOSITORY=/home/ubuntu/build >> scripts/after-deploy.sh
-          echo cd $REPOSITORY >> scripts/after-deploy.sh
-          echo rm -rf node_modules >> scripts/after-deploy.sh
-          echo npm ci >> scripts/after-deploy.sh
-          echo rm -rf dist >> scripts/after-deploy.sh
-          echo npm run build:push >> scripts/after-deploy.sh
+          str="#!/bin/bash"
+          echo $str >> scripts/after-deploy.sh
+          echo cd /home/ubuntu/build >> scripts/after-deploy.sh
+          echo sudo rm -rf node_modules >> scripts/after-deploy.sh
+          echo sudo n 12 >> scripts/after-deploy.sh
+          echo sudo npm ci >> scripts/after-deploy.sh
+          echo sudo n 16 >> scripts/after-deploy.sh
+          echo sudo npm i graphql >> scripts/after-deploy.sh
+          echo sudo rm -rf dist >> scripts/after-deploy.sh
+          echo sudo npm run build:push >> scripts/after-deploy.sh
+          echo sudo pm2 restart pog-push >> scripts/after-deploy.sh
           cat scripts/after-deploy.sh
 
       - name: Create env
         run: |
           touch .env
-          echo NODE_ENV=development >> .env
+          echo NODE_ENV=production >> .env
           echo PORT=${{ secrets.PORT }} >> .env
           echo PUSH_PORT=${{ secrets.PUSH_PORT }} >> .env
           echo ADMIN_USER=${{ secrets.ADMIN_USER }} >> .env
