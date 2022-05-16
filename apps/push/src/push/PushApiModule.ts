@@ -18,6 +18,7 @@ import { PushJobService } from '@app/common-config/job/push/PushJobService';
 import { EApplicationInjectionToken } from '@app/common-config/enum/ApplicationInjectionToken';
 import { EventStoreModule } from '../../../../libs/cache/EventStoreModule';
 import { ModuleRef } from '@nestjs/core';
+import { ConfigService } from '../../../../libs/entity/config/configService';
 
 const application: Provider[] = [
   {
@@ -61,6 +62,7 @@ export class PushApiModule implements OnModuleInit {
     this.taskRegister.setModuleRef(this.moduleRef);
     this.taskRegister.register(PushApiTask, {
       queue: 'PushQueue',
+      options: ConfigService.bullConfig(),
     });
 
     // const limiter: RateLimiter = {
