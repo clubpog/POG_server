@@ -10,7 +10,7 @@ import { AuthApiModule } from '../src/auth/AuthApiModule';
 import { UserApiModule } from '../src/user/UserApiModule';
 import { SummonerRecordApiModule } from '../src/summonerRecord/SummonerRecordApiModule';
 import { ValidationSchema } from '@app/common-config/config/validationSchema';
-import { FavoriteSummonerTestApiModule } from './FavoriteSummonerApiModule';
+import { FavoriteSummonerTestApiModule } from './FavoriteSummonerApiTestModule';
 
 @Module({
   imports: [

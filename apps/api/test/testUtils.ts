@@ -34,6 +34,32 @@ export class TestUtils {
     return res.body.data['accessToken'];
   }
 
+  async getAnotherUserToken(): Promise<string> {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [ApiTestAppModule],
+    }).compile();
+
+    const app = module.createNestApplication();
+    SetNestApp(app);
+    await app.init();
+
+    const deviceId = 'test1';
+    const firebaseToken = 'test1';
+
+    await request(app.getHttpServer()).post('/auth/signup/v1').send({
+      deviceId,
+      firebaseToken,
+    });
+
+    const res = await request(app.getHttpServer())
+      .post('/auth/signin/v1')
+      .send({
+        deviceId,
+      });
+
+    return res.body.data['accessToken'];
+  }
+
   async createUser(): Promise<number> {
     const module: TestingModule = await Test.createTestingModule({
       imports: [ApiTestAppModule],
