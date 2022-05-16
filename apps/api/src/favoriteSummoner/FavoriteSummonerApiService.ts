@@ -8,7 +8,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, Connection, QueryRunner } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FavoriteSummoner } from '@app/entity/domain/favoriteSummoner/FavoriteSummoner.entity';
 import { SummonerRecordApiQueryRepository } from '../summonerRecord/SummonerRecordApiQueryRepository';
@@ -40,6 +40,7 @@ export class FavoriteSummonerApiService {
     @Inject(EInfrastructureInjectionToken.EVENT_STORE.name)
     private readonly redisClient?: IEventStoreService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger?: Logger,
+    private readonly connection?: Connection,
   ) {}
 
   async createFavoriteSummoner(
@@ -48,9 +49,21 @@ export class FavoriteSummonerApiService {
   ): Promise<void> {
     await this.checkLimitFavoriteSummoner(userDto.userId);
     await this.redisClient.saveRedisSummonerRecord(favoriteSummonerDto);
-    await this.saveSummonerRecord(favoriteSummonerDto);
-    await this.saveFavoriteSummoner(favoriteSummonerDto, userDto);
-    await this.restoreFavoriteSummoner(favoriteSummonerDto, userDto);
+
+    const [isFindSummonerRecordId, favoriteSummonerId] = await Promise.all([
+      await this.isSummonerRecordBySummonerId(favoriteSummonerDto.summonerId),
+      await this.findFavoriteSummonerIdWithSoftDelete(
+        userDto.userId,
+        favoriteSummonerDto.summonerId,
+      ),
+    ]);
+
+    await this.saveOrRestoreTransaction(
+      isFindSummonerRecordId,
+      favoriteSummonerId,
+      favoriteSummonerDto,
+      userDto,
+    );
   }
 
   async createFavoriteSummonerV1(
@@ -60,9 +73,21 @@ export class FavoriteSummonerApiService {
     try {
       await this.checkLimitFavoriteSummoner(userDto.userId);
       await this.redisClient.saveRedisSummonerRecord(favoriteSummonerDto);
-      await this.saveSummonerRecord(favoriteSummonerDto);
-      await this.saveFavoriteSummoner(favoriteSummonerDto, userDto);
-      await this.restoreFavoriteSummoner(favoriteSummonerDto, userDto);
+
+      const [isFindSummonerRecordId, favoriteSummonerId] = await Promise.all([
+        await this.isSummonerRecordBySummonerId(favoriteSummonerDto.summonerId),
+        await this.findFavoriteSummonerIdWithSoftDelete(
+          userDto.userId,
+          favoriteSummonerDto.summonerId,
+        ),
+      ]);
+
+      await this.saveOrRestoreTransaction(
+        isFindSummonerRecordId,
+        favoriteSummonerId,
+        favoriteSummonerDto,
+        userDto,
+      );
     } catch (error) {
       this.logger.error(
         `userDto = ${JSON.stringify(
@@ -154,30 +179,27 @@ export class FavoriteSummonerApiService {
   }
 
   private async saveFavoriteSummoner(
+    favoriteSummonerId: FavoriteSummonerId,
     favoriteSummonerDto: FavoriteSummonerReq,
     userDto: UserReq,
+    queryRunner: QueryRunner,
   ): Promise<void> {
-    if (
-      !(await this.findFavoriteSummonerIdWithSoftDelete(
-        userDto.userId,
-        favoriteSummonerDto.summonerId,
-      ))
-    )
-      await this.favoriteSummonerRepository.save(
+    if (!favoriteSummonerId)
+      await queryRunner.manager.save(
         await favoriteSummonerDto.toFavoriteSummonerEntity(userDto.userId),
       );
   }
 
   private async restoreFavoriteSummoner(
-    favoriteSummonerDto: FavoriteSummonerReq,
-    userDto: UserReq,
+    favoriteSummonerId: FavoriteSummonerId,
+    queryRunner: QueryRunner,
   ): Promise<void> {
-    const favoriteSummonerId = await this.findFavoriteSummonerIdWithSoftDelete(
-      userDto.userId,
-      favoriteSummonerDto.summonerId,
-    );
-    if (favoriteSummonerId)
-      await this.favoriteSummonerRepository.restore(favoriteSummonerId.id);
+    if (favoriteSummonerId) {
+      await queryRunner.manager.restore(
+        FavoriteSummoner,
+        favoriteSummonerId.id,
+      );
+    }
   }
 
   private async checkLimitFavoriteSummoner(userId: number): Promise<void> {
@@ -194,16 +216,45 @@ export class FavoriteSummonerApiService {
   }
 
   private async saveSummonerRecord(
+    isFindSummonerRecordId: boolean,
     favoriteSummonerDto: FavoriteSummonerReq,
+    queryRunner: QueryRunner,
   ): Promise<void> {
-    const isFindSummonerRecordId = await this.isSummonerRecordBySummonerId(
-      favoriteSummonerDto.summonerId,
-    );
-
     if (!isFindSummonerRecordId) {
-      await this.summonerRecordRepository.save(
+      await queryRunner.manager.save(
         await favoriteSummonerDto.toSummonerRecordEntity(),
       );
+    }
+  }
+
+  private async saveOrRestoreTransaction(
+    isFindSummonerRecordId: boolean,
+    favoriteSummonerId: FavoriteSummonerId,
+    favoriteSummonerDto: FavoriteSummonerReq,
+    userDto: UserReq,
+  ) {
+    const queryRunner: QueryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await this.saveSummonerRecord(
+        isFindSummonerRecordId,
+        favoriteSummonerDto,
+        queryRunner,
+      );
+      await this.saveFavoriteSummoner(
+        favoriteSummonerId,
+        favoriteSummonerDto,
+        userDto,
+        queryRunner,
+      );
+      await this.restoreFavoriteSummoner(favoriteSummonerId, queryRunner);
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
   }
 

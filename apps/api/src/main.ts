@@ -15,6 +15,8 @@ import {
   SwaggerCustomOptions,
 } from '@nestjs/swagger';
 import expressBasicAuth from 'express-basic-auth';
+import * as Sentry from '@sentry/node';
+import { SlackService } from '@app/common-config/job/slack/SlackService';
 
 class Application {
   private logger = new Logger(Application.name);
@@ -75,8 +77,15 @@ class Application {
     SwaggerModule.setup('docs', this.server, document, swaggerCustomOptions);
   }
 
+  private sentry() {
+    Sentry.init({
+      dsn: ConfigService.sentryDsn(),
+    });
+  }
+
   async bootstrap() {
-    SetNestApp(this.server);
+    SetNestApp(this.server, new SlackService());
+    this.sentry();
     await this.swagger();
     await this.server.listen(ConfigService.appPort());
   }
