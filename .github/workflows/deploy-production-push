@@ -2,14 +2,44 @@ name: Deploy prod-push EC2
 on:
   push:
     branches:
-      - production-push
+      - development/push
+      # - production-push
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    #액션의 실행 수행내용, 단계별로 실행된다.
     steps:
+      - name: Get current date
+        id: current-time
+        run: echo "::set-output name=date::$(date +KST%Y%m%d-T%H%M%S.%3N)"
+        env:
+          TZ: Asia/Seoul
+
       - name: Checkout source code
         uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Create Code Deploy Script
+        run: |
+          touch scripts/after-deploy.sh
+          echo #!/bin/bash >> scripts/after-deploy.sh
+          echo REPOSITORY=/home/ubuntu/build >> scripts/after-deploy.sh
+          echo cd $REPOSITORY >> scripts/after-deploy.sh
+          echo rm -rf node_modules >> scripts/after-deploy.sh
+          echo sudo npm ci >> scripts/after-deploy.sh
+          echo sudo rm -rf dist >> scripts/after-deploy.sh
+          echo sudo npm run build:push >> scripts/after-deploy.sh
+          cat scripts/after-deploy.sh
 
       - name: Create env
         run: |
@@ -49,24 +79,31 @@ jobs:
           echo DB_DEV_USERNAME=${{ secrets.DB_DEV_USERNAME }} >> .env
           echo DB_DEV_PASSWORD=${{ secrets.DB_DEV_PASSWORD }} >> .env
           echo DEV_LOGGING=${{ secrets.DEV_LOGGING }} >> .env
-          echo DEV_SYNCHRONIZE=false >> .env
+          echo DEV_SYNCHRONIZE=${{ secrets.SYNCHRONIZE }} >> .env
           echo SENTRY_DSN=${{ secrets.SENTRY_DSN }} >> .env
           echo SLACK_SENTRY_WEBHOOK=${{ secrets.SLACK_SENTRY_WEBHOOK }} >> .env
           cat .env
 
+      
       - name: Generate deployment package
-        run: zip -r deploy.zip . -x '*.git*' -x node_modules/\*
+        run: zip -r deploy-${{ steps.current-time.outputs.date }}.zip . -x '*.git*'
 
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v14
+      - name: AWS configure credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws_access_key: ${{ secrets.AWS_PROD_ACCESS_KEY }}
-          aws_secret_key: ${{ secrets.AWS_PROD_SECRET_KEY }}
-          application_name: ${{ secrets.AWS_PROD_APPLICATION_NAME }}
-          environment_name: ${{ secrets.AWS_PROD_ENV_NAME }}
-          region: ${{ secrets.AWS_REGION }}
-          version_label: pog-production-api-${{ github.sha }}
-          deployment_package: deploy.zip
+          aws-access-key-id: ${{ secrets.AWS_PROD_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_PROD_SECRET_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./deploy-push-${{ steps.current-time.outputs.date }}.zip s3://pog-push-codedeploy/
+
+      - name: deploy with AWS codeDeploy
+        run: aws deploy create-deployment
+          --application-name pog-push-deploy
+          --deployment-config-name CodeDeployDefault.AllAtOnce
+          --deployment-group-name pog-push-deploy-pipe
+          --s3-location bucket=pog-push-codedeploy,bundleType=zip,key=deploy-${{ steps.current-time.outputs.date }}.zip
 
       - name: Success
         run: echo deployed successfully.
