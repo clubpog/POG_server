@@ -2,8 +2,7 @@ name: Deploy prod-push EC2
 on:
   push:
     branches:
-      - development/push
-      # - production-push
+      - production-push
 
 jobs:
   build:
