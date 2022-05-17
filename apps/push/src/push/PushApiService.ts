@@ -82,6 +82,12 @@ export class PushApiService {
     if (checkWinOrLose === 'lose') {
       return await this.addLosePushQueue(summonerId, summonerName);
     }
+    if (checkWinOrLose === 'tierUp') {
+      return await this.addTierUpPushQueue(summonerId, summonerName);
+    }
+    if (checkWinOrLose === 'tierDown') {
+      return await this.addTierDownPushQueue(summonerId, summonerName);
+    }
     return;
   }
 
@@ -91,9 +97,15 @@ export class PushApiService {
   ): Promise<string> {
     const [win, lose, tier] = redisResponse;
     if (riotApiResponse[0].win !== win) {
+      if (riotApiResponse[0].tier !== tier) {
+        return 'tierUp';
+      }
       return 'win';
     }
     if (riotApiResponse[0].lose !== lose) {
+      if (riotApiResponse[0].tier !== tier) {
+        return 'tierDown';
+      }
       return 'lose';
     }
   }
@@ -132,6 +144,28 @@ export class PushApiService {
   private async addLosePushQueue(summonerId: string, summonerName: string) {
     return await this.bullService.createJob(
       this.tasks.addLosePushQueue,
+      {
+        summonerId,
+        summonerName,
+      },
+      { delay: 10000, removeOnComplete: true },
+    );
+  }
+
+  private async addTierUpPushQueue(summonerId: string, summonerName: string) {
+    return await this.bullService.createJob(
+      this.tasks.addTierUpPushQueue,
+      {
+        summonerId,
+        summonerName,
+      },
+      { delay: 10000, removeOnComplete: true },
+    );
+  }
+
+  private async addTierDownPushQueue(summonerId: string, summonerName: string) {
+    return await this.bullService.createJob(
+      this.tasks.addTierDownPushQueue,
       {
         summonerId,
         summonerName,
