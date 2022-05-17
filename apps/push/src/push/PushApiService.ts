@@ -96,13 +96,14 @@ export class PushApiService {
     redisResponse: string[],
   ): Promise<string> {
     const [win, lose, tier] = redisResponse;
-    if (riotApiResponse[0].win !== win) {
+
+    if (riotApiResponse[0].win !== Number(win)) {
       if (riotApiResponse[0].tier !== tier) {
         return 'tierUp';
       }
       return 'win';
     }
-    if (riotApiResponse[0].lose !== lose) {
+    if (riotApiResponse[0].lose !== Number(lose)) {
       if (riotApiResponse[0].tier !== tier) {
         return 'tierDown';
       }
