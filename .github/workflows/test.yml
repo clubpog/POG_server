@@ -19,4 +19,4 @@ jobs:
           SLACK_TITLE: Production API Deployed 
           SLACK_USERNAME: '배포 귀요미'
           SLACK_FOOTER: null
-          SLACK_ICON: ${{SLACK_DEPLOY_IMAGE}}
+          SLACK_ICON: ${{ secrets.SLACK_DEPLOY_IMAGE }}
