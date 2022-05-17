@@ -19,4 +19,4 @@ jobs:
           SLACK_TITLE: Production API Deployed 
           SLACK_USERNAME: '배포 요정'
           SLACK_FOOTER: null
-          SLACK_ICON_EMOJI: ':남성_요정:' 
+          SLACK_ICON_EMOJI: ':male_fairy:'
