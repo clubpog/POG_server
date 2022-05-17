@@ -1,0 +1,19 @@
+name: Slack Test
+on:
+  push:
+    branches:
+      - feature/deploy-slack-notification
+
+jobs:
+  SlackNotification:
+      name: Slack Notification
+      # needs: [build]
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v2
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_MESSAGE: '상용 API 서버가 배포되었습니다! 확인 부탁드립니다 :rocket:'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_SENTRY_WEBHOOK }}
+          SLACK_TITLE: Production API Deployed 
