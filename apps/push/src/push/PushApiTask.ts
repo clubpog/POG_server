@@ -62,6 +62,36 @@ export class PushApiTask implements IPushApiTask {
     done(null);
   }
 
+  @Task({ name: 'addTierUpPushQueue' })
+  async addTierUpPushQueue(
+    job: Bull.Job,
+    done: Bull.DoneCallback,
+  ): Promise<void> {
+    await this.pushJobService.tierUpSummonerListSend(
+      job.data['summonerId'],
+      job.data['summonerName'],
+    );
+    this.logger.log(
+      `${job.data['summonerName']}의 ${job.data['summonerId']} topic 푸시를 전송했습니다.`,
+    );
+    done(null);
+  }
+
+  @Task({ name: 'addTierDownPushQueue' })
+  async addTierDownPushQueue(
+    job: Bull.Job,
+    done: Bull.DoneCallback,
+  ): Promise<void> {
+    await this.pushJobService.tierDownSummonerListSend(
+      job.data['summonerId'],
+      job.data['summonerName'],
+    );
+    this.logger.log(
+      `${job.data['summonerName']}의 ${job.data['summonerId']} topic 푸시를 전송했습니다.`,
+    );
+    done(null);
+  }
+
   @Task({ name: 'recoverPushQueue' })
   async recoverPushQueue(
     job: Bull.Job,
