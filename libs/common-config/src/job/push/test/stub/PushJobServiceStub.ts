@@ -18,6 +18,21 @@ export class PushJobServiceStub {
     return this.addPushQueue;
   }
 
+<<<<<<< HEAD
+=======
+  // AB 테스트 진행
+  async defaultSummonerListSend(summonerId: string, summonerName: string) {
+    const message = {
+      notification: {
+        title: `${summonerName} 전적 갱신`,
+        body: `${summonerName}의 전적이 갱신됐어요.`,
+      },
+      topic: `A_${summonerId}`,
+    };
+    return message;
+  }
+
+>>>>>>> b99a0c32567c5b461d5efeaffab8a082d2152637
   async winSummonerListSend(summonerId: string, summonerName: string) {
     const message = {
       notification: {
@@ -39,6 +54,7 @@ export class PushJobServiceStub {
     };
     return message;
   }
+<<<<<<< HEAD
 
   async tierUpSummonerListSend(summonerId: string, summonerName: string) {
     const message = {
@@ -61,4 +77,6 @@ export class PushJobServiceStub {
     };
     return message;
   }
+=======
+>>>>>>> b99a0c32567c5b461d5efeaffab8a082d2152637
 }

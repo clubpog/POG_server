@@ -10,7 +10,6 @@ export class PushApiTaskStub implements IPushApiTask {
   addPushQueue(task?, data?, opts?) {
     return this.pushJobService.send(data['summonerId'], data['summonerName']);
   }
-
   addWinPushQueue(task, data, opts?) {
     return this.pushJobService.winSummonerListSend(
       data['summonerId'],
