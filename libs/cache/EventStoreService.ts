@@ -43,7 +43,7 @@ export class EventStoreServiceImplement implements IEventStoreService {
   ): Promise<void> {
     const redisClient = this.master;
 
-    const [win, lose, tier] = await this.summonerRecordMget(
+    const [win, lose, tier, rank] = await this.summonerRecordMget(
       favoriteSummonerDto.summonerId,
     );
 
@@ -63,6 +63,12 @@ export class EventStoreServiceImplement implements IEventStoreService {
       await redisClient.set(
         `summonerId:${favoriteSummonerDto.summonerId}:tier`,
         favoriteSummonerDto.tier,
+      );
+
+    if (!rank)
+      await redisClient.set(
+        `summonerId:${favoriteSummonerDto.summonerId}:rank`,
+        favoriteSummonerDto.rank,
       );
 
     await redisClient.sadd('summonerId', favoriteSummonerDto.summonerId);
@@ -131,6 +137,7 @@ export class EventStoreServiceImplement implements IEventStoreService {
       `summonerId:${summonerId}:win`,
       `summonerId:${summonerId}:lose`,
       `summonerId:${summonerId}:tier`,
+      `summonerId:${summonerId}:rank`,
     );
   }
 
