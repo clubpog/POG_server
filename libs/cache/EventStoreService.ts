@@ -133,6 +133,8 @@ export class EventStoreServiceImplement implements IEventStoreService {
       0,
       `summonerId:${summonerId}:tier`,
       '언랭',
+      `summonerId:${summonerId}:rank`,
+      '언랭',
     );
   }
   async summonerRecordMget(summonerId: string): Promise<string[]> {
