@@ -95,6 +95,7 @@ export class EventStoreServiceImplement implements IEventStoreService {
       await redisClient.del(`summonerId:${summonerId}:lose`);
       await redisClient.del(`summonerId:${summonerId}:tier`);
       await redisClient.del(`summonerId:${summonerId}:win`);
+      await redisClient.del(`summonerId:${summonerId}:rank`);
       await redisClient.srem('summonerId', 'error');
 
       await redisClient.exec();
@@ -115,6 +116,8 @@ export class EventStoreServiceImplement implements IEventStoreService {
         riotApiResponse[0].lose,
         `summonerId:${summonerId}:tier`,
         riotApiResponse[0].tier,
+        `summonerId:${summonerId}:rank`,
+        riotApiResponse[0].rank,
       );
     } catch (error) {
       console.error(error);

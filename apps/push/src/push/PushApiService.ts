@@ -115,7 +115,8 @@ export class PushApiService {
     riotApiResponse: PushRiotApi,
     redisResponse: string[],
   ): Promise<boolean> {
-    const [win, lose, tier] = redisResponse;
+    const [win, lose, tier, rank] = redisResponse;
+    if (riotApiResponse[0].rank !== rank) return true;
     if (riotApiResponse[0].tier !== tier) return true;
     if (riotApiResponse[0].win !== Number(win)) return true;
     if (riotApiResponse[0].lose !== Number(lose)) return true;
