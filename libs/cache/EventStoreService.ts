@@ -81,6 +81,7 @@ export class EventStoreServiceImplement implements IEventStoreService {
     await redisClient.del(`summonerId:${summonerId}:win`);
     await redisClient.del(`summonerId:${summonerId}:lose`);
     await redisClient.del(`summonerId:${summonerId}:tier`);
+    await redisClient.del(`summonerId:${summonerId}:rank`);
     await redisClient.srem('summonerId', summonerId);
     await redisClient.exec();
   }
