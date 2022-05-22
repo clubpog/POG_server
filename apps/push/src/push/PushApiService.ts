@@ -82,10 +82,10 @@ export class PushApiService {
     if (checkWinOrLose === 'lose') {
       return await this.addLosePushQueue(summonerId, summonerName);
     }
-    if (checkWinOrLose === 'tierUp') {
+    if (checkWinOrLose === 'tierUp' || checkWinOrLose === 'rankUp') {
       return await this.addTierUpPushQueue(summonerId, summonerName);
     }
-    if (checkWinOrLose === 'tierDown') {
+    if (checkWinOrLose === 'tierDown' || checkWinOrLose === 'rankDown') {
       return await this.addTierDownPushQueue(summonerId, summonerName);
     }
     return;
@@ -95,17 +95,23 @@ export class PushApiService {
     riotApiResponse: PushRiotApi,
     redisResponse: string[],
   ): Promise<string> {
-    const [win, lose, tier] = redisResponse;
+    const [win, lose, tier, rank] = redisResponse;
 
     if (riotApiResponse[0].win !== Number(win)) {
       if (riotApiResponse[0].tier !== tier) {
         return 'tierUp';
+      }
+      if (riotApiResponse[0].rank !== rank) {
+        return 'rankUp';
       }
       return 'win';
     }
     if (riotApiResponse[0].lose !== Number(lose)) {
       if (riotApiResponse[0].tier !== tier) {
         return 'tierDown';
+      }
+      if (riotApiResponse[0].rank !== rank) {
+        return 'rankDown';
       }
       return 'lose';
     }
