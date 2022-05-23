@@ -52,6 +52,7 @@ export class PushApiService {
           await this.checkWinOrLose(riotApiResponse, redisResponse),
           summonerId,
           riotApiResponse[0].summonerName,
+          await this.findPuuid(summonerId),
         );
         // await this.addPushQueue(summonerId, riotApiResponse[0].summonerName);
 
@@ -75,7 +76,11 @@ export class PushApiService {
     checkWinOrLose: string,
     summonerId: string,
     summonerName: string,
+    puuid: string,
   ): Promise<Bull.Job<any>> {
+    // 테스트 용으로 이렇게 설정함.
+    await this.addChangeTierRank(puuid);
+
     if (checkWinOrLose === 'win') {
       return await this.addWinPushQueue(summonerId, summonerName);
     }
@@ -83,12 +88,38 @@ export class PushApiService {
       return await this.addLosePushQueue(summonerId, summonerName);
     }
     if (checkWinOrLose === 'tierUp' || checkWinOrLose === 'rankUp') {
+      await this.addChangeTierRank(puuid);
       return await this.addTierUpPushQueue(summonerId, summonerName);
     }
     if (checkWinOrLose === 'tierDown' || checkWinOrLose === 'rankDown') {
+      await this.addChangeTierRank(puuid);
       return await this.addTierDownPushQueue(summonerId, summonerName);
     }
     return;
+  }
+
+  private async findPuuid(summonerId: string): Promise<string> {
+    try {
+      const findPuuid =
+        await this.summonerRecordApiQueryRepository.findOnePuuidAtSummonerRecord(
+          summonerId,
+        );
+      return findPuuid.puuid;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private async addChangeTierRank(puuid: string) {
+    try {
+      const matchId: string = await this.riotApiJobService.recentMatchIdResult(
+        puuid,
+      );
+      console.log(matchId);
+      // 데이터 저장하는 것만 하면 될 듯.
+    } catch (error) {
+      throw error;
+    }
   }
 
   private async checkWinOrLose(
