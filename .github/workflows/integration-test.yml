@@ -82,10 +82,7 @@ jobs:
         run: apt-get update && apt-get install -y postgresql-client
 
       - name: Test with DB
-        run: npx jest --runInBand --detectOpenHandles --forceExit
-
-      - name: Test Coverage 
-        run: npx jest --coverage
+        run: npx jest --coverage --runInBand --detectOpenHandles --forceExit
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
