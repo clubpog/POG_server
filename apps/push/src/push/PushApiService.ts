@@ -11,6 +11,7 @@ import { SummonerRecordApiQueryRepository } from '../summonerRecord/SummonerReco
 import { BullService } from '../../../../libs/entity/queue/src/lib/BullService';
 
 import { IPushApiTask } from './interface/IPushApiTask';
+import { ChangedTierApiQueryRepository } from '../changedTier/ChangedTierApiQueryRepository';
 
 @Injectable()
 export class PushApiService {
@@ -23,6 +24,7 @@ export class PushApiService {
     private readonly bullService?: BullService,
     @Inject(EApplicationInjectionToken.PUSH_API_TASK.name)
     private readonly tasks?: IPushApiTask,
+    private readonly changedTierApiQueryRepository?: ChangedTierApiQueryRepository,
   ) {}
   @Interval('pushCronTask', 180000)
   async addMessageQueue(): Promise<void> {

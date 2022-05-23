@@ -19,6 +19,7 @@ import { EApplicationInjectionToken } from '@app/common-config/enum/ApplicationI
 import { EventStoreModule } from '../../../../libs/cache/EventStoreModule';
 import { ModuleRef } from '@nestjs/core';
 import { ConfigService } from '../../../../libs/entity/config/configService';
+import { ChangedTierApiModule } from '../changedTier/ChangedTierApiModule';
 
 const application: Provider[] = [
   {
@@ -47,6 +48,7 @@ const application: Provider[] = [
     BullModule,
     ScheduleModule.forRoot(),
     SummonerRecordApiModule,
+    ChangedTierApiModule,
     EventStoreModule,
   ],
   controllers: [PushApiController],
