@@ -20,6 +20,7 @@ import { EventStoreModule } from '../../../../libs/cache/EventStoreModule';
 import { ModuleRef } from '@nestjs/core';
 import { ConfigService } from '../../../../libs/entity/config/configService';
 import { ChangedTierApiModule } from '../changedTier/ChangedTierApiModule';
+import { ChangedTierModule } from '@app/entity/domain/changedTier/ChangedTierModule';
 
 const application: Provider[] = [
   {
@@ -49,6 +50,7 @@ const application: Provider[] = [
     ScheduleModule.forRoot(),
     SummonerRecordApiModule,
     ChangedTierApiModule,
+    ChangedTierModule,
     EventStoreModule,
   ],
   controllers: [PushApiController],

@@ -12,6 +12,9 @@ import { BullService } from '../../../../libs/entity/queue/src/lib/BullService';
 
 import { IPushApiTask } from './interface/IPushApiTask';
 import { ChangedTierApiQueryRepository } from '../changedTier/ChangedTierApiQueryRepository';
+import { ChangedTier } from '@app/entity/domain/changedTier/ChangedTier.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class PushApiService {
@@ -25,6 +28,8 @@ export class PushApiService {
     @Inject(EApplicationInjectionToken.PUSH_API_TASK.name)
     private readonly tasks?: IPushApiTask,
     private readonly changedTierApiQueryRepository?: ChangedTierApiQueryRepository,
+    @InjectRepository(ChangedTier)
+    private changedTierRepository?: Repository<ChangedTier>,
   ) {}
   @Interval('pushCronTask', 180000)
   async addMessageQueue(): Promise<void> {
@@ -55,6 +60,8 @@ export class PushApiService {
           summonerId,
           riotApiResponse[0].summonerName,
           await this.findPuuid(summonerId),
+          riotApiResponse[0].tier,
+          riotApiResponse[0].rank,
         );
         // await this.addPushQueue(summonerId, riotApiResponse[0].summonerName);
 
@@ -79,10 +86,9 @@ export class PushApiService {
     summonerId: string,
     summonerName: string,
     puuid: string,
+    tier: string,
+    rank: string,
   ): Promise<Bull.Job<any>> {
-    // 테스트 용으로 이렇게 설정함.
-    await this.addChangeTierRank(puuid);
-
     if (checkWinOrLose === 'win') {
       return await this.addWinPushQueue(summonerId, summonerName);
     }
@@ -90,11 +96,11 @@ export class PushApiService {
       return await this.addLosePushQueue(summonerId, summonerName);
     }
     if (checkWinOrLose === 'tierUp' || checkWinOrLose === 'rankUp') {
-      await this.addChangeTierRank(puuid);
+      await this.addChangeTierRank(puuid, summonerId, tier, rank);
       return await this.addTierUpPushQueue(summonerId, summonerName);
     }
     if (checkWinOrLose === 'tierDown' || checkWinOrLose === 'rankDown') {
-      await this.addChangeTierRank(puuid);
+      await this.addChangeTierRank(puuid, summonerId, tier, rank);
       return await this.addTierDownPushQueue(summonerId, summonerName);
     }
     return;
@@ -112,13 +118,25 @@ export class PushApiService {
     }
   }
 
-  private async addChangeTierRank(puuid: string) {
+  private async addChangeTierRank(
+    puuid: string,
+    summonerId: string,
+    tier: string,
+    rank: string,
+  ) {
     try {
       const matchId: string = await this.riotApiJobService.recentMatchIdResult(
         puuid,
       );
-      console.log(matchId);
-      // 데이터 저장하는 것만 하면 될 듯.
+
+      const changedTier = await ChangedTier.createChangedTier(
+        summonerId,
+        matchId,
+        tier,
+        rank,
+      );
+
+      await this.changedTierRepository.save(changedTier);
     } catch (error) {
       throw error;
     }

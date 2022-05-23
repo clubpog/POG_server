@@ -33,4 +33,18 @@ export class ChangedTier extends BaseTimeEntity {
   )
   @JoinColumn({ name: 'summoner_id', referencedColumnName: 'summonerId' })
   SummonerRecord: SummonerRecord[] | SummonerRecord | string;
+
+  static async createChangedTier(
+    summonerId: string,
+    matchId: string,
+    tier: string,
+    rank: string,
+  ): Promise<ChangedTier> {
+    const changedTier = new ChangedTier();
+    changedTier.SummonerRecord = summonerId;
+    changedTier.matchId = matchId;
+    changedTier.tier = tier;
+    changedTier.rank = rank;
+    return changedTier;
+  }
 }
