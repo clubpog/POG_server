@@ -28,17 +28,25 @@ export class ChangedTier extends BaseTimeEntity {
   })
   summonerId: string;
 
+  @Column({
+    type: 'varchar',
+    nullable: false,
+  })
+  status: string;
+
   static async createChangedTier(
     summonerId: string,
     matchId: string,
     tier: string,
     rank: string,
+    status?: string,
   ): Promise<ChangedTier> {
     const changedTier = new ChangedTier();
     changedTier.summonerId = summonerId;
     changedTier.matchId = matchId;
     changedTier.tier = tier;
     changedTier.rank = rank;
+    changedTier.status = status;
     return changedTier;
   }
 }
