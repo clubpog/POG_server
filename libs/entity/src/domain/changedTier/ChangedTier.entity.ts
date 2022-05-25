@@ -39,7 +39,7 @@ export class ChangedTier extends BaseTimeEntity {
     matchId: string,
     tier: string,
     rank: string,
-    status?: string,
+    status: string,
   ): Promise<ChangedTier> {
     const changedTier = new ChangedTier();
     changedTier.summonerId = summonerId;
