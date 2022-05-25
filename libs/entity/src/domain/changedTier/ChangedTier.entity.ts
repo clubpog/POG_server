@@ -1,9 +1,8 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
-import { SummonerRecord } from '../summonerRecord/SummonerRecord.entity';
 
 @Entity()
-@Index('idx_changedTier_1', ['SummonerRecord'])
+@Index('idx_changedTier_1', ['summonerId'])
 export class ChangedTier extends BaseTimeEntity {
   @Column({
     type: 'varchar',
@@ -23,16 +22,11 @@ export class ChangedTier extends BaseTimeEntity {
   })
   rank: string;
 
-  @ManyToOne(
-    () => SummonerRecord,
-    (summonerRecord: SummonerRecord) => summonerRecord.ChangedTier,
-    {
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    },
-  )
-  @JoinColumn({ name: 'summoner_id', referencedColumnName: 'summonerId' })
-  SummonerRecord: SummonerRecord[] | SummonerRecord | string;
+  @Column({
+    type: 'varchar',
+    nullable: false,
+  })
+  summonerId: string;
 
   static async createChangedTier(
     summonerId: string,
@@ -41,7 +35,7 @@ export class ChangedTier extends BaseTimeEntity {
     rank: string,
   ): Promise<ChangedTier> {
     const changedTier = new ChangedTier();
-    changedTier.SummonerRecord = summonerId;
+    changedTier.summonerId = summonerId;
     changedTier.matchId = matchId;
     changedTier.tier = tier;
     changedTier.rank = rank;

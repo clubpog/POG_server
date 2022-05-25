@@ -1,6 +1,5 @@
 import { Column, Entity, Index, OneToMany } from 'typeorm';
 import { BaseTimeEntity } from '../BaseTimeEntity';
-import { ChangedTier } from '../changedTier/ChangedTier.entity';
 import { FavoriteSummoner } from '../favoriteSummoner/FavoriteSummoner.entity';
 
 @Entity()
@@ -58,12 +57,6 @@ export class SummonerRecord extends BaseTimeEntity {
     (favoriteSummoner: FavoriteSummoner) => favoriteSummoner.SummonerRecord,
   )
   FavoriteSummoner: FavoriteSummoner[];
-
-  @OneToMany(
-    () => ChangedTier,
-    (changedTier: ChangedTier) => changedTier.SummonerRecord,
-  )
-  ChangedTier: ChangedTier[];
 
   static async createSummonerRecord(
     name: string,
