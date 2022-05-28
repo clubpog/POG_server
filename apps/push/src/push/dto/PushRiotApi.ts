@@ -3,7 +3,6 @@ import { Exclude, Expose } from 'class-transformer';
 export class PushRiotApi {
   @Exclude() leagueId: string;
   @Exclude() queueType: string;
-  @Exclude() rank: string;
   @Exclude() summonerId: string;
   @Exclude() leaguePoints: number;
   @Exclude() veteran: boolean;
@@ -19,6 +18,9 @@ export class PushRiotApi {
 
   @Expose({ name: 'tier' })
   tier: string;
+
+  @Expose({ name: 'rank' })
+  rank: string;
 
   @Expose({ name: 'summonerName' })
   summonerName: string;

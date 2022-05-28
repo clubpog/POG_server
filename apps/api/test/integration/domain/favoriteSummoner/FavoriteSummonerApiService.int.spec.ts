@@ -1,3 +1,5 @@
+import { ChangedTierApiQueryRepository } from './../../../../src/changedTier/ChangedTierApiQueryRepository';
+import { ChangedTierApiModule } from './../../../../../push/src/changedTier/ChangedTierApiModule';
 import { UserModule } from './../../../../../../libs/entity/src/domain/user/UserModule';
 import { TestUtils } from './../../../testUtils';
 import { FavoriteSummoner } from '@app/entity/domain/favoriteSummoner/FavoriteSummoner.entity';
@@ -21,6 +23,7 @@ import { EventStoreTestServiceImplement } from '../../../../../../libs/cache/Eve
 import { User } from '@app/entity/domain/user/User.entity';
 import { SummonerRecord } from '@app/entity/domain/summonerRecord/SummonerRecord.entity';
 import { FavoriteSummonerIdReq } from '../../../../src/favoriteSummoner/dto/FavoriteSummonerIdReq.dto';
+import { ChangedTier } from '@app/entity/domain/changedTier/ChangedTier.entity';
 
 describe('FavoriteSummonerApiService', () => {
   let favoriteSummonerRepository: Repository<FavoriteSummoner>;
@@ -30,6 +33,7 @@ describe('FavoriteSummonerApiService', () => {
   let sut: FavoriteSummonerApiService;
   let testUtils: TestUtils;
   let userId: number;
+  let changedTierRepository: Repository<ChangedTier>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -37,6 +41,7 @@ describe('FavoriteSummonerApiService', () => {
         FavoriteSummonerModule,
         SummonerRecordModule,
         SummonerRecordApiModule,
+        ChangedTierApiModule,
         ConfigModule.forRoot({
           isGlobal: true,
           validationSchema: ValidationSchema,
@@ -50,12 +55,14 @@ describe('FavoriteSummonerApiService', () => {
         FavoriteSummonerApiService,
         FavoriteSummonerApiRepository,
         FavoriteSummonerApiQueryRepository,
+        ChangedTierApiQueryRepository,
       ],
     }).compile();
 
     favoriteSummonerRepository = module.get('FavoriteSummonerRepository');
     userRepository = module.get('UserRepository');
     summonerRecordRepository = module.get('SummonerRecordRepository');
+    changedTierRepository = module.get('ChangedTierRepository');
 
     sut = module.get<FavoriteSummonerApiService>(FavoriteSummonerApiService);
     redisClient = module.get<EventStoreTestServiceImplement>(
@@ -67,6 +74,7 @@ describe('FavoriteSummonerApiService', () => {
     await userRepository.delete({});
     await summonerRecordRepository.delete({});
     await redisClient.flushall();
+    await changedTierRepository.delete({});
   });
 
   afterAll(async () => {
@@ -78,6 +86,7 @@ describe('FavoriteSummonerApiService', () => {
     await userRepository.delete({});
     await summonerRecordRepository.delete({});
     await redisClient.flushall();
+    await changedTierRepository.delete({});
   });
 
   it('createFavoriteSummonerV1', async () => {
