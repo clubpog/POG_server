@@ -26,7 +26,6 @@ import { IEventStoreService } from '../../../../libs/cache/interface/integration
 import { FavoriteSummonerChangedTierReq } from './dto/FavoriteSummonerChangedTierReq.dto';
 import { ChangedTierApiQueryRepository } from '../changedTier/ChangedTierApiQueryRepository';
 import { FavoriteSummonerChangedTierQuery } from './dto/FavoriteSummonerChangedTierQuery.dto';
-import { IFavoriteSummonerChangedTierReadSuccess } from '../changedTier/interface/IChangedTierReadSuccess';
 import { FavoriteSummonerChangedTierRes } from './dto/FavoriteSummonerChangedTierRes.dto';
 
 @Injectable()
