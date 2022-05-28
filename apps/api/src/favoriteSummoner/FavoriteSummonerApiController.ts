@@ -9,6 +9,7 @@ import {
   Get,
   Inject,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { Logger } from 'winston';
@@ -21,6 +22,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -44,6 +46,10 @@ import { FavoriteSummonerCreateFailV1 } from '@app/common-config/response/swagge
 import { FavoriteSummonerDeleteNotFoundV1 } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteNotFoundV1';
 import { FavoriteSummonerDeleteFailV1 } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerDeleteFailV1';
 import { FavoriteSummonerReadFailV1 } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerReadFailV1';
+import { FavoriteSummonerChangedTierReq } from './dto/FavoriteSummonerChangedTierReq.dto';
+import { FavoriteSummonerChangedTierQuery } from './dto/FavoriteSummonerChangedTierQuery.dto';
+import { FavoriteSummonerChangedTierRes } from './dto/FavoriteSummonerChangedTierRes.dto';
+import { FavoriteSummonerChangedTierReadSuccess } from '@app/common-config/response/swagger/domain/favoriteSummoner/FavoriteSummonerChangedTierReadSuccess';
 
 @Controller('favoriteSummoner')
 @ApiTags('소환사 즐겨찾기 API')
@@ -325,6 +331,56 @@ export class FavoriteSummonerApiController {
 
     return ResponseEntity.OK_WITH_DATA(
       '소환사 즐겨찾기 조회에 성공했습니다.',
+      data,
+    );
+  }
+
+  @ApiOperation({
+    summary: '소환사 전적 갱신 조회',
+    description: `
+    헤더에 토큰 값을 제대로 설정하지 않으면 401 에러를 출력합니다. \n
+    소환사 전적 갱신 조회 시 조회를 실패하면 500 에러를 출력합니다. \n
+    소환사 전적 갱신 조회 시 조회를 성공하면 200 코드를 출력합니다. \n
+    `,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: true,
+    description: '최대 몇 개의 contents를 가져올 것인지에 대한 값입니다.',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: true,
+    description:
+      'contents의 시작페이지의 수를 나타냅니다. 0을 제외한 양수의 값입니다.',
+  })
+  @ApiOkResponse({
+    description: '소환사 전적 갱신 조회에 성공했습니다.',
+    type: FavoriteSummonerChangedTierReadSuccess,
+  })
+  @ApiUnauthorizedResponse({
+    description: '잘못된 Authorization입니다.',
+    type: UnauthorizedError,
+  })
+  @ApiInternalServerErrorResponse({
+    description: '소환사 전적 갱신 조회에 실패했습니다.',
+    type: FavoriteSummonerReadFailV1,
+  })
+  @ApiBearerAuth('Authorization')
+  @UseGuards(JwtAuthGuard)
+  @Post('/changedTier')
+  async changedTier(
+    @Query() queryDto: FavoriteSummonerChangedTierQuery,
+    @Body() favoriteSummonerChangedTierDto: FavoriteSummonerChangedTierReq,
+  ): Promise<ResponseEntity<FavoriteSummonerChangedTierRes[] | string>> {
+    const data: FavoriteSummonerChangedTierRes[] =
+      await this.favoriteSummonerApiService.getChangedTier(
+        queryDto,
+        favoriteSummonerChangedTierDto,
+      );
+
+    return ResponseEntity.OK_WITH_DATA(
+      '소환사 전적 갱신 조회에 성공했습니다.',
       data,
     );
   }

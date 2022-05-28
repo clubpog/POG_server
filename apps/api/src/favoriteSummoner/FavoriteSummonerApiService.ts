@@ -23,6 +23,11 @@ import { EInfrastructureInjectionToken } from '@app/common-config/enum/Infrastru
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { IEventStoreService } from '../../../../libs/cache/interface/integration';
+import { FavoriteSummonerChangedTierReq } from './dto/FavoriteSummonerChangedTierReq.dto';
+import { ChangedTierApiQueryRepository } from '../changedTier/ChangedTierApiQueryRepository';
+import { FavoriteSummonerChangedTierQuery } from './dto/FavoriteSummonerChangedTierQuery.dto';
+import { IFavoriteSummonerChangedTierReadSuccess } from '../changedTier/interface/IChangedTierReadSuccess';
+import { FavoriteSummonerChangedTierRes } from './dto/FavoriteSummonerChangedTierRes.dto';
 
 @Injectable()
 export class FavoriteSummonerApiService {
@@ -41,6 +46,7 @@ export class FavoriteSummonerApiService {
     private readonly redisClient?: IEventStoreService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger?: Logger,
     private readonly connection?: Connection,
+    private readonly changedTierApiQueryRepository?: ChangedTierApiQueryRepository,
   ) {}
 
   async createFavoriteSummoner(
@@ -100,6 +106,45 @@ export class FavoriteSummonerApiService {
       }
       throw new InternalServerErrorException();
     }
+  }
+
+  async getChangedTier(
+    queryDto: FavoriteSummonerChangedTierQuery,
+    favoriteSummonerChangedTierDto: FavoriteSummonerChangedTierReq,
+  ): Promise<FavoriteSummonerChangedTierRes[]> {
+    try {
+      const array = [];
+      for (const summonerId of favoriteSummonerChangedTierDto.summonerId) {
+        array.push({
+          summonerId: await this.findFavoriteSummonersChangedTier(
+            summonerId,
+            queryDto.getOffset(),
+            queryDto.getLimit(),
+          ),
+        });
+      }
+      return array;
+    } catch (error) {
+      this.logger.error(
+        `favoriteSummonerDto = ${JSON.stringify(
+          favoriteSummonerChangedTierDto,
+        )}`,
+        error,
+      );
+      throw new InternalServerErrorException();
+    }
+  }
+
+  private async findFavoriteSummonersChangedTier(
+    summonerId: string,
+    offset: number,
+    limit: number,
+  ) {
+    return await this.changedTierApiQueryRepository.findChangedTierByPagination(
+      summonerId,
+      offset,
+      limit,
+    );
   }
 
   async deleteFavoriteSummoner(

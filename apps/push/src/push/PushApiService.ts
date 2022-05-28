@@ -89,8 +89,6 @@ export class PushApiService {
     tier: string,
     rank: string,
   ): Promise<Bull.Job<any>> {
-    await this.addChangeTierRank(puuid, summonerId, tier, rank, checkWinOrLose);
-
     if (checkWinOrLose === 'win') {
       return await this.addWinPushQueue(summonerId, summonerName);
     }
@@ -98,11 +96,23 @@ export class PushApiService {
       return await this.addLosePushQueue(summonerId, summonerName);
     }
     if (checkWinOrLose === 'tierUp' || checkWinOrLose === 'rankUp') {
-      // await this.addChangeTierRank(puuid, summonerId, tier, rank);
+      await this.addChangeTierRank(
+        puuid,
+        summonerId,
+        tier,
+        rank,
+        checkWinOrLose,
+      );
       return await this.addTierUpPushQueue(summonerId, summonerName);
     }
     if (checkWinOrLose === 'tierDown' || checkWinOrLose === 'rankDown') {
-      // await this.addChangeTierRank(puuid, summonerId, tier, rank);
+      await this.addChangeTierRank(
+        puuid,
+        summonerId,
+        tier,
+        rank,
+        checkWinOrLose,
+      );
       return await this.addTierDownPushQueue(summonerId, summonerName);
     }
     return;
@@ -131,10 +141,6 @@ export class PushApiService {
       const matchId: string = await this.riotApiJobService.recentMatchIdResult(
         puuid,
       );
-
-      // 테스트를 위한 임시 코드
-      if (status === 'win') status = 'tierUp';
-      if (status === 'lose') status = 'tierDown';
 
       const changedTier = await ChangedTier.createChangedTier(
         summonerId,
