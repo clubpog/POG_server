@@ -82,7 +82,13 @@ jobs:
         run: apt-get update && apt-get install -y postgresql-client
 
       - name: Test with DB
-        run: npx jest --runInBand --detectOpenHandles --forceExit
+        run: npx jest --coverage --detectOpenHandles --forceExit
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Success
         run: echo Test Completed Successfully.

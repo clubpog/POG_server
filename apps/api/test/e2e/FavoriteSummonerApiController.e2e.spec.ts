@@ -14,12 +14,14 @@ import { FavoriteSummoner } from '@app/entity/domain/favoriteSummoner/FavoriteSu
 import { SummonerRecord } from '@app/entity/domain/summonerRecord/SummonerRecord.entity';
 import { EventStoreTestServiceImplement } from '../../../../libs/cache/EventStoreTestService';
 import { EInfrastructureInjectionToken } from '@app/common-config/enum/InfrastructureInjectionToken';
+import { ChangedTier } from '@app/entity/domain/changedTier/ChangedTier.entity';
 
 describe('FavoriteSummonerApiController (e2e)', () => {
   let app: INestApplication;
   let userRepository: Repository<User>;
   let favoriteRepository: Repository<FavoriteSummoner>;
   let summonerRecordRepository: Repository<SummonerRecord>;
+  let changedTierRepository: Repository<ChangedTier>;
   let testUtils: TestUtils;
   let redisClient: EventStoreTestServiceImplement;
   let userToken: string;
@@ -37,6 +39,7 @@ describe('FavoriteSummonerApiController (e2e)', () => {
     redisClient = module.get<EventStoreTestServiceImplement>(
       EInfrastructureInjectionToken.EVENT_STORE.name,
     );
+    changedTierRepository = module.get(getRepositoryToken(ChangedTier));
 
     SetNestApp(app); // ClassSerializerInterceptor 적용
     await app.init();
@@ -45,6 +48,7 @@ describe('FavoriteSummonerApiController (e2e)', () => {
     await summonerRecordRepository.delete({});
     await redisClient.flushall();
     userToken = await testUtils.getDefaultUserToken();
+    await changedTierRepository.delete({});
   });
 
   afterAll(async () => {
@@ -57,6 +61,7 @@ describe('FavoriteSummonerApiController (e2e)', () => {
     await summonerRecordRepository.delete({});
     await redisClient.flushall();
     userToken = await testUtils.getDefaultUserToken();
+    await changedTierRepository.delete({});
   });
 
   it('/favoriteSummoner/v1 (POST)', async () => {

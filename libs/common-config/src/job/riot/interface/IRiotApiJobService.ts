@@ -2,4 +2,5 @@ import { PushRiotApi } from '../../../../../../apps/push/src/push/dto/PushRiotAp
 
 export interface IRiotApiJobService {
   soloRankResult(summonerId: string);
+  recentMatchIdResult(summonerId: string);
 }

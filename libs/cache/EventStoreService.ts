@@ -43,7 +43,7 @@ export class EventStoreServiceImplement implements IEventStoreService {
   ): Promise<void> {
     const redisClient = this.master;
 
-    const [win, lose, tier] = await this.summonerRecordMget(
+    const [win, lose, tier, rank] = await this.summonerRecordMget(
       favoriteSummonerDto.summonerId,
     );
 
@@ -65,6 +65,12 @@ export class EventStoreServiceImplement implements IEventStoreService {
         favoriteSummonerDto.tier,
       );
 
+    if (!rank)
+      await redisClient.set(
+        `summonerId:${favoriteSummonerDto.summonerId}:rank`,
+        favoriteSummonerDto.rank,
+      );
+
     await redisClient.sadd('summonerId', favoriteSummonerDto.summonerId);
   }
 
@@ -75,6 +81,7 @@ export class EventStoreServiceImplement implements IEventStoreService {
     await redisClient.del(`summonerId:${summonerId}:win`);
     await redisClient.del(`summonerId:${summonerId}:lose`);
     await redisClient.del(`summonerId:${summonerId}:tier`);
+    await redisClient.del(`summonerId:${summonerId}:rank`);
     await redisClient.srem('summonerId', summonerId);
     await redisClient.exec();
   }
@@ -88,6 +95,7 @@ export class EventStoreServiceImplement implements IEventStoreService {
       await redisClient.del(`summonerId:${summonerId}:lose`);
       await redisClient.del(`summonerId:${summonerId}:tier`);
       await redisClient.del(`summonerId:${summonerId}:win`);
+      await redisClient.del(`summonerId:${summonerId}:rank`);
       await redisClient.srem('summonerId', 'error');
 
       await redisClient.exec();
@@ -108,6 +116,8 @@ export class EventStoreServiceImplement implements IEventStoreService {
         riotApiResponse[0].lose,
         `summonerId:${summonerId}:tier`,
         riotApiResponse[0].tier,
+        `summonerId:${summonerId}:rank`,
+        riotApiResponse[0].rank,
       );
     } catch (error) {
       console.error(error);
@@ -123,6 +133,8 @@ export class EventStoreServiceImplement implements IEventStoreService {
       0,
       `summonerId:${summonerId}:tier`,
       '언랭',
+      `summonerId:${summonerId}:rank`,
+      '언랭',
     );
   }
   async summonerRecordMget(summonerId: string): Promise<string[]> {
@@ -131,6 +143,7 @@ export class EventStoreServiceImplement implements IEventStoreService {
       `summonerId:${summonerId}:win`,
       `summonerId:${summonerId}:lose`,
       `summonerId:${summonerId}:tier`,
+      `summonerId:${summonerId}:rank`,
     );
   }
 
