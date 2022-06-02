@@ -9,6 +9,7 @@ import { FavoriteSummonerModule } from '@app/entity/domain/favoriteSummoner/Favo
 import { SummonerRecordApiModule } from '../summonerRecord/SummonerRecordApiModule';
 import { SummonerRecordModule } from '@app/entity/domain/summonerRecord/SummonerRecordModule';
 import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRepository';
+import { ChangedTierApiModule } from '../changedTier/ChangedTierApiModule';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { FavoriteSummonerApiQueryRepository } from './FavoriteSummonerApiQueryRe
     SummonerRecordModule,
     WinstonModule.forRoot(getWinstonLogger(process.env.NODE_ENV, 'api')),
     SummonerRecordApiModule,
+    ChangedTierApiModule,
     EventStoreModule,
   ],
   controllers: [FavoriteSummonerApiController],

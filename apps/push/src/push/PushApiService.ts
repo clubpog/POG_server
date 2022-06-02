@@ -11,6 +11,10 @@ import { SummonerRecordApiQueryRepository } from '../summonerRecord/SummonerReco
 import { BullService } from '../../../../libs/entity/queue/src/lib/BullService';
 
 import { IPushApiTask } from './interface/IPushApiTask';
+import { ChangedTierApiQueryRepository } from '../changedTier/ChangedTierApiQueryRepository';
+import { ChangedTier } from '@app/entity/domain/changedTier/ChangedTier.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class PushApiService {
@@ -23,6 +27,9 @@ export class PushApiService {
     private readonly bullService?: BullService,
     @Inject(EApplicationInjectionToken.PUSH_API_TASK.name)
     private readonly tasks?: IPushApiTask,
+    private readonly changedTierApiQueryRepository?: ChangedTierApiQueryRepository,
+    @InjectRepository(ChangedTier)
+    private changedTierRepository?: Repository<ChangedTier>,
   ) {}
   @Interval('pushCronTask', 180000)
   async addMessageQueue(): Promise<void> {
@@ -52,6 +59,9 @@ export class PushApiService {
           await this.checkWinOrLose(riotApiResponse, redisResponse),
           summonerId,
           riotApiResponse[0].summonerName,
+          await this.findPuuid(summonerId),
+          riotApiResponse[0].tier,
+          riotApiResponse[0].rank,
         );
         // await this.addPushQueue(summonerId, riotApiResponse[0].summonerName);
 
@@ -75,6 +85,9 @@ export class PushApiService {
     checkWinOrLose: string,
     summonerId: string,
     summonerName: string,
+    puuid: string,
+    tier: string,
+    rank: string,
   ): Promise<Bull.Job<any>> {
     if (checkWinOrLose === 'win') {
       return await this.addWinPushQueue(summonerId, summonerName);
@@ -82,30 +95,92 @@ export class PushApiService {
     if (checkWinOrLose === 'lose') {
       return await this.addLosePushQueue(summonerId, summonerName);
     }
-    if (checkWinOrLose === 'tierUp') {
+
+    if (checkWinOrLose === 'tierUp' || checkWinOrLose === 'rankUp') {
+      await this.addChangeTierRank(
+        puuid,
+        summonerId,
+        tier,
+        rank,
+        checkWinOrLose,
+      );
       return await this.addTierUpPushQueue(summonerId, summonerName);
     }
-    if (checkWinOrLose === 'tierDown') {
+    if (checkWinOrLose === 'tierDown' || checkWinOrLose === 'rankDown') {
+      await this.addChangeTierRank(
+        puuid,
+        summonerId,
+        tier,
+        rank,
+        checkWinOrLose,
+      );
       return await this.addTierDownPushQueue(summonerId, summonerName);
     }
     return;
+  }
+
+  private async findPuuid(summonerId: string): Promise<string> {
+    try {
+      const findPuuid =
+        await this.summonerRecordApiQueryRepository.findOnePuuidAtSummonerRecord(
+          summonerId,
+        );
+      return findPuuid.puuid;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private async addChangeTierRank(
+    puuid: string,
+    summonerId: string,
+    tier: string,
+    rank: string,
+    status: string,
+  ) {
+    try {
+      const matchId: string = await this.riotApiJobService.recentMatchIdResult(
+        puuid,
+      );
+
+      const changedTier = await ChangedTier.createChangedTier(
+        summonerId,
+        matchId,
+        tier,
+        rank,
+        status,
+      );
+
+      await this.changedTierRepository.save(changedTier);
+    } catch (error) {
+      throw error;
+    }
   }
 
   private async checkWinOrLose(
     riotApiResponse: PushRiotApi,
     redisResponse: string[],
   ): Promise<string> {
-    const [win, lose, tier] = redisResponse;
+
+    const [win, lose, tier, rank] = redisResponse;
 
     if (riotApiResponse[0].win !== Number(win)) {
       if (riotApiResponse[0].tier !== tier) {
         return 'tierUp';
+      }
+
+      if (riotApiResponse[0].rank !== rank) {
+        return 'rankUp';
       }
       return 'win';
     }
     if (riotApiResponse[0].lose !== Number(lose)) {
       if (riotApiResponse[0].tier !== tier) {
         return 'tierDown';
+      }
+
+      if (riotApiResponse[0].rank !== rank) {
+        return 'rankDown';
       }
       return 'lose';
     }
@@ -115,7 +190,8 @@ export class PushApiService {
     riotApiResponse: PushRiotApi,
     redisResponse: string[],
   ): Promise<boolean> {
-    const [win, lose, tier] = redisResponse;
+    const [win, lose, tier, rank] = redisResponse;
+    if (riotApiResponse[0].rank !== rank) return true;
     if (riotApiResponse[0].tier !== tier) return true;
     if (riotApiResponse[0].win !== Number(win)) return true;
     if (riotApiResponse[0].lose !== Number(lose)) return true;
