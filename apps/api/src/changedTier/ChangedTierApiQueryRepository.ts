@@ -16,7 +16,7 @@ export class ChangedTierApiQueryRepository extends Repository<ChangedTier> {
       offset,
       limit,
     );
-    rows.map(row =>
+    rows.forEach(row =>
       changedTierArray.push(plainToInstance(ChangedTierPagination, row)),
     );
     return changedTierArray;
